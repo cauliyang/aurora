@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     let cy;
-    let walks = [];
+    const walks = [];
 
     // Fetching the data from the JSON file
     fetch("graphData.json")
