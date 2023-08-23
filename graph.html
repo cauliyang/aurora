@@ -6,13 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Visualization</title>
 
-    <!-- Including the main Cytoscape.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
-
-    <!-- Including the dagre library for layout -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
-
-    <!-- Including the Cytoscape.js integration for dagre -->
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
 
 
@@ -33,6 +28,14 @@
             border: 1px solid black;
             overflow-y: auto;
         }
+
+        #info {
+            width: 100%;
+            height: 48vh;
+            padding: 10px;
+            border: 1px solid black;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -40,6 +43,11 @@
     <div id="cy"></div>
     <div id="walks">
         <h3>Graph Walks:</h3>
+    </div>
+
+    <div id="info">
+        <h3>Information:</h3>
+        <!-- Attributes or information will be shown here -->
     </div>
 
     <script src="graph.js"></script>
