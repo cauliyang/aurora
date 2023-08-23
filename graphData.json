@@ -1,0 +1,76 @@
+{
+	"nodes": [
+		{ "data": { "id": "S1", "name": "S1" } },
+		{ "data": { "id": "S2", "name": "S2" } },
+		{ "data": { "id": "A", "name": "A" } },
+		{ "data": { "id": "B", "name": "B" } },
+		{ "data": { "id": "C", "name": "C" } },
+		{ "data": { "id": "D", "name": "D" } },
+		{ "data": { "id": "E", "name": "E" } }
+	],
+	"edges": [
+		{
+			"data": {
+				"id": "S1A",
+				"source": "S1",
+				"target": "A",
+				"label": "S1 to A",
+				"weight": 2
+			}
+		},
+		{
+			"data": {
+				"id": "AB",
+				"source": "A",
+				"target": "B",
+				"label": "A to B",
+				"weight": 3
+			}
+		},
+		{
+			"data": {
+				"id": "BS2",
+				"source": "B",
+				"target": "S2",
+				"label": "B to S2",
+				"weight": 4
+			}
+		},
+		{
+			"data": {
+				"id": "S1C",
+				"source": "S1",
+				"target": "C",
+				"label": "S1 to C",
+				"weight": 5
+			}
+		},
+		{
+			"data": {
+				"id": "CD",
+				"source": "C",
+				"target": "D",
+				"label": "C to D",
+				"weight": 1
+			}
+		},
+		{
+			"data": {
+				"id": "DE",
+				"source": "D",
+				"target": "E",
+				"label": "D to E",
+				"weight": 3
+			}
+		},
+		{
+			"data": {
+				"id": "ES2",
+				"source": "E",
+				"target": "S2",
+				"label": "E to S2",
+				"weight": 2
+			}
+		}
+	]
+}
