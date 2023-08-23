@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Visualization</title>
+
+    <!-- Including the main Cytoscape.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
+
+    <!-- Including the dagre library for layout -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
+
+    <!-- Including the Cytoscape.js integration for dagre -->
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
+
+
+    <style>
+        #cy {
+            width: 70%;
+            height: 500px;
+            display: inline-block;
+            border: 1px solid black;
+        }
+
+        #walks {
+            width: 28%;
+            height: 500px;
+            display: inline-block;
+            vertical-align: top;
+            padding: 10px;
+            border: 1px solid black;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cy"></div>
+    <div id="walks">
+        <h3>Graph Walks:</h3>
+    </div>
+
+    <script src="graph.js"></script>
+</body>
+
+</html>
