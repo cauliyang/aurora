@@ -51,6 +51,23 @@ function handleFileUpload(event) {
 	}
 }
 
+document.getElementById("resetGraph").addEventListener("click", function () {
+	// Reset layout to default
+	resetPreviousElementStyle();
+	previousClickedElement = null;
+	previousClickedElementStyle = null;
+	cy.elements().removeClass("highlighted");
+	layoutSelect.value = "dagre";
+	cy.layout({
+		name: "dagre",
+		animate: true,
+		fit: true,
+		padding: 10,
+		avoidOverlap: true,
+		rankDir: "LR",
+	}).run();
+});
+
 document.getElementById("captureGraph").addEventListener("click", function () {
 	// Get the base64 representation of the graph
 	const base64Image = cy.png();

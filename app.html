@@ -35,14 +35,15 @@
         <div id="top-container">
             <div style="position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; gap: 10px;">
 
-                <button id="toggleMaximize">Maximize Graph</button>
+                <button id="toggleMaximize" class="ui-button">Maximize</button>
 
                 <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload">
                     <input type="file" name="file" accept=".json" style="display: none;" id="uploadInput">
-                    <label for="uploadInput" class="uploadLabel">Upload and Visualize</label>
+                    <label for="uploadInput" class="ui-button">Upload</label>
                 </form>
 
-                <button id="captureGraph">Capture Graph</button>
+                <button id="captureGraph" , class="ui-button">Capture</button>
+                <button id="resetGraph" , class="ui-button">Reset</button>
 
                 <!-- Add the select element for layout options -->
                 <select id="layoutSelect">
