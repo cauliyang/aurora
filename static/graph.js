@@ -14,6 +14,19 @@ function loadGraphDataFromServer(data) {
 	setupGraphInteractions();
 }
 
+document.getElementById("captureGraph").addEventListener("click", function () {
+	// Get the base64 representation of the graph
+	const base64Image = cy.png();
+
+	// Create a new anchor element to enable downloading
+	const downloadLink = document.createElement("a");
+	downloadLink.href = base64Image;
+	downloadLink.download = "graph_capture.png";
+
+	// Trigger the download
+	downloadLink.click();
+});
+
 // Handle file selection and send it to the server without submitting the form
 document.getElementById("uploadInput").addEventListener("change", function (e) {
 	if (this.files.length) {
