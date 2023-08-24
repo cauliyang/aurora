@@ -126,6 +126,8 @@ document.addEventListener("DOMContentLoaded", function () {
 				.map((node) => node.id())
 				.join(" -> ")}`;
 
+			walkDiv.title = "Click to highlight this walk in the graph"; // Tooltip
+
 			// Add a click event to each walk element
 			walkDiv.addEventListener("click", function () {
 				highlightWalk(walk);
