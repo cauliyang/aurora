@@ -1,21 +1,21 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f8f8f8;
-}
+/* body { */
+/*   font-family: Arial, sans-serif; */
+/*   margin: 0; */
+/*   padding: 0; */
+/*   background-color: #f8f8f8; */
+/* } */
 
 #container {
   width: 100%;
-  height: 95vh;
+  height: 100vh;
   background-color: #fff;
-  border-radius: 5px;
+  border-radius: 2px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 #top-container {
-  height: 75%;
+  height: 70%;
   display: flex;
   background-color: #fafafa;
 }
