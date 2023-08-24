@@ -99,6 +99,26 @@
             background-color: #0056b3;
         }
 
+        #captureGraph {
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #captureGraph:hover {
+            background-color: #0056b3;
+        }
+
+
+
         .gutter {
             background-repeat: no-repeat;
             background-position: center;
@@ -114,16 +134,15 @@
 <body>
     <div id="container">
         <div id="top-container">
-            <!-- Upload form and button -->
+            <div style="position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; gap: 10px;">
+                <button id="toggleMaximize">Maximize Graph</button>
+                <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload">
+                    <input type="file" name="file" accept=".json" style="display: none;" id="uploadInput">
+                    <label for="uploadInput" class="uploadLabel">Upload and Visualize</label>
+                </form>
+                <button id="captureGraph">Capture Graph</button>
+            </div>
 
-            <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload"
-                style="position: absolute; top: 10px; left: 140px; z-index: 1;">
-                <input type="file" name="file" accept=".json" style="display: none;" id="uploadInput">
-                <label for="uploadInput" class="uploadLabel">Upload and Visualize</label>
-            </form>
-
-            <button id="toggleMaximize" style="position: absolute; top: 10px; left: 10px; z-index: 1;">Maximize
-                Graph</button>
 
             <div id="cy"></div>
             <div id="walks">
