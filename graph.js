@@ -100,6 +100,21 @@ document.addEventListener("DOMContentLoaded", function () {
 					cy.elements().removeClass("highlighted");
 				}
 			});
+			// Split between #cy and #walks
+			Split(["#cy", "#walks"], {
+				sizes: [70, 30],
+				minSize: [100, 100],
+				gutterSize: 5,
+				direction: "horizontal", // this will make them side-by-side
+			});
+
+			// Split between #top-container and #info
+			Split(["#top-container", "#info"], {
+				sizes: [75, 25],
+				minSize: [100, 100],
+				gutterSize: 5,
+				direction: "vertical", // this will make #info below #top-container
+			});
 		})
 		.catch((error) => console.error("Failed to fetch graph data:", error));
 });
