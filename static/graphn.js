@@ -5,11 +5,6 @@ let previousClickedElementStyle = null;
 let isMaximized = false; // A flag to keep track of the current view state
 
 function loadGraphDataFromServer(graphData) {
-	// console.log("Graph data received:", data.jsonfile);
-
-	// Parse the JSON string to an object
-	// const graphData = JSON.parse(data.jsonfile);
-
 	initializeGraph(graphData);
 	setupGraphInteractions();
 }
