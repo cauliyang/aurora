@@ -1,7 +1,7 @@
-document.addEventListener("DOMContentLoaded", function () {
-	let cy;
-	const walks = [];
+const walks = [];
+let cy;
 
+document.addEventListener("DOMContentLoaded", function () {
 	// Fetching the data from the JSON file
 	fetch("graphData.json")
 		.then((response) => response.json())
@@ -102,102 +102,101 @@ document.addEventListener("DOMContentLoaded", function () {
 			});
 		})
 		.catch((error) => console.error("Failed to fetch graph data:", error));
+});
 
-	function dfs(node, currentPath, sinkNodes) {
-		currentPath.push(node);
+function highlightWalk(walk) {
+	// Reset any previously highlighted nodes or edges
+	cy.elements().removeClass("highlighted");
+	for (let i = 0; i < walk.length; i++) {
+		// Highlight every node in the walk
+		walk[i].addClass("highlighted");
 
-		if (sinkNodes.includes(node)) {
-			walks.push([...currentPath]); // Found a path
-		} else {
-			let neighbors = node.outgoers().nodes();
-			neighbors.forEach((neighbor) => {
-				dfs(neighbor, currentPath, sinkNodes);
-			});
+		// If it's not the last node in the walk, highlight the edge to the next node
+		if (i < walk.length - 1) {
+			let currentNode = walk[i];
+			let nextNode = walk[i + 1];
+			let connectingEdge = currentNode.edgesTo(nextNode);
+			connectingEdge.addClass("highlighted");
 		}
-
-		currentPath.pop(); // backtrack
 	}
+}
+function dfs(node, currentPath, sinkNodes) {
+	currentPath.push(node);
 
-	function displayWalks() {
-		let walksContainer = document.getElementById("walks");
-		walks.forEach((walk, index) => {
-			let walkDiv = document.createElement("div");
-			walkDiv.textContent = `Walk ${index + 1}: ${walk
-				.map((node) => node.id())
-				.join(" -> ")}`;
-
-			walkDiv.title = "Click to highlight this walk in the graph"; // Tooltip
-
-			// Add a click event to each walk element
-			walkDiv.addEventListener("click", function () {
-				highlightWalk(walk);
-			});
-
-			walksContainer.appendChild(walkDiv);
+	if (sinkNodes.includes(node)) {
+		walks.push([...currentPath]); // Found a path
+	} else {
+		let neighbors = node.outgoers().nodes();
+		neighbors.forEach((neighbor) => {
+			dfs(neighbor, currentPath, sinkNodes);
 		});
 	}
 
-	function highlightWalk(walk) {
-		// Reset any previously highlighted nodes or edges
-		cy.elements().removeClass("highlighted");
-		for (let i = 0; i < walk.length; i++) {
-			// Highlight every node in the walk
-			walk[i].addClass("highlighted");
+	currentPath.pop(); // backtrack
+}
 
-			// If it's not the last node in the walk, highlight the edge to the next node
-			if (i < walk.length - 1) {
-				let currentNode = walk[i];
-				let nextNode = walk[i + 1];
-				let connectingEdge = currentNode.edgesTo(nextNode);
-				connectingEdge.addClass("highlighted");
-			}
-		}
-	}
+function setupClickEvent() {
+	cy.on("tap", "node, edge", function (evt) {
+		let element = evt.target;
 
-	function setupClickEvent() {
-		cy.on("tap", "node, edge", function (evt) {
-			let element = evt.target;
+		let infoContainer = document.getElementById("info");
+		let infoHtml = "";
 
-			let info = "";
-			if (element.isNode()) {
-				info = `Node Information:\n\nID: ${element.id()}\nData: ${JSON.stringify(
-					element.data(),
-				)}`;
-			} else if (element.isEdge()) {
-				info = `Edge Information:\n\nSource: ${element
-					.source()
-					.id()}\nTarget: ${element.target().id()}\nData: ${JSON.stringify(
-					element.data(),
-				)}`;
-			}
-
-			alert(info);
-		});
-	}
-
-	function setupClickEvent() {
-		cy.on("tap", "node, edge", function (evt) {
-			let element = evt.target;
-
-			let infoContainer = document.getElementById("info");
-			let infoHtml = "";
-
-			if (element.isNode()) {
-				infoHtml = `
+		if (element.isNode()) {
+			infoHtml = `
                     <h4>Node Information:</h4>
                     <p><strong>ID:</strong> ${element.id()}</p>
                     <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>
                 `;
-			} else if (element.isEdge()) {
-				infoHtml = `
+		} else if (element.isEdge()) {
+			infoHtml = `
                     <h4>Edge Information:</h4>
                     <p><strong>Source:</strong> ${element.source().id()}</p>
                     <p><strong>Target:</strong> ${element.target().id()}</p>
                     <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>
                 `;
-			}
+		}
 
-			infoContainer.innerHTML = infoHtml;
+		infoContainer.innerHTML = infoHtml;
+	});
+}
+
+function setupClickEvent() {
+	cy.on("tap", "node, edge", function (evt) {
+		let element = evt.target;
+
+		let info = "";
+		if (element.isNode()) {
+			info = `Node Information:\n\nID: ${element.id()}\nData: ${JSON.stringify(
+				element.data(),
+			)}`;
+		} else if (element.isEdge()) {
+			info = `Edge Information:\n\nSource: ${element
+				.source()
+				.id()}\nTarget: ${element.target().id()}\nData: ${JSON.stringify(
+				element.data(),
+			)}`;
+		}
+
+		alert(info);
+	});
+}
+
+function displayWalks() {
+	let walksContainer = document.getElementById("walks");
+	walks.forEach((walk, index) => {
+		let walkDiv = document.createElement("div");
+		walkDiv.textContent = `Walk ${index + 1}: ${walk
+			.map((node) => node.id())
+			.join(" -> ")}`;
+
+		walkDiv.title = "Click to highlight this walk in the graph"; // Tooltip
+
+		// Add a click event to each walk element
+		walkDiv.addEventListener("click", function () {
+			highlightWalk(walk);
 		});
-	}
-});
+
+		walksContainer.appendChild(walkDiv);
+	});
+}
