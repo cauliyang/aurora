@@ -3,6 +3,28 @@ let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
 
+let isMaximized = false; // A flag to keep track of the current view state
+
+function toggleView() {
+	if (isMaximized) {
+		// Restore the original view
+		document.getElementById("cy").style.width = "75%";
+		document.getElementById("walks").style.display = "block";
+		// document.getElementById("info").style.display = "block";
+		document.getElementById("toggleMaximize").textContent = "Maximize Graph";
+		cy.resize(); // Make sure Cytoscape adjusts to the new size
+	} else {
+		// Maximize the graph view and hide other panels
+		document.getElementById("cy").style.width = "100%";
+		document.getElementById("walks").style.display = "none";
+		// document.getElementById("info").style.display = "none";
+		document.getElementById("toggleMaximize").textContent = "Restore View";
+		cy.resize(); // Make sure Cytoscape adjusts to the new size
+	}
+
+	isMaximized = !isMaximized; // Toggle the flag
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 	// Fetching the data from the JSON file
 	fetch("graphData.json")
@@ -106,6 +128,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			displayWalks();
 			setupClickEvent();
+
+			document
+				.getElementById("toggleMaximize")
+				.addEventListener("click", toggleView);
 
 			// Split between #cy and #walks
 			Split(["#cy", "#walks"], {
