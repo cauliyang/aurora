@@ -4,6 +4,24 @@ let previousClickedElement = null;
 let previousClickedElementStyle = null;
 let isMaximized = false; // A flag to keep track of the current view state
 
+// Get the "Change Layout" button element
+const layoutSelect = document.getElementById("layoutSelect");
+
+layoutSelect.addEventListener("change", () => {
+	// Get the selected layout from the select element
+	const selectedLayout = layoutSelect.value;
+
+	// Apply the chosen layout
+	cy.layout({
+		name: selectedLayout,
+		animate: true, // You can adjust animation settings if needed
+		fit: true,
+		padding: 10,
+		avoidOverlap: true,
+		rankDir: "LR",
+	}).run();
+});
+
 function loadGraphDataFromServer(graphData) {
 	initializeGraph(graphData);
 	setupGraphInteractions();
@@ -45,32 +63,6 @@ document.getElementById("captureGraph").addEventListener("click", function () {
 	// Trigger the download
 	downloadLink.click();
 });
-
-// // Handle file selection and send it to the server without submitting the form
-// document.getElementById("uploadInput").addEventListener("change", function(e) {
-//     if (this.files.length) {
-//         const formData = new FormData();
-//         formData.append("file", this.files[0]);
-
-//         fetch("/upload", {
-//             method: "POST",
-//             body: formData,
-//         })
-//             .then((response) => {
-//                 if (!response.ok) {
-//                     throw new Error("Network response was not ok");
-//                 }
-//                 return response.json();
-//             })
-//             .then((data) => {
-//                 console.log("Data from /upload:", data);
-//                 loadGraphDataFromServer(data);
-//             })
-//             .catch((error) => {
-//                 console.error("Error:", error);
-//             });
-//     }
-// });
 
 document.addEventListener("DOMContentLoaded", function () {
 	console.log("DOM Loaded");

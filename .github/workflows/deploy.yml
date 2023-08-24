@@ -13,27 +13,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-build-
-            ${{ runner.OS }}-
-
-      - name: Install Dependencies (if cache miss)
-        if: steps.cache-primes.outputs.cache-hit != 'true'
-        run: npm install
-
-      - name: Build (if cache miss)
-        if: steps.cache-primes.outputs.cache-hit != 'true'
-        run: npm run build
-
       - name: Move to Subpath Folder
         run: |
           mkdir aurora
-          mv dist/* aurora/
+          cp index.html aurora/
+          cp -r static aurora/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.4.3

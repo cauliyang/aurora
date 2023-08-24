@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<base href="/aurora/">
+<!-- <base href="/aurora/"> -->
 
 <head>
     <meta charset="UTF-8">
@@ -28,6 +28,15 @@
                     <label for="uploadInput" class="uploadLabel">Upload and Visualize</label>
                 </form>
                 <button id="captureGraph">Capture Graph</button>
+
+                <!-- Add the select element for layout options -->
+                <select id="layoutSelect">
+                    <option value="grid">Grid Layout</option>
+                    <option value="circle">Circle Layout</option>
+                    <option value="cose">Compound Spring Embedder Layout</option>
+                    <option value="dagre">Directed Acyclic Graph Layout</option>
+                    <!-- Add more layout options as needed -->
+                </select>
             </div>
 
 
