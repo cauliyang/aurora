@@ -39,47 +39,46 @@
         style="position: absolute; display: none; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 5px; border-radius: 5px;">
     </div>
 
-    <div id="container">
-        <div id="top-container">
-            <div style="position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; gap: 10px;">
+    <div class="container-fluid h-100 p-3">
+        <div class="row h-100">
+            <div class="col-12 position-relative mb-2">
+                <div class="d-flex gap-2" style="position: absolute; top: 10px; left: 10px; z-index: 1;">
 
-                <button id="toggleMaximize" class="myui-button">Maximize</button>
+                    <button id="toggleMaximize" class="btn btn-outline-primary">Maximize</button>
 
-                <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload">
-                    <input type="file" name="file" accept=".json" style="display: none;" id="uploadInput">
-                    <label for="uploadInput" class="myui-button">Upload</label>
-                </form>
+                    <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload"
+                        class="d-inline-block">
+                        <input type="file" name="file" accept=".json" class="d-none" id="uploadInput">
+                        <label for="uploadInput" class="btn btn-outline-primary">Upload</label>
+                    </form>
 
-                <button id="captureGraph" , class="myui-button">Capture</button>
-                <button id="resetGraph" , class="myui-button">Reset</button>
+                    <button id="captureGraph" class="btn btn-outline-primary">Capture</button>
+                    <button id="resetGraph" class="btn btn-outline-primary">Reset</button>
+                    <button id="openJsonEditor" type="button" class="btn btn-primary">Open JSON Editor</button>
 
-                <button id="openJsonEditor" type="button" class="btn btn-primary">
-                    Open JSON Editor
-                </button>
+                    <select id="layoutSelect" class="form-select w-auto">
+                        <option value="dagre">DAG Layout</option>
+                        <option value="grid">Grid Layout</option>
+                        <option value="circle">Circle Layout</option>
+                        <option value="cose">CSE Layout</option>
+                        <!-- Add more layout options as needed -->
+                    </select>
 
 
-                <!-- Add the select element for layout options -->
-                <select id="layoutSelect">
-                    <option value="dagre">DAG Layout</option>
-                    <option value="grid">Grid Layout</option>
-                    <option value="circle">Circle Layout</option>
-                    <option value="cose">CSE Layout</option>
-                    <!-- Add more layout options as needed -->
-                </select>
+                </div>
             </div>
-
-
-            <div id="cy"></div>
-            <div id="walks">
-                <h3>Graph Walks:</h3>
+            <div id="top-container" class="col-12 d-flex h-70">
+                <div class="flex-grow-1" id="cy"></div>
+                <div class="flex-grow-1" id="walks">
+                    <h3>Graph Walks:</h3>
+                </div>
             </div>
-        </div>
-        <div id="info">
-            <h3>Node/Edge Info:</h3>
-            <div id="info-content"></div>
+            <div class="col-12 h-30" id="info">
+                <h3>Node/Edge Info:</h3>
+                <div id="info-content"></div>
+            </div>
         </div>
     </div>
-
 
     <!-- Modal for JSON Editor -->
     <div class="modal fade" id="jsonModal" tabindex="-1" aria-labelledby="jsonModalLabel" aria-hidden="true">

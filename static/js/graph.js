@@ -11,6 +11,8 @@ layoutSelect.addEventListener("change", () => {
 	// Get the selected layout from the select element
 	const selectedLayout = layoutSelect.value;
 
+	if (cy === undefined) return;
+
 	// Apply the chosen layout
 	cy.layout({
 		name: selectedLayout,
@@ -83,6 +85,22 @@ document.getElementById("captureGraph").addEventListener("click", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
 	console.log("DOM Loaded");
+
+	// Split between #cy and #walks
+	Split(["#cy", "#walks"], {
+		sizes: [67, 33], // This will give the cy panel 67% width initially and walks panel 33% width initially.
+		minSize: [100, 100],
+		gutterSize: 5,
+		direction: "horizontal",
+	});
+
+	// Split between the top panels (#cy and #walks combined) and #info
+	Split(["#top-container", "#info"], {
+		sizes: [70, 30], // This will give the top container 70% height initially and info panel 30% height initially.
+		minSize: [100, 100],
+		gutterSize: 5,
+		direction: "vertical",
+	});
 });
 
 function initializeGraph(graphData) {
@@ -224,22 +242,6 @@ function setupGraphInteractions() {
 	document
 		.getElementById("toggleMaximize")
 		.addEventListener("click", toggleView);
-	// Split between #cy and #walks
-
-	Split(["#cy", "#walks"], {
-		sizes: [70, 30],
-		minSize: [100, 100],
-		gutterSize: 5,
-		direction: "horizontal", // this will make them side-by-side
-	});
-
-	// Split between #top-container and #info
-	Split(["#top-container", "#info"], {
-		sizes: [75, 25],
-		minSize: [100, 100],
-		gutterSize: 5,
-		direction: "vertical", // this will make #info below #top-container
-	});
 }
 
 function displayWalks() {
@@ -264,24 +266,40 @@ function displayWalks() {
 		walksContainer.appendChild(walkDiv);
 	});
 }
-
 function toggleView() {
 	if (isMaximized) {
 		// Restore the original view
-		document.getElementById("cy").style.width = "75%";
+		document.getElementById("cy").style.width = "70%";
+		document.getElementById("cy").style.height = "75%";
+		document.getElementById("walks").style.width = "30%";
 		document.getElementById("walks").style.display = "block";
-		// document.getElementById("info").style.display = "block";
+		document.getElementById("info").style.display = "block";
 		document.getElementById("toggleMaximize").textContent = "Maximize Graph";
-		cy.resize(); // Make sure Cytoscape adjusts to the new size
+
+		// We reinitialize the Split.js with the original configuration
+		Split(["#cy", "#walks"], {
+			sizes: [70, 30],
+			minSize: [100, 100],
+			gutterSize: 5,
+			direction: "horizontal",
+		});
+
+		Split(["#top-container", "#info"], {
+			sizes: [75, 25],
+			minSize: [100, 100],
+			gutterSize: 5,
+			direction: "vertical",
+		});
 	} else {
 		// Maximize the graph view and hide other panels
-		document.getElementById("cy").style.width = "100%";
+		document.getElementById("cy").style.width = "100vw";
+		document.getElementById("cy").style.height = "100vh";
 		document.getElementById("walks").style.display = "none";
-		// document.getElementById("info").style.display = "none";
+		document.getElementById("info").style.display = "none";
 		document.getElementById("toggleMaximize").textContent = "Restore View";
-		cy.resize(); // Make sure Cytoscape adjusts to the new size
 	}
 
+	cy.resize(); // Make sure Cytoscape adjusts to the new size
 	isMaximized = !isMaximized; // Toggle the flag
 }
 
