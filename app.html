@@ -14,6 +14,15 @@
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.css" rel="stylesheet"
+        type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.js"></script>
 
     <!-- PERFORMANCE -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -30,34 +39,24 @@
         style="position: absolute; display: none; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 5px; border-radius: 5px;">
     </div>
 
-
     <div id="container">
         <div id="top-container">
             <div style="position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; gap: 10px;">
 
-                <button id="toggleMaximize" class="ui-button">Maximize</button>
+                <button id="toggleMaximize" class="myui-button">Maximize</button>
 
                 <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload">
                     <input type="file" name="file" accept=".json" style="display: none;" id="uploadInput">
-                    <label for="uploadInput" class="ui-button">Upload</label>
+                    <label for="uploadInput" class="myui-button">Upload</label>
                 </form>
 
-                <button id="captureGraph" , class="ui-button">Capture</button>
-                <button id="resetGraph" , class="ui-button">Reset</button>
+                <button id="captureGraph" , class="myui-button">Capture</button>
+                <button id="resetGraph" , class="myui-button">Reset</button>
 
+                <button id="openJsonEditor" type="button" class="btn btn-primary">
+                    Open JSON Editor
+                </button>
 
-
-                <!-- The Modal -->
-                <div id="pasteModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Paste Your JSON Data</h2>
-                        <textarea id="jsonDataInput" rows="10" cols="50"></textarea>
-                        <button id="submitJsonData">Submit</button>
-                    </div>
-                </div>
-
-                <button id="openPasteModal">Paste JSON Data</button>
 
                 <!-- Add the select element for layout options -->
                 <select id="layoutSelect">
@@ -81,7 +80,30 @@
         </div>
     </div>
 
+
+    <!-- Modal for JSON Editor -->
+    <div class="modal fade" id="jsonModal" tabindex="-1" aria-labelledby="jsonModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jsonModalLabel">Edit JSON Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="jsoneditor"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        id="closeEditor">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveEditedJson">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="static/js/graph.js"></script>
+    <script src="static/js/events.js"></script>
 
 
     <footer role="contentinfo" class="ui-section-footer">
