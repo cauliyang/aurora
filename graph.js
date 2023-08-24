@@ -17,6 +17,21 @@ document.addEventListener("DOMContentLoaded", function () {
 				},
 				style: [
 					{
+						selector: ".highlighted",
+						style: {
+							"border-width": "2px",
+							"border-color": "#FF5733",
+						},
+					},
+					{
+						selector: "edge.highlighted",
+						style: {
+							width: "4px",
+							"line-color": "#FF5733",
+							"target-arrow-color": "#FF5733",
+						},
+					},
+					{
 						selector: "node",
 						style: {
 							label: "data(name)",
@@ -26,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 					{
 						selector: "node[source-node]",
 						style: {
-							"background-color": "#FF5733",
+							"background-color": "#00FF00",
 						},
 					},
 					{
@@ -79,6 +94,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			displayWalks();
 			setupClickEvent();
+
+			cy.on("tap", function (evt) {
+				if (evt.target === cy) {
+					cy.elements().removeClass("highlighted");
+				}
+			});
 		})
 		.catch((error) => console.error("Failed to fetch graph data:", error));
 
@@ -104,8 +125,31 @@ document.addEventListener("DOMContentLoaded", function () {
 			walkDiv.textContent = `Walk ${index + 1}: ${walk
 				.map((node) => node.id())
 				.join(" -> ")}`;
+
+			// Add a click event to each walk element
+			walkDiv.addEventListener("click", function () {
+				highlightWalk(walk);
+			});
+
 			walksContainer.appendChild(walkDiv);
 		});
+	}
+
+	function highlightWalk(walk) {
+		// Reset any previously highlighted nodes or edges
+		cy.elements().removeClass("highlighted");
+		for (let i = 0; i < walk.length; i++) {
+			// Highlight every node in the walk
+			walk[i].addClass("highlighted");
+
+			// If it's not the last node in the walk, highlight the edge to the next node
+			if (i < walk.length - 1) {
+				let currentNode = walk[i];
+				let nextNode = walk[i + 1];
+				let connectingEdge = currentNode.edgesTo(nextNode);
+				connectingEdge.addClass("highlighted");
+			}
+		}
 	}
 
 	function setupClickEvent() {
