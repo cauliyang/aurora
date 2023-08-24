@@ -45,6 +45,20 @@
                 <button id="captureGraph" , class="ui-button">Capture</button>
                 <button id="resetGraph" , class="ui-button">Reset</button>
 
+
+
+                <!-- The Modal -->
+                <div id="pasteModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>Paste Your JSON Data</h2>
+                        <textarea id="jsonDataInput" rows="10" cols="50"></textarea>
+                        <button id="submitJsonData">Submit</button>
+                    </div>
+                </div>
+
+                <button id="openPasteModal">Paste JSON Data</button>
+
                 <!-- Add the select element for layout options -->
                 <select id="layoutSelect">
                     <option value="dagre">DAG Layout</option>

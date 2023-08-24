@@ -166,6 +166,7 @@ function initializeGraph(graphData) {
 		}
 	});
 
+	walks.length = 0;
 	const sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
 	const sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
 
@@ -243,6 +244,10 @@ function setupGraphInteractions() {
 
 function displayWalks() {
 	const walksContainer = document.getElementById("walks");
+
+	// Clear previous walks display
+	walksContainer.innerHTML = "<h3>Graph Walks:</h3>";
+
 	walks.forEach((walk, index) => {
 		const walkDiv = document.createElement("div");
 		walkDiv.textContent = `Walk ${index + 1}: ${walk
@@ -364,3 +369,41 @@ function setupClickEvent() {
 		infoContainer.innerHTML = infoHtml;
 	});
 }
+
+// Get modal and related elements
+const modal = document.getElementById("pasteModal");
+const openModalButton = document.getElementById("openPasteModal");
+const closeModalButton = document.querySelector(".close");
+const jsonDataInput = document.getElementById("jsonDataInput");
+const submitJsonDataButton = document.getElementById("submitJsonData");
+
+// Event to open the modal
+openModalButton.addEventListener("click", function () {
+	modal.style.display = "block";
+});
+
+// Event to close the modal
+closeModalButton.addEventListener("click", function () {
+	modal.style.display = "none";
+});
+
+// Event to handle JSON data submission
+submitJsonDataButton.addEventListener("click", function () {
+	const jsonData = jsonDataInput.value;
+	try {
+		const parsedData = JSON.parse(jsonData);
+		// Reset panels before visualizing new data
+		loadGraphDataFromServer(parsedData); // Assuming you have this function from your previous code
+		modal.style.display = "none"; // Close modal after successful processing
+	} catch (error) {
+		console.error("Error parsing JSON:", error);
+		alert("Invalid JSON data.");
+	}
+});
+
+// Event to close the modal when clicking outside of it
+window.addEventListener("click", function (event) {
+	if (event.target === modal) {
+		modal.style.display = "none";
+	}
+});
