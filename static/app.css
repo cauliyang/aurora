@@ -62,24 +62,9 @@ h3 {
   margin-top: 0;
   color: #333;
   border-bottom: 1px solid #e4e4e4;
-  padding-bottom: 5px;
-}
-
-.myui-button {
-  background-color: #007bff;
-  border: none;
-  color: white;
-  padding: 4px 6px;
-  text-align: center;
-  display: inline-block;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-#myui-button:hover {
-  background-color: #0056b3;
+  padding-bottom: 2px;
+  font-size: 14px; /* reduced font size */
+  margin-bottom: 5px; /* added margin-bottom for spacing */
 }
 
 .gutter {
