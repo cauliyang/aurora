@@ -2,7 +2,6 @@ const walks = [];
 let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
-let isMaximized = false; // A flag to keep track of the current view state
 
 // Get the "Change Layout" button element
 const layoutSelect = document.getElementById("layoutSelect");
@@ -208,10 +207,6 @@ function setupGraphInteractions() {
 	displayWalks();
 	setupClickEvent();
 	createTooltip();
-
-	document
-		.getElementById("toggleMaximize")
-		.addEventListener("click", toggleView);
 }
 
 function displayWalks() {
@@ -235,42 +230,6 @@ function displayWalks() {
 
 		walksContainer.appendChild(walkDiv);
 	});
-}
-function toggleView() {
-	if (isMaximized) {
-		// Restore the original view
-		document.getElementById("cy").style.width = "70%";
-		document.getElementById("cy").style.height = "75%";
-		document.getElementById("walks").style.width = "30%";
-		document.getElementById("walks").style.display = "block";
-		document.getElementById("info").style.display = "block";
-		document.getElementById("toggleMaximize").textContent = "Maximize Graph";
-
-		// We reinitialize the Split.js with the original configuration
-		Split(["#cy", "#walks"], {
-			sizes: [70, 30],
-			minSize: [100, 100],
-			gutterSize: 5,
-			direction: "horizontal",
-		});
-
-		Split(["#top-container", "#info"], {
-			sizes: [75, 25],
-			minSize: [100, 100],
-			gutterSize: 5,
-			direction: "vertical",
-		});
-	} else {
-		// Maximize the graph view and hide other panels
-		document.getElementById("cy").style.width = "100vw";
-		document.getElementById("cy").style.height = "100vh";
-		document.getElementById("walks").style.display = "none";
-		document.getElementById("info").style.display = "none";
-		document.getElementById("toggleMaximize").textContent = "Restore View";
-	}
-
-	cy.resize(); // Make sure Cytoscape adjusts to the new size
-	isMaximized = !isMaximized; // Toggle the flag
 }
 
 function highlightWalk(walk) {
