@@ -3,24 +3,41 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master # or main, depending on your default branch
+      - master
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install Dependencies (if you have any)
-        run: npm install # or yarn install, depending on your preference
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
 
-      - name: Build (if you have a build script)
-        run: npm run build # adjust this if you have a different build command
+      - name: Install Dependencies (if cache miss)
+        if: steps.cache-primes.outputs.cache-hit != 'true'
+        run: npm install
+
+      - name: Build (if cache miss)
+        if: steps.cache-primes.outputs.cache-hit != 'true'
+        run: npm run build
+
+      - name: Move to Subpath Folder
+        run: |
+          mkdir aurora
+          mv dist/* aurora/
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@4.4.3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: dist # The folder the action should deploy. Change to the folder where your build command puts its output, if you have one.
+          BRANCH: gh-pages
+          FOLDER: aurora
