@@ -157,6 +157,36 @@ function initializeGraph(graphData) {
 	});
 }
 
+function createTooltipContent(elementData) {
+	let content = "<ul>";
+	for (const key in elementData) {
+		// rome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
+		if (elementData.hasOwnProperty(key)) {
+			content += `<li><strong>${key}:</strong> ${elementData[key]}</li>`;
+		}
+	}
+	content += "</ul>";
+	return content;
+}
+
+function createTooltip() {
+	cy.on("mouseover", "node, edge", function (event) {
+		const target = event.target;
+		const elementData = target.data();
+
+		const tooltip = document.getElementById("tooltip");
+		tooltip.innerHTML = createTooltipContent(elementData);
+		tooltip.style.display = "block";
+		tooltip.style.left = `${event.originalEvent.pageX}px`;
+		tooltip.style.top = `${event.originalEvent.pageY}px`;
+	});
+
+	cy.on("mouseout", "node, edge", function () {
+		const tooltip = document.getElementById("tooltip");
+		tooltip.style.display = "none";
+	});
+}
+
 function setupGraphInteractions() {
 	// ... [Your cy.on("tap", ...), displayWalks(), setupClickEvent(), and Split functions calls]
 	cy.on("tap", function (evt) {
@@ -171,12 +201,13 @@ function setupGraphInteractions() {
 
 	displayWalks();
 	setupClickEvent();
+	createTooltip();
 
 	document
 		.getElementById("toggleMaximize")
 		.addEventListener("click", toggleView);
-
 	// Split between #cy and #walks
+
 	Split(["#cy", "#walks"], {
 		sizes: [70, 30],
 		minSize: [100, 100],
