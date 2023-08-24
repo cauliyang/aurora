@@ -26,25 +26,25 @@ git clone https://github.com/your-username/Aurora.git
 cd Aurora
 ```
 
--. Install the required dependencies:
+- Install the required dependencies:
 
-    ```bash
-    npm install
-    ```
+  ```bash
+  npm install
+  ```
 
--. Build the project:
+- Build the project:
 
 ```bash
 npm run build
 ```
 
--. Start the development server:
+- Start the development server:
 
 ```bash
 npm start
 ```
 
--. Open your web browser and access the application at http://localhost:3000/aurora/.
+- Open your web browser and access the application at http://localhost:3000/aurora/.
 
 ## Usage
 
