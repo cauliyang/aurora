@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- <base href="/aurora/"> -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Visualization</title>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
+
+
+    <!-- PERFORMANCE -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <link rel="preload" as="style" href="static/style.css">
+    <link rel="stylesheet" href="static/style.css">
+
+    <link rel="stylesheet" href="static/app.css">
+
+</head>
+
+<body>
+    <div id="tooltip"
+        style="position: absolute; display: none; background-color: rgba(0, 0, 0, 0.8); color: white; padding: 5px; border-radius: 5px;">
+    </div>
+
+
+    <div id="container">
+        <div id="top-container">
+            <div style="position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; gap: 10px;">
+
+                <button id="toggleMaximize">Maximize Graph</button>
+
+                <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload">
+                    <input type="file" name="file" accept=".json" style="display: none;" id="uploadInput">
+                    <label for="uploadInput" class="uploadLabel">Upload and Visualize</label>
+                </form>
+
+                <button id="captureGraph">Capture Graph</button>
+
+                <!-- Add the select element for layout options -->
+                <select id="layoutSelect">
+                    <option value="dagre">DAG Layout</option>
+                    <option value="grid">Grid Layout</option>
+                    <option value="circle">Circle Layout</option>
+                    <option value="cose">CSE Layout</option>
+                    <!-- Add more layout options as needed -->
+                </select>
+            </div>
+
+
+            <div id="cy"></div>
+            <div id="walks">
+                <h3>Graph Walks:</h3>
+            </div>
+        </div>
+        <div id="info">
+            <h3>Node/Edge Info:</h3>
+            <div id="info-content"></div>
+        </div>
+    </div>
+
+    <script src="static/js/graph.js"></script>
+</body>
+
+</html>
