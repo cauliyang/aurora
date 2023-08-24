@@ -27,24 +27,15 @@ document.getElementById("captureGraph").addEventListener("click", function () {
 	downloadLink.click();
 });
 
-// Handle file selection and send it to the server without submitting the form
 document.getElementById("uploadInput").addEventListener("change", function (e) {
 	if (this.files.length) {
-		const formData = new FormData();
-		formData.append("file", this.files[0]);
-
-		fetch("/upload", {
-			method: "POST",
-			body: formData,
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error("Network response was not ok");
-				}
-				return response.json();
+		tauri
+			.invoke({
+				cmd: "readFile",
+				path: this.files[0].path,
 			})
 			.then((data) => {
-				console.log("Data from /upload:", data);
+				console.log("Data from readFile:", data);
 				loadGraphDataFromServer(data);
 			})
 			.catch((error) => {
