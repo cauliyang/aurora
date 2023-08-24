@@ -1,5 +1,7 @@
 const walks = [];
 let cy;
+let previousClickedElement = null;
+let previousClickedElementStyle = null;
 
 document.addEventListener("DOMContentLoaded", function () {
 	// Fetching the data from the JSON file
@@ -19,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 					{
 						selector: ".highlighted",
 						style: {
-							"border-width": "2px",
+							"border-width": "0px",
 							"border-color": "#FF5733",
 						},
 					},
@@ -41,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
 					{
 						selector: "node[source-node]",
 						style: {
-							"background-color": "#00FF00",
+							"background-color": "#31a354",
 						},
 					},
 					{
@@ -85,21 +87,26 @@ document.addEventListener("DOMContentLoaded", function () {
 				}
 			});
 
-			let sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
-			let sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
+			const sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
+			const sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
 
 			sourceNodes.forEach((sourceNode) => {
 				dfs(sourceNode, [], sinkNodes);
 			});
 
-			displayWalks();
-			setupClickEvent();
-
 			cy.on("tap", function (evt) {
 				if (evt.target === cy) {
+					resetPreviousElementStyle();
+					previousClickedElement = null;
+					previousClickedElementStyle = null;
+
 					cy.elements().removeClass("highlighted");
 				}
 			});
+
+			displayWalks();
+			setupClickEvent();
+
 			// Split between #cy and #walks
 			Split(["#cy", "#walks"], {
 				sizes: [70, 30],
@@ -128,9 +135,9 @@ function highlightWalk(walk) {
 
 		// If it's not the last node in the walk, highlight the edge to the next node
 		if (i < walk.length - 1) {
-			let currentNode = walk[i];
-			let nextNode = walk[i + 1];
-			let connectingEdge = currentNode.edgesTo(nextNode);
+			const currentNode = walk[i];
+			const nextNode = walk[i + 1];
+			const connectingEdge = currentNode.edgesTo(nextNode);
 			connectingEdge.addClass("highlighted");
 		}
 	}
@@ -141,7 +148,7 @@ function dfs(node, currentPath, sinkNodes) {
 	if (sinkNodes.includes(node)) {
 		walks.push([...currentPath]); // Found a path
 	} else {
-		let neighbors = node.outgoers().nodes();
+		const neighbors = node.outgoers().nodes();
 		neighbors.forEach((neighbor) => {
 			dfs(neighbor, currentPath, sinkNodes);
 		});
@@ -150,19 +157,45 @@ function dfs(node, currentPath, sinkNodes) {
 	currentPath.pop(); // backtrack
 }
 
+function resetPreviousElementStyle() {
+	if (previousClickedElement) {
+		if (previousClickedElement.isNode()) {
+			previousClickedElement.style(previousClickedElementStyle);
+		} else if (previousClickedElement.isEdge()) {
+		}
+	}
+}
+
 function setupClickEvent() {
 	cy.on("tap", "node, edge", function (evt) {
-		let element = evt.target;
+		resetPreviousElementStyle();
+		const element = evt.target;
 
-		let infoContainer = document.getElementById("info");
+		const infoContainer = document.getElementById("info");
 		let infoHtml = "";
 
 		if (element.isNode()) {
+			const indegree = element.indegree();
+			const outdegree = element.outdegree();
+
 			infoHtml = `
                     <h4>Node Information:</h4>
                     <p><strong>ID:</strong> ${element.id()}</p>
                     <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>
                 `;
+
+			infoHtml += `In-degree: ${indegree}<br>`;
+			infoHtml += `Out-degree: ${outdegree}<br>`;
+
+			previousClickedElementStyle = element.style();
+			// Highlight the clicked node
+			element.style({
+				"background-color": "#8dd3c7",
+				"border-width": "0px",
+				// "border-color": "#8dd3c7", // get current color
+			});
+
+			element.addClass("highlighted");
 		} else if (element.isEdge()) {
 			infoHtml = `
                     <h4>Edge Information:</h4>
@@ -172,6 +205,8 @@ function setupClickEvent() {
                 `;
 		}
 
+		// Update the previously clicked item
+		previousClickedElement = element;
 		infoContainer.innerHTML = infoHtml;
 	});
 }
