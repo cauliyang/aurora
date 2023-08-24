@@ -176,27 +176,6 @@ function setupClickEvent() {
 	});
 }
 
-function setupClickEvent() {
-	cy.on("tap", "node, edge", function (evt) {
-		let element = evt.target;
-
-		let info = "";
-		if (element.isNode()) {
-			info = `Node Information:\n\nID: ${element.id()}\nData: ${JSON.stringify(
-				element.data(),
-			)}`;
-		} else if (element.isEdge()) {
-			info = `Edge Information:\n\nSource: ${element
-				.source()
-				.id()}\nTarget: ${element.target().id()}\nData: ${JSON.stringify(
-				element.data(),
-			)}`;
-		}
-
-		alert(info);
-	});
-}
-
 function displayWalks() {
 	let walksContainer = document.getElementById("walks");
 	walks.forEach((walk, index) => {
