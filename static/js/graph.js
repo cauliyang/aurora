@@ -2,7 +2,6 @@ const walks = [];
 let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
-let isMaximized = false; // A flag to keep track of the current view state
 
 // Get the "Change Layout" button element
 const layoutSelect = document.getElementById("layoutSelect");
@@ -10,6 +9,8 @@ const layoutSelect = document.getElementById("layoutSelect");
 layoutSelect.addEventListener("change", () => {
 	// Get the selected layout from the select element
 	const selectedLayout = layoutSelect.value;
+
+	if (cy === undefined) return;
 
 	// Apply the chosen layout
 	cy.layout({
@@ -51,6 +52,23 @@ function handleFileUpload(event) {
 	}
 }
 
+document.getElementById("resetGraph").addEventListener("click", function () {
+	// Reset layout to default
+	resetPreviousElementStyle();
+	previousClickedElement = null;
+	previousClickedElementStyle = null;
+	cy.elements().removeClass("highlighted");
+	layoutSelect.value = "dagre";
+	cy.layout({
+		name: "dagre",
+		animate: true,
+		fit: true,
+		padding: 10,
+		avoidOverlap: true,
+		rankDir: "LR",
+	}).run();
+});
+
 document.getElementById("captureGraph").addEventListener("click", function () {
 	// Get the base64 representation of the graph
 	const base64Image = cy.png();
@@ -66,6 +84,22 @@ document.getElementById("captureGraph").addEventListener("click", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
 	console.log("DOM Loaded");
+
+	// Split between #cy and #walks
+	Split(["#cy", "#walks"], {
+		sizes: [67, 33], // This will give the cy panel 67% width initially and walks panel 33% width initially.
+		minSize: [100, 100],
+		gutterSize: 5,
+		direction: "horizontal",
+	});
+
+	// Split between the top panels (#cy and #walks combined) and #info
+	Split(["#top-container", "#info"], {
+		sizes: [70, 30], // This will give the top container 70% height initially and info panel 30% height initially.
+		minSize: [100, 100],
+		gutterSize: 5,
+		direction: "vertical",
+	});
 });
 
 function initializeGraph(graphData) {
@@ -149,41 +183,12 @@ function initializeGraph(graphData) {
 		}
 	});
 
+	walks.length = 0;
 	const sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
 	const sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
 
 	sourceNodes.forEach((sourceNode) => {
 		dfs(sourceNode, [], sinkNodes);
-	});
-}
-
-function createTooltipContent(elementData) {
-	let content = "<ul>";
-	for (const key in elementData) {
-		// rome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
-		if (elementData.hasOwnProperty(key)) {
-			content += `<li><strong>${key}:</strong> ${elementData[key]}</li>`;
-		}
-	}
-	content += "</ul>";
-	return content;
-}
-
-function createTooltip() {
-	cy.on("mouseover", "node, edge", function (event) {
-		const target = event.target;
-		const elementData = target.data();
-
-		const tooltip = document.getElementById("tooltip");
-		tooltip.innerHTML = createTooltipContent(elementData);
-		tooltip.style.display = "block";
-		tooltip.style.left = `${event.originalEvent.pageX}px`;
-		tooltip.style.top = `${event.originalEvent.pageY}px`;
-	});
-
-	cy.on("mouseout", "node, edge", function () {
-		const tooltip = document.getElementById("tooltip");
-		tooltip.style.display = "none";
 	});
 }
 
@@ -202,30 +207,14 @@ function setupGraphInteractions() {
 	displayWalks();
 	setupClickEvent();
 	createTooltip();
-
-	document
-		.getElementById("toggleMaximize")
-		.addEventListener("click", toggleView);
-	// Split between #cy and #walks
-
-	Split(["#cy", "#walks"], {
-		sizes: [70, 30],
-		minSize: [100, 100],
-		gutterSize: 5,
-		direction: "horizontal", // this will make them side-by-side
-	});
-
-	// Split between #top-container and #info
-	Split(["#top-container", "#info"], {
-		sizes: [75, 25],
-		minSize: [100, 100],
-		gutterSize: 5,
-		direction: "vertical", // this will make #info below #top-container
-	});
 }
 
 function displayWalks() {
 	const walksContainer = document.getElementById("walks");
+
+	// Clear previous walks display
+	walksContainer.innerHTML = "<h3>Graph Walks:</h3>";
+
 	walks.forEach((walk, index) => {
 		const walkDiv = document.createElement("div");
 		walkDiv.textContent = `Walk ${index + 1}: ${walk
@@ -241,26 +230,6 @@ function displayWalks() {
 
 		walksContainer.appendChild(walkDiv);
 	});
-}
-
-function toggleView() {
-	if (isMaximized) {
-		// Restore the original view
-		document.getElementById("cy").style.width = "75%";
-		document.getElementById("walks").style.display = "block";
-		// document.getElementById("info").style.display = "block";
-		document.getElementById("toggleMaximize").textContent = "Maximize Graph";
-		cy.resize(); // Make sure Cytoscape adjusts to the new size
-	} else {
-		// Maximize the graph view and hide other panels
-		document.getElementById("cy").style.width = "100%";
-		document.getElementById("walks").style.display = "none";
-		// document.getElementById("info").style.display = "none";
-		document.getElementById("toggleMaximize").textContent = "Restore View";
-		cy.resize(); // Make sure Cytoscape adjusts to the new size
-	}
-
-	isMaximized = !isMaximized; // Toggle the flag
 }
 
 function highlightWalk(walk) {
