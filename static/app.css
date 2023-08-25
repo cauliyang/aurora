@@ -8,7 +8,6 @@ html {
     background-color: #e9ecef;
     border: 1px solid #ccc;
     height: 100%;
-    overflow: auto;
 }
 
 #info,
