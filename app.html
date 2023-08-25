@@ -31,16 +31,35 @@
 
 <body>
 
+    <!-- Fancy Header Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <a class="navbar-brand" href="index.html">Aurora</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+                <!-- Additional navigation links can be added here -->
+            </ul>
+        </div>
+    </nav>
+    <!-- End of Fancy Header Bar -->
+
+
     <div id="tooltip"> </div>
 
     <div class="container-fluid h-100 p-3">
         <div class="row h-100">
 
             <div class="col-12 position-relative mb-2">
-                <div class="d-flex gap-2" style="position: absolute; top: 10px; left: 10px; z-index: 1;">
+                <div class="btn-toolbar" style="position: absolute; top:10px; left: 10px; z-index: 1;" role="toolbar" aria-label="Toolbar with button groups">
 
                     <!-- ... (your button and form elements remain unchanged) ... -->
-                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                    <div class="btn-group me-2" role="group" aria-label="First group">
                         <button id="toggleMaximize" class="btn btn-outline-primary"><i class="bi bi-arrows-fullscreen"></i></button>
                         <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload" class="btn btn-outline-primary">
                             <input type="file" name="file" accept=".json" class="d-none" id="uploadInput">
@@ -49,8 +68,10 @@
 
                         <button id="captureGraph" class="btn btn-outline-primary"><i class="bi bi-camera"></i></button>
                         <button id="resetGraph" class="btn btn-outline-primary"><i class="bi bi-arrow-repeat"></i></button>
+                    </div>
 
-
+                    <!-- Layout Selection -->
+                    <div class="btn-group me-2" role="group">
                         <select id="layoutSelect" class="form-select w-auto">
                         <option value="dagre">DAG Layout</option>
                         <option value="grid">Grid Layout</option>
@@ -58,12 +79,16 @@
                         <option value="cose">COSE Layout</option>
                         <!-- Add more layout options as needed -->
                     </select>
-
-                        <button id="openJsonEditor" type="button" class="btn btn-primary"><i class="bi bi-code-square"></i></button>
-                        <button class="btn  btn-outline-primary" id="redirectToIgv"><img src="img/igv-logo-cooked-40x40.png" alt="IGV" style="width:20px; height:20px;"> </button>
-
                     </div>
+
+                    <!-- !-- JSON Editor and IGV Buttons -->
+                    <div class="btn-group" role="group">
+                        <button id="openJsonEditor" type="button" class="btn btn-primary"><i class="bi bi-code-square"></i></button>
+                        <button class="btn  btn-outline-primary" id="redirectToIgv"><img src="img/igv-logo-cooked-40x40.png" alt="IGV" class="img-fluid" style="width:20px; height:20px;"> </button>
+                    </div>
+
                 </div>
+
             </div>
 
             <div class="col-lg-8 col-md-12 h-100" id="cy"></div>

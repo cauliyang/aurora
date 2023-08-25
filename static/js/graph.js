@@ -44,6 +44,7 @@ document
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
+    console.log(file);
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
