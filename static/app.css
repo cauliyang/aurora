@@ -1,76 +1,77 @@
 body,
 html {
-  height: 100%;
-  margin: 0;
+    height: 100%;
+    margin: 0;
 }
 
-/* Adjust the width and height of the JSONEditor */
-#jsoneditor {
-  width: 100%;
-  height: 400px; /* You can adjust this value as needed */
+#cy {
+    background-color: #e9ecef;
+    border: 1px solid #ccc;
+    height: 100%;
+    overflow: auto;
 }
 
-#container {
-  height: 100%;
-}
-
+#info,
 #walks {
-  width: 30%;
-  border-left: 1px solid #e4e4e4;
-  overflow-y: auto;
-  padding: 10px;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+#right-container {
+    height: 100%;
+    display: flex;
+    /* Add this line to enable flex layout */
+    flex-direction: column;
+    /* Add this line to stack the panels vertically */
 }
 
 #walks div:hover {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 4px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 4px;
+}
+
+#jsoneditor {
+    width: 100%;
+    height: 400px;
+    /* You can adjust this value as needed */
 }
 
 h3 {
-  margin-top: 0;
-  color: #333;
-  border-bottom: 1px solid #e4e4e4;
-  padding-bottom: 2px;
-  font-size: 14px; /* reduced font size */
-  margin-bottom: 5px; /* added margin-bottom for spacing */
-}
-
-.gutter {
-  background-repeat: no-repeat;
-  background-position: center;
-  cursor: ew-resize;
-}
-
-.gutter.gutter-horizontal {
-  cursor: ns-resize;
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #e4e4e4;
+    padding-bottom: 2px;
+    font-size: 14px;
+    /* reduced font size */
+    margin-bottom: 5px;
+    /* added margin-bottom for spacing */
 }
 
 #tooltip {
-  position: absolute;
-  display: none;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  z-index: 9999;
-  font-size: 14px;
-  line-height: 1.4;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  transform: translateY(-10px);
-  opacity: 0;
+    position: absolute;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 9999;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(-10px);
+    opacity: 0;
 }
 
 #tooltip::before {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }

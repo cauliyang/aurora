@@ -1,3 +1,5 @@
+import { loadGraphDataFromServer } from "./graph.js";
+
 let editor; // Global variable to store the editor instance
 
 const exampleJson = {
