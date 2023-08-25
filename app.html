@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Visualization</title>
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
@@ -40,25 +39,25 @@
                 <div class="d-flex gap-2" style="position: absolute; top: 10px; left: 10px; z-index: 1;">
 
                     <!-- ... (your button and form elements remain unchanged) ... -->
-                    <button id="toggleMaximize" class="btn btn-outline-primary">Maximize</button>
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <button id="toggleMaximize" class="btn btn-outline-primary">Maximize</button>
+                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload" class="btn btn-outline-primary">
+                            <input type="file" name="file" accept=".json" class="d-none" id="uploadInput">
+                            <label for="uploadInput">Upload</label>
+                        </form>
 
-                    <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload" class="d-inline-block">
-                        <input type="file" name="file" accept=".json" class="d-none" id="uploadInput">
-                        <label for="uploadInput" class="btn btn-outline-primary">Upload</label>
-                    </form>
+                        <button id="captureGraph" class="btn btn-outline-primary">Capture</button>
+                        <button id="resetGraph" class="btn btn-outline-primary">Reset</button>
+                        <button id="openJsonEditor" type="button" class="btn btn-primary">Open JSON Editor</button>
 
-                    <button id="captureGraph" class="btn btn-outline-primary">Capture</button>
-                    <button id="resetGraph" class="btn btn-outline-primary">Reset</button>
-                    <button id="openJsonEditor" type="button" class="btn btn-primary">Open JSON Editor</button>
-
-                    <select id="layoutSelect" class="form-select w-auto">
+                        <select id="layoutSelect" class="form-select w-auto">
                         <option value="dagre">DAG Layout</option>
                         <option value="grid">Grid Layout</option>
                         <option value="circle">Circle Layout</option>
                         <option value="cose">COSE Layout</option>
                         <!-- Add more layout options as needed -->
                     </select>
-
+                    </div>
                 </div>
             </div>
 
