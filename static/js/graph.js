@@ -3,6 +3,11 @@ let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
 
+const nodeColor = "#666";
+const hightColor = "#FF5733";
+const sourceNodeColor = "#31a354";
+const selectedNodeColor = "#8dd3c7";
+
 // Get the "Change Layout" button element
 const layoutSelect = document.getElementById("layoutSelect");
 
@@ -118,28 +123,28 @@ function initializeGraph(graphData) {
 				selector: ".highlighted",
 				style: {
 					"border-width": "0px",
-					"border-color": "#FF5733",
+					"border-color": hightColor,
 				},
 			},
 			{
 				selector: "edge.highlighted",
 				style: {
 					width: "4px",
-					"line-color": "#FF5733",
-					"target-arrow-color": "#FF5733",
+					"line-color": hightColor,
+					"target-arrow-color": hightColor,
 				},
 			},
 			{
 				selector: "node",
 				style: {
 					label: "data(name)",
-					"background-color": "#666",
+					"background-color": nodeColor,
 				},
 			},
 			{
 				selector: "node[source-node]",
 				style: {
-					"background-color": "#31a354",
+					"background-color": sourceNodeColor,
 				},
 			},
 			{
@@ -165,7 +170,7 @@ function initializeGraph(graphData) {
 		userZoomingEnabled: true,
 		panningEnabled: true,
 		userPanningEnabled: true,
-		boxSelectionEnabled: false,
+		boxSelectionEnabled: true,
 		selectionType: "single",
 		touchTapThreshold: 8,
 		desktopTapThreshold: 4,
@@ -296,9 +301,8 @@ function setupClickEvent() {
 			previousClickedElementStyle = element.style();
 			// Highlight the clicked node
 			element.style({
-				"background-color": "#8dd3c7",
+				"background-color": selectedNodeColor,
 				"border-width": "0px",
-				// "border-color": "#8dd3c7", // get current color
 			});
 
 			element.addClass("highlighted");
