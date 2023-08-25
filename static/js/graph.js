@@ -66,6 +66,12 @@ document.getElementById("resetGraph").addEventListener("click", function() {
     previousClickedElement = null;
     previousClickedElementStyle = null;
     cy.elements().removeClass("highlighted");
+
+    // Clear info panel
+    document.getElementById("info").innerHTML = "<h3>Node/Edge Info:</h3>";
+    // Clear walks panel
+    document.getElementById("walks").innerHTML = "<h3>Graph Walks:</h3>";
+
     layoutSelect.value = "dagre";
     cy.layout({
         name: "dagre",
