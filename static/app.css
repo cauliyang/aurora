@@ -35,6 +35,22 @@ h3 {
     transform: scale(1.05);
 }
 
+.btn-upload {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.btn-upload:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
 #cy {
     background-color: #e9ecef;
     border: 1px solid #ccc;
@@ -166,4 +182,26 @@ a:hover,
     100% {
         transform: scale(1);
     }
+}
+
+.file-upload-container {
+    justify-content: flex-start;
+}
+
+.igv-container {
+    border: 1px solid #d6d6d6;
+    height: 100vh;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+#selectedFileName {
+    color: #555;
+}
+
+.navbar-brand {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    padding-left: 2rem;
 }

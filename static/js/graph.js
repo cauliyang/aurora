@@ -8,6 +8,10 @@ const hightColor = "#FF5733";
 const sourceNodeColor = "#31a354";
 const selectedNodeColor = "#8dd3c7";
 
+document.getElementById("redirectToIgv").addEventListener("click", function() {
+    window.open("igv.html", "_blank");
+});
+
 // Get the "Change Layout" button element
 const layoutSelect = document.getElementById("layoutSelect");
 
@@ -40,6 +44,7 @@ document
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
+    console.log(file);
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
