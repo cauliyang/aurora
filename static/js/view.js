@@ -2,12 +2,6 @@ let isMaximized = false; // A flag to keep track of the current view state
 let originalZoom;
 let originalPan;
 
-function destroySplit(splitInstance) {
-	if (splitInstance?.gutters) {
-		splitInstance.gutters.forEach((gutter) => gutter.remove());
-	}
-}
-
 function toggleView() {
 	if (isMaximized) {
 		// Restore the original view
@@ -17,10 +11,6 @@ function toggleView() {
 		document.getElementById("walks").style.display = "block";
 		document.getElementById("info").style.display = "block";
 		document.getElementById("toggleMaximize").textContent = "Maximize Graph";
-
-		// Destroy existing Split.js instances
-		destroySplit(Split.instances[0]);
-		destroySplit(Split.instances[1]);
 
 		// We reinitialize the Split.js with the original configuration
 		Split(["#cy", "#walks"], {
