@@ -1,5 +1,3 @@
-import { split } from "./split.js";
-
 const walks = [];
 let cy;
 let previousClickedElement = null;
@@ -30,9 +28,12 @@ layoutSelect.addEventListener("change", () => {
     }).run();
 });
 
+
 function loadGraphDataFromServer(graphData) {
+
     initializeGraph(graphData);
     setupGraphInteractions();
+
 }
 
 document
@@ -91,7 +92,6 @@ document.getElementById("captureGraph").addEventListener("click", function() {
 
 document.addEventListener("DOMContentLoaded", function() {
     console.log("DOM Loaded");
-    // split(cy);
 });
 
 function initializeGraph(graphData) {
@@ -276,7 +276,7 @@ function setupClickEvent(cy) {
             const outdegree = element.outdegree();
 
             infoHtml = `
-                    <h4>Node Information:</h4>
+                    <h3>Node Information:</h3>
                     <p><strong>ID:</strong> ${element.id()}</p>
                     <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>
                 `;
@@ -294,7 +294,7 @@ function setupClickEvent(cy) {
             element.addClass("highlighted");
         } else if (element.isEdge()) {
             infoHtml = `
-                    <h4>Edge Information:</h4>
+                    <h3>Edge Information:</h3>
                     <p><strong>Source:</strong> ${element.source().id()}</p>
                     <p><strong>Target:</strong> ${element.target().id()}</p>
                     <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>

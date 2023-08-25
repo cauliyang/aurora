@@ -15,6 +15,7 @@ html {
     border: 1px solid #ccc;
     overflow-y: auto;
     flex: 1 1 auto;
+    height: 100%;
 }
 
 #right-container {
