@@ -354,6 +354,14 @@ function resetPreviousElementStyle() {
     }
 }
 
+function generateInfoHtml(title, details) {
+    let html = `<h3>${title} Information:</h3>`;
+    for (const [key, value] of Object.entries(details)) {
+        html += `<strong>${key}:</strong> ${value}<br>`;
+    }
+    return html;
+}
+
 function setupClickEvent(cy) {
     cy.on("tap", "node, edge", function(evt) {
         resetPreviousElementStyle();
@@ -366,14 +374,13 @@ function setupClickEvent(cy) {
             const indegree = element.indegree();
             const outdegree = element.outdegree();
 
-            infoHtml = `
-                    <h3>Node Information:</h3>
-                    <p><strong>ID:</strong> ${element.id()}</p>
-                    <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>
-                `;
-
-            infoHtml += `In-degree: ${indegree}<br>`;
-            infoHtml += `Out-degree: ${outdegree}<br>`;
+            const details = {
+                "Node ID": element.id(),
+                "In-degree": element.indegree(),
+                "Out-degree": element.outdegree(),
+                "Attributes": `<pre class="expandable">${JSON.stringify(element.data(), null, 2)}</pre>`
+            };
+            infoHtml = generateInfoHtml("Node", details);
 
             previousClickedElementStyle = element.style();
             // Highlight the clicked node
@@ -384,12 +391,21 @@ function setupClickEvent(cy) {
 
             element.addClass("highlighted");
         } else if (element.isEdge()) {
-            infoHtml = `
-                    <h3>Edge Information:</h3>
-                    <p><strong>Source:</strong> ${element.source().id()}</p>
-                    <p><strong>Target:</strong> ${element.target().id()}</p>
-                    <p><strong>Data:</strong> ${JSON.stringify(element.data())}</p>
-                `;
+            const details = {
+                "Source": element.source().id(),
+                "Target": element.target().id(),
+                "Data": `<pre class="expandable">${JSON.stringify(element.data(), null, 2)}</pre>`
+            };
+            infoHtml = generateInfoHtml("Edge", details);
+        }
+
+
+        infoContainer.innerHTML = infoHtml;
+        const preElement = infoContainer.querySelector("pre");
+        if (preElement) {
+            preElement.addEventListener("click", function() {
+                this.classList.toggle("expanded");
+            });
         }
 
         // Update the previously clicked item

@@ -75,3 +75,15 @@ h3 {
     border-style: solid;
     border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
+
+pre {
+    overflow: hidden;
+    max-height: 100px;
+    transition: max-height 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+pre.expanded {
+    max-height: 500px;
+    /* or whatever value you feel appropriate */
+}
