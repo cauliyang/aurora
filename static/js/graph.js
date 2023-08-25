@@ -79,6 +79,17 @@ document.getElementById("resetGraph").addEventListener("click", function() {
         avoidOverlap: true,
         rankDir: "LR",
     }).run();
+
+    const cyContainer = document.getElementById("cy");
+    const infoPanel = document.getElementById("info");
+    const walksPanel = document.getElementById("walks");
+
+    cyContainer.style.width = "";
+    cyContainer.style.height = "";
+    infoPanel.style.width = "";
+    walksPanel.style.width = "";
+    infoPanel.style.display = "";
+    walksPanel.style.display = "";
 });
 
 document.getElementById("captureGraph").addEventListener("click", function() {
@@ -94,10 +105,7 @@ document.getElementById("captureGraph").addEventListener("click", function() {
     downloadLink.click();
 });
 
-document.addEventListener("DOMContentLoaded", function() {
-    console.log("DOM Loaded");
-
-
+function resizePanels() {
     // Enable drag and resize interactions on the cy container
     interact('#cy')
         .resizable({
@@ -170,7 +178,11 @@ document.addEventListener("DOMContentLoaded", function() {
             // Update the right position to fill the right side of the screen
             target.style.right = '0';
         });
+}
 
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM Loaded");
+    resizePanels();
 });
 
 function initializeGraph(graphData) {
