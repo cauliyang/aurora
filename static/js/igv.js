@@ -1,19 +1,10 @@
-async function igvBrowser(bamUrl = null, locs = null, genome = "hg38", ) {
-    bamUrl = await urlExists(bamUrl) ? bamUrl : "https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram";
-
-    if (locs == null) {
-        locs = "1:1000000-1001000";
-    }
+async function igvBrowser(bamUrl = null, locs = "1:1000000-1001000", genome = "hg38", ) {
+    bamUrl = bamUrl ? bamUrl : "https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram";
 
     if (bamUrl.endsWith('.cram')) {
         baiUrl = bamUrl + '.crai';
     } else {
         baiUrl = bamUrl + '.bai';
-    }
-
-    if (!await urlExists(baiUrl)) {
-        alert("The BAM/CRAM file does not have an index file (.bai/.crai).");
-        return;
     }
 
     const div = document.getElementById("igvContainer");
@@ -32,22 +23,6 @@ async function igvBrowser(bamUrl = null, locs = null, genome = "hg38", ) {
         .then(function(browser) {
             console.log("IGV browser is initialized.");
         });
-}
-
-// You can use this function to check if the URL exists or if it's a valid local file
-async function urlExists(url) {
-    if (!url) return false;
-    // If it's a local file, check if it's accessible by trying to fetch it
-    if (url.startsWith("file://")) {
-        try {
-            const response = await fetch(url);
-            return response && response.ok;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 function loadBAMFiles() {

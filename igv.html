@@ -29,57 +29,62 @@
     <link rel="stylesheet" href="static/app.css">
 </head>
 
-<body>
-    <div class="container-fluid mt-4 p-0">
+<div class="container-fluid h-100 p-3">
+    <div class="row h-100">
+
         <h1 class="text-center">Demo Layout</h1>
 
-        <div class="row m-0 justify-content-start mb-3">
-            <!-- BAM File Input Section -->
-            <div class="col-auto d-flex align-items-center">
-                <input type="file" class="d-none" id="bamFileInput" onchange="loadBAMFile()">
-                <button class="btn btn-primary" onclick="document.getElementById('bamFileInput').click()">
-                <i class="bi bi-upload"></i> Select BAM File
-            </button>
+
+        <div class="col-12 mb-2">
+            <!-- File Input Section -->
+
+            <div class="row m-0 justify-content-start mb-3">
+                <!-- BAM & BAI File Input Section -->
+                <div class="col-auto d-flex align-items-center">
+                    <input type="file" class="d-none" id="bamBaiFileInput" multiple>
+                    <button class="btn btn-primary" onclick="document.getElementById('bamBaiFileInput').click()">
+            <i class="bi bi-upload"></i> Upload BAM & BAI
+        </button>
+                </div>
             </div>
+
         </div>
 
-        <!-- IGV Container -->
-        <div class="row m-0">
-            <div class="col-12 px-3">
-                <div id="igvContainer" style="border:1px solid gray; height: 100vh;"></div>
-            </div>
+        <div class="col-12 px-3">
+            <div id="igvContainer" style="border:1px solid gray; height: 100vh;"></div>
         </div>
+
     </div>
-
-    <script src="static/js/igv.js"></script>
-
+</div>
 
 
-    <footer role="contentinfo" class="ui-section-footer">
-        <div class="ui-layout-container">
-            <div class="ui-section-footer__layout ui-layout-flex">
-                <!-- COPYRIGHT -->
-                <p class="ui-section-footer--copyright ui-text-note"><small>&copy; 2023 Yangyang Li</small></p>
-                <!-- MENU -->
-                <a href="https://twitter.com/yangyangliz5" role="link" aria-label="#">
-                    <svg viewBox="0 0 24 24" height="16" width="16" fill="none" stroke="#AEAEAE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" role="img" aria-label="#">
+<script src="static/js/igv.js"></script>
+
+<footer role="contentinfo" class="ui-section-footer">
+    <div class="ui-layout-container">
+        <div class="ui-section-footer__layout ui-layout-flex">
+            <!-- COPYRIGHT -->
+            <p class="ui-section-footer--copyright ui-text-note"><small>&copy; 2023 Yangyang Li</small></p>
+            <!-- MENU -->
+            <a href="https://twitter.com/yangyangliz5" role="link" aria-label="#">
+                <svg viewBox="0 0 24 24" height="16" width="16" fill="none" stroke="#AEAEAE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" role="img" aria-label="#">
                         <path
                             d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
                     </svg>
-                </a>
-                <a href="https://github.com/cauliyang/Aurora" role="link" aria-label="#">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="yangyangli.top" role="link" aria-label="#">
-                    <svg viewBox="0 0 24 24" height="16" width="16" fill="none" stroke="#AEAEAE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" role="img" aria-label="#">
+            </a>
+            <a href="https://github.com/cauliyang/Aurora" role="link" aria-label="#">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="yangyangli.top" role="link" aria-label="#">
+                <svg viewBox="0 0 24 24" height="16" width="16" fill="none" stroke="#AEAEAE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" role="img" aria-label="#">
                         <circle cx="12" cy="12" r="10" />
                         <path
                             d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32" />
                     </svg>
-                </a>
-            </div>
+            </a>
         </div>
-    </footer>
+    </div>
+</footer>
 </body>
 
 </html>
