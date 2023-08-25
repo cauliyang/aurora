@@ -31,11 +31,29 @@
 
 <body>
 
-    <div class="container-fluid h-100 p-3">
-        <!-- Fancy Header Bar -->
+    <!-- Fancy Header Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <a class="navbar-brand" href="index.html">Aurora</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+                <!-- Additional navigation links can be added here -->
+            </ul>
+        </div>
+    </nav>
+    <!-- End of Fancy Header Bar -->
+
+
+    <div class="container-fluid  p-3">
         <!-- End of Fancy Header Bar -->
 
-        <div class="row h-100">
+        <div class="row">
             <div class="col-12 mb-2">
                 <!-- File Input Section -->
                 <div class="row m-0 justify-content-start mb-3">
@@ -50,38 +68,52 @@
             </div>
 
             <div class="col-12 px-3">
-                <div id="igvContainer" style="border:1px solid gray; height: 100vh;"></div>
+                <div id="igvContainer" style="border:1px solid gray; max-height: 90vh; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
 
     <script src="static/js/igv.js"></script>
 
-    <footer role="contentinfo" class="ui-section-footer">
-        <div class="ui-layout-container">
-            <div class="ui-section-footer__layout ui-layout-flex">
-                <!-- COPYRIGHT -->
-                <p class="ui-section-footer--copyright ui-text-note"><small>&copy; 2023 Yangyang Li</small></p>
-                <!-- MENU -->
-                <a href="https://twitter.com/yangyangliz5" role="link" aria-label="#">
-                    <svg viewBox="0 0 24 24" height="16" width="16" fill="none" stroke="#AEAEAE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" role="img" aria-label="#">
-                        <path
-                            d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
-                    </svg>
-                </a>
-                <a href="https://github.com/cauliyang/Aurora" role="link" aria-label="#">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="yangyangli.top" role="link" aria-label="#">
-                    <svg viewBox="0 0 24 24" height="16" width="16" fill="none" stroke="#AEAEAE" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" role="img" aria-label="#">
-                        <circle cx="12" cy="12" r="10" />
-                        <path
-                            d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32" />
-                    </svg>
-                </a>
+    <!-- Footer Start -->
+    <footer class="mt-5 py-3 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <!-- Left: About/Links -->
+                <div class="col-md-4">
+                    <h5>About Aurora</h5>
+                    <p>Aurora is a state-of-the-art graph visualization platform. Dive deep into your data and extract meaningful insights.</p>
+                </div>
+
+                <!-- Center: Quick Links -->
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white">Home</a></li>
+                        <li><a href="index.html" class="text-white">Features</a></li>
+                        <li><a href="#" class="text-white">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Right: Social Media Links -->
+                <div class="col-md-3">
+                    <h5>Connect with Us</h5>
+                    <a href="https://yangyangli.top" class="text-white mr-3"><i class="bi bi-person-circle"></i></a>
+                    <a href="https://twitter.com/yangyangliz5" class="text-white mr-3"><i class="bi bi-twitter"></i></a>
+                    <a href="https://github.com/cauliyang/aurora" class="text-white mr-3"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+
+            <!-- Bottom: Copyright -->
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <p>&copy; 2023 Yangyang Li. All rights reserved.</p>
+                </div>
             </div>
         </div>
     </footer>
+
+
 </body>
 
 </html>
