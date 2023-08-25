@@ -369,19 +369,23 @@ function setupClickEvent(cy) {
 
         const infoContainer = document.getElementById("info");
         let infoHtml = "";
-
+        const uniqueID = Date.now(); // Generate a uni
         if (element.isNode()) {
             const indegree = element.indegree();
             const outdegree = element.outdegree();
+            infoHtml += `<strong>Node ID:</strong> ${element.id()}<br>`;
+            infoHtml += `<strong>In-degree:</strong> ${indegree}<br>`;
+            infoHtml += `<strong>Out-degree:</strong> ${outdegree}<br>`;
 
-            const details = {
-                "Node ID": element.id(),
-                "In-degree": element.indegree(),
-                "Out-degree": element.outdegree(),
-                "Attributes": `<pre class="expandable">${JSON.stringify(element.data(), null, 2)}</pre>`
-            };
-            infoHtml = generateInfoHtml("Node", details);
-
+            // Interactive checking of JSON data attributes
+            infoHtml += `
+                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="false">
+                    Attributes
+                </button>
+                <div class="collapse show" id="attributesNode-${uniqueID}">
+                    <pre>${JSON.stringify(element.data(), null, 2)}</pre>
+                </div>
+            `;
             previousClickedElementStyle = element.style();
             // Highlight the clicked node
             element.style({
@@ -391,21 +395,17 @@ function setupClickEvent(cy) {
 
             element.addClass("highlighted");
         } else if (element.isEdge()) {
-            const details = {
-                "Source": element.source().id(),
-                "Target": element.target().id(),
-                "Data": `<pre class="expandable">${JSON.stringify(element.data(), null, 2)}</pre>`
-            };
-            infoHtml = generateInfoHtml("Edge", details);
-        }
+            infoHtml += `
+                <strong>Source:</strong> ${element.source().id()}<br>
+                <strong>Target:</strong> ${element.target().id()}<br>
 
-
-        infoContainer.innerHTML = infoHtml;
-        const preElement = infoContainer.querySelector("pre");
-        if (preElement) {
-            preElement.addEventListener("click", function() {
-                this.classList.toggle("expanded");
-            });
+                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}" aria-expanded="false">
+                    Data
+                </button>
+                <div class="collapse show" id="dataEdge-${uniqueID}">
+                    <pre>${JSON.stringify(element.data(), null, 2)}</pre>
+                </div>
+            `;
         }
 
         // Update the previously clicked item
