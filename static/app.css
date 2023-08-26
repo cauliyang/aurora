@@ -200,8 +200,15 @@ a:hover,
     color: #555;
 }
 
+.navbar {
+    height: 25px;
+    font-size: 0.9rem;
+}
+
 .navbar-brand {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     letter-spacing: 1px;
-    padding-left: 2rem;
+    padding-left: 1rem;
+    display: flex;
+    align-items: center;
 }
