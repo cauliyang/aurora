@@ -31,24 +31,58 @@
 
 <body>
 
-    <!-- Fancy Header Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <a class="navbar-brand" href="index.html">Aurora</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+
+        <!-- Container wrapper -->
+        <div class="container-fluid" style="padding-top: 15px;">
+            <!-- Toggle button -->
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
     </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
-                <!-- Additional navigation links can be added here -->
-            </ul>
-        </div>
-    </nav>
-    <!-- End of Fancy Header Bar -->
+            <!-- Collapsible wrapper -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Navbar brand -->
+                <a class="navbar-brand mt-2 mt-lg-0" href="#">
+                    <em>Aurora</em> <i class="bi bi-lightning-charge-fill"></i>
+                </a>
 
+                <!-- Left links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Project</a>
+                    </li>
+                </ul>
+                <!-- Left links -->
+            </div>
+
+            <!-- Right elements -->
+            <div class="d-flex align-items-center">
+                <!-- Right elements -->
+                <div class="d-flex align-items-center">
+                    <a href="https://github.com/cauliyang">
+                        <i class="bi bi-github" style="font-size: 1.4rem;"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 
+            <div class="d-flex align-items-center">
+                <a href="https://yangyangli.top/">
+                    <img src="img/avatar.jpeg" alt="Avatar" class="avatar rounded" style="width: 25px; height: 25px;">
+                </a>
+            </div> -->
+
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    <!-- Navbar -->
+
+    <hr class="hr" />
 
     <div id="tooltip"> </div>
 
