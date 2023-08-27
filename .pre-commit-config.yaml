@@ -22,4 +22,4 @@ repos:
     rev: v3.0.2
     hooks:
       - id: prettier
-        types: [yaml, markdown, html, javascript]
+        types: [yaml, markdown]
