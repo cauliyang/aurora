@@ -3,6 +3,13 @@
 Aurora is a web application for visualizing graphs using Cytoscape.js.
 This application allows you to upload JSON data representing graphs and visualize them with various layout options.
 
+## Refactor
+
+- https://github.com/refinedev/refine
+- https://github.com/TarikHuber/react-most-wanted
+- https://github.com/mui/material-ui?tab=readme-ov-file
+- https://github.com/leptos-rs/leptos
+
 ## Features
 
 - Upload and visualize graph data in JSON format.
