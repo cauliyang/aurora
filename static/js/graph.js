@@ -392,7 +392,7 @@ function setupClickEvent(cy) {
 
             // Interactive checking of JSON data attributes
             infoHtml += `
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="false">
+                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="fals">
                     Attributes
                 </button>
                 <div class="collapse show" id="attributesNode-${uniqueID}">

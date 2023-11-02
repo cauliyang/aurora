@@ -7,6 +7,7 @@
 		"test": "test"
 	},
 	"dependencies": {
+		"@tldraw/tldraw": "^2.0.0-alpha.17",
 		"accepts": "^1.3.8",
 		"ajv": "^8.11.0",
 		"ansi-align": "^3.0.1",
