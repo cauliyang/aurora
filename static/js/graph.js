@@ -8,7 +8,7 @@ const hightColor = "#FF5733";
 const sourceNodeColor = "#31a354";
 const selectedNodeColor = "#8dd3c7";
 
-document.getElementById("redirectToIgv").addEventListener("click", function() {
+document.getElementById("redirectToIgv").addEventListener("click", () => {
     window.open("igv.html", "_blank");
 });
 
@@ -53,7 +53,7 @@ function handleFileUpload(event) {
     console.log(file);
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = (e) => {
             const content = e.target.result;
             try {
                 const jsonData = JSON.parse(content);
@@ -69,7 +69,7 @@ function handleFileUpload(event) {
     }
 }
 
-document.getElementById("resetGraph").addEventListener("click", function() {
+document.getElementById("resetGraph").addEventListener("click", () => {
     // Reset layout to default
     resetPreviousElementStyle();
     previousClickedElement = null;
@@ -101,7 +101,7 @@ document.getElementById("resetGraph").addEventListener("click", function() {
     walksPanel.style.display = "";
 });
 
-document.getElementById("captureGraph").addEventListener("click", function() {
+document.getElementById("captureGraph").addEventListener("click", () => {
     // Get the base64 representation of the graph
     const base64Image = cy.png();
 
@@ -126,7 +126,7 @@ function resizePanels() {
                 min: { width: 100, height: 100 },
             },
         })
-        .on("resizemove", function(event) {
+        .on("resizemove", (event) => {
             const target = event.target;
             let x = parseFloat(target.getAttribute("data-x")) || 0;
             let y = parseFloat(target.getAttribute("data-y")) || 0;
@@ -156,18 +156,18 @@ function resizePanels() {
                 min: { width: 100 },
             },
         })
-        .on("resizemove", function(event) {
+        .on("resizemove", (event) => {
             const target = event.target;
             let x = parseFloat(target.getAttribute("data-x")) || 0;
 
             // Update the element's style
-            target.style.width = event.rect.width + "px";
+            target.style.width = `${event.rect.width}px`;
 
             // Translate when resizing from left edge
             x += event.deltaRect.left;
 
-            target.style.webkitTransform = target.style.transform =
-                "translate(" + x + "px)";
+            target.style.webkitTransform =
+                target.style.transform = `translate(${x}px)`;
 
             target.setAttribute("data-x", x);
         });
@@ -179,25 +179,31 @@ function resizePanels() {
                 min: { width: 100 }, // Set minimum width
             },
         })
-        .on("resizemove", function(event) {
-            let target = event.target;
-            let newWidth = event.rect.width;
+        .on("resizemove", (event) => {
+            const target = event.target;
+            const newWidth = event.rect.width;
 
             // Update the width of the element
-            target.style.width = newWidth + "px";
+            target.style.width = `${newWidth}px`;
 
             // Update the right position to fill the right side of the screen
             target.style.right = "0";
         });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM Loaded");
     resizePanels();
 });
 
 function initializeGraph(graphData) {
     // ... [All the code inside your fetch(jsonfile).then((graphData) => {...}) block]
+    const maxWeight = Math.max(
+        ...graphData.edges.map((edge) => edge.data.weight),
+    );
+    const minWidth = 1;
+    const maxWidth = 10; // Maximum width you prefer
+
     cy = cytoscape({
         container: document.getElementById("cy"),
         layout: {
@@ -239,7 +245,14 @@ function initializeGraph(graphData) {
             {
                 selector: "edge",
                 style: {
-                    width: "data(weight)",
+                    width: (edge) => {
+                        // Normalize the edge width and ensure it's between minWidth and maxWidth
+                        const normalizedWidth =
+                            (edge.data("weight") / maxWeight) * (maxWidth - minWidth) +
+                            minWidth;
+                        return normalizedWidth;
+                    },
+
                     label: "data(weight)",
                     "text-rotation": "autorotate",
                     "curve-style": "bezier",
@@ -288,7 +301,7 @@ function initializeGraph(graphData) {
 
 function setupGraphInteractions() {
     // ... [Your cy.on("tap", ...), displayWalks(), setupClickEvent(), and Split functions calls]
-    cy.on("tap", function(evt) {
+    cy.on("tap", (evt) => {
         if (evt.target === cy) {
             resetPreviousElementStyle();
             previousClickedElement = null;
@@ -318,7 +331,7 @@ function displayWalks() {
         walkDiv.title = "Click to highlight this walk in the graph"; // Tooltip
 
         // Add a click event to each walk element
-        walkDiv.addEventListener("click", function() {
+        walkDiv.addEventListener("click", () => {
             highlightWalk(walk);
         });
 
@@ -376,7 +389,7 @@ function generateInfoHtml(title, details) {
 }
 
 function setupClickEvent(cy) {
-    cy.on("tap", "node, edge", function(evt) {
+    cy.on("tap", "node, edge", (evt) => {
         resetPreviousElementStyle();
         const element = evt.target;
 
@@ -392,7 +405,7 @@ function setupClickEvent(cy) {
 
             // Interactive checking of JSON data attributes
             infoHtml += `
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="false">
+                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="fals">
                     Attributes
                 </button>
                 <div class="collapse show" id="attributesNode-${uniqueID}">
@@ -437,7 +450,7 @@ const maximizeButton = document.getElementById("toggleMaximize");
 let isMaximized = false;
 
 // Add click event listener to the maximize button
-maximizeButton.addEventListener("click", function() {
+maximizeButton.addEventListener("click", () => {
     if (isMaximized) {
         // Restore previous layout
         cyContainer.style.width = "";
