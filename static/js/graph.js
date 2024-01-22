@@ -4,8 +4,8 @@ let previousClickedElement = null;
 let previousClickedElementStyle = null;
 let originalGraphData = null;
 
-const nodeColor = "#666";
-const hightColor = "#FF5733";
+const nodeColor = "#1f77b4";
+const hightColor = "#2ca02c";
 const sourceNodeColor = "#31a354";
 const selectedNodeColor = "#8dd3c7";
 
@@ -319,6 +319,11 @@ function initializeGraph(graphData) {
                 style: {
                     label: "data(name)",
                     "background-color": nodeColor,
+                    "border-color": "#000",
+                    "border-width": 2,
+                    width: "mapData(degree, 0, 10, 20, 50)", // Size based on degree
+                    height: "mapData(degree, 0, 10, 20, 50)",
+                    shape: "ellipse", // Shape of the nodes
                 },
             },
             {
@@ -340,8 +345,8 @@ function initializeGraph(graphData) {
 
                     label: "data(weight)",
                     "text-rotation": "autorotate",
-                    "curve-style": "bezier",
-                    "target-arrow-shape": "triangle",
+                    "target-arrow-shape": "triangle", // Arrow shape
+                    "curve-style": "bezier", // Edge style (curved or straight)
                 },
             },
         ],
