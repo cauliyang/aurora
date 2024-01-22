@@ -33,18 +33,57 @@ layoutSelect.addEventListener("change", () => {
     }).run();
 });
 
+function applyWeightFilter(minWeight) {
+    // Hide edges with weight less than minWeight
+    if (minWeight === 1) return;
+
+    // Hide edges with weight less than minWeight and their connected elements
+    cy.edges().forEach((edge) => {
+        if (edge.data("weight") < minWeight) {
+            hideConnectedElements(edge);
+        }
+    });
+}
+
+function hideConnectedElements(edge) {
+    edge.hide(); // Hide the edge itself
+    const sourceNode = edge.source();
+    const targetNode = edge.target();
+
+    // Hide upstream nodes and edges recursively
+    hideUpstream(sourceNode);
+
+    // Hide downstream nodes and edges recursively
+    hideDownstream(targetNode);
+}
+
+function hideUpstream(node) {
+    if (node.indegree() === 0 || node.data("visibleInPath") === false) return;
+    node.hide();
+    node.incomers("edge").forEach((edge) => {
+        edge.hide();
+        hideUpstream(edge.source());
+    });
+}
+
+function hideDownstream(node) {
+    if (node.outdegree() === 0 || node.data("visibleInPath") === false) return;
+    node.hide();
+    node.outgoers("edge").forEach((edge) => {
+        edge.hide();
+        hideDownstream(edge.target());
+    });
+}
+
 // Function to update graph based on edge weight
 function updateGraph(minWeight) {
     // Reset graph to original data
     cy.elements().remove();
     cy.add(originalGraphData);
 
-    // Hide edges with weight less than minWeight
-    cy.edges().forEach((edge) => {
-        if (edge.data("weight") < minWeight) {
-            edge.hide();
-        }
-    });
+    // Apply the new weight filter
+    applyWeightFilter(minWeight);
+
     // Optionally, you can re-run layout here
     cy.layout({
         name: "dagre",
