@@ -354,7 +354,7 @@ function initializeGraph(graphData) {
             {
                 selector: "edge",
                 style: {
-                    width: 5,
+                    width: 4,
                     "line-color": (ele) => {
                         const weight = ele.data("weight");
                         return getColorForWeight(weight, minWeight, maxWeight, colorScale);
