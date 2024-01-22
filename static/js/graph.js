@@ -43,8 +43,21 @@ function applyWeightFilter(minWeight) {
             hideConnectedElements(edge);
         }
     });
+
+    // Hide singleton nodes
+    hideSingletonNodes();
 }
 
+function hideSingletonNodes() {
+    cy.nodes().forEach((node) => {
+        // Check if all connected edges of the node are hidden
+        if (node.connectedEdges(":visible").length === 0) {
+            node.hide();
+        }
+    });
+}
+
+// Existing hideConnectedElements, hideUpstream, and hideDownstream functions...
 function hideConnectedElements(edge) {
     edge.hide(); // Hide the edge itself
     const sourceNode = edge.source();
