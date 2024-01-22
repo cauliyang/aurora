@@ -281,13 +281,33 @@ document.addEventListener("DOMContentLoaded", () => {
     resizePanels();
 });
 
+// Function to get color based on weight
+function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
+    if (weight <= minWeight) {
+        return colorScale[0];
+    }
+    if (weight >= maxWeight) {
+        return colorScale[colorScale.length - 1];
+    }
+
+    let index = Math.floor(
+        ((colorScale.length - 1) * (weight - minWeight)) / (maxWeight - minWeight),
+    );
+    return colorScale[index];
+}
+
 function initializeGraph(graphData) {
-    // ... [All the code inside your fetch(jsonfile).then((graphData) => {...}) block]
     const maxWeight = Math.max(
         ...graphData.edges.map((edge) => edge.data.weight),
     );
-    const minWidth = 1;
-    const maxWidth = 10; // Maximum width you prefer
+
+    // Assume minWeight and maxWeight are known (you can calculate these based on your data)
+    const minWeight = 1; // e.g., 1
+    // gray to black
+    const colorScale = chroma
+        .scale(["gray", "black"])
+        .mode("lch")
+        .colors(maxWeight);
 
     cy = cytoscape({
         container: document.getElementById("cy"),
@@ -309,7 +329,6 @@ function initializeGraph(graphData) {
             {
                 selector: "edge.highlighted",
                 style: {
-                    width: "4px",
                     "line-color": hightColor,
                     "target-arrow-color": hightColor,
                 },
@@ -335,18 +354,20 @@ function initializeGraph(graphData) {
             {
                 selector: "edge",
                 style: {
-                    width: (edge) => {
-                        // Normalize the edge width and ensure it's between minWidth and maxWidth
-                        const normalizedWidth =
-                            (edge.data("weight") / maxWeight) * (maxWidth - minWidth) +
-                            minWidth;
-                        return normalizedWidth;
+                    width: 5,
+                    "line-color": (ele) => {
+                        const weight = ele.data("weight");
+                        return getColorForWeight(weight, minWeight, maxWeight, colorScale);
                     },
-
+                    "target-arrow-color": (ele) => {
+                        const weight = ele.data("weight");
+                        return getColorForWeight(weight, minWeight, maxWeight, colorScale);
+                    },
                     label: "data(weight)",
                     "text-rotation": "autorotate",
                     "target-arrow-shape": "triangle", // Arrow shape
                     "curve-style": "bezier", // Edge style (curved or straight)
+                    "text-margin-y": -10,
                 },
             },
         ],
