@@ -7,12 +7,16 @@
     <title>Graph Visualization</title>
 
 
+
     <script src="https://cdn.jsdelivr.net/npm/chroma-js@2.1.0/chroma.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-tidytree/dist/cytoscape-tidytree.js"></script>
+
+    <script src="https://unpkg.com/cytoscape-klay/cytoscape-klay.js"></script>
 
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -124,14 +128,26 @@
                             <option value="grid">Grid Layout</option>
                             <option value="circle">Circle Layout</option>
                             <option value="cose">COSE Layout</option>
+                            <option value="breadthfirst">Breadthfirst Layout</option>
+                            <option value="concentric">Concentric Layout</option>
+                            <!-- <option value="preset">Preset Layout</option> -->
+                            <option value="random">Radom Layout</option>
+                            <option value="tidytree">Tidytree Layout</option>
+                            <!-- <option value="elk">Elk Layout</option> -->
+                            <!-- <option value="cola">Cola Layout</option> -->
+                            <!-- <option value="cise">Cise Layout</option> -->
+                            <!-- <option value="klay">Klay Layout</option> -->
+                            <!-- <option value="avsdf">Avsdf Layout</option> -->
+
+                            <!-- https://blog.js.cytoscape.org/2020/05/11/layouts/#classes-of-layouts -->
                             <!-- Add more layout options as needed -->
                         </select>
                     </div>
 
                     <!-- Edge Weight Input -->
                     <div class="input-group me-1">
-                        <input type="number" id="minEdgeWeight" class="form-control" placeholder="weight" , value="1"
-                            style="width: 100px;">
+                        <input type="number" id="minEdgeWeight" class="form-control" placeholder="weight" , value="1" ,
+                            min="1" , style="width: 100px;">
                     </div>
 
                     <!-- !-- JSON Editor and IGV Buttons -->
