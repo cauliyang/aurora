@@ -90,6 +90,8 @@ function hideDownstream(node) {
 
 // Function to update graph based on edge weight
 function updateGraph(minWeight) {
+    // TODO: Update walks <01-22-24, Yangyang Li yangyang.li@northwestern.edu>
+
     // Reset graph to original data
     cy.elements().remove();
     cy.add(originalGraphData);
