@@ -35,7 +35,7 @@ layoutSelect.addEventListener("change", () => {
 
 function applyWeightFilter(minWeight) {
     // Hide edges with weight less than minWeight
-    if (minWeight === 1) return;
+    if (minWeight <= 1) return;
 
     // Hide edges with weight less than minWeight and their connected elements
     cy.edges().forEach((edge) => {
