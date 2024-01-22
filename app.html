@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Visualization</title>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/chroma-js@2.1.0/chroma.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
@@ -123,6 +126,11 @@
                             <option value="cose">COSE Layout</option>
                             <!-- Add more layout options as needed -->
                         </select>
+                    </div>
+
+                    <!-- Edge Weight Input -->
+                    <div class="input-group me-1">
+                        <input type="number" id="minEdgeWeight" class="form-control" placeholder="Enter weight">
                     </div>
 
                     <!-- !-- JSON Editor and IGV Buttons -->

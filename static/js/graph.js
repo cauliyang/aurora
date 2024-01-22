@@ -2,9 +2,10 @@ const walks = [];
 let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
+let originalGraphData = null;
 
-const nodeColor = "#666";
-const hightColor = "#FF5733";
+const nodeColor = "#1f77b4";
+const hightColor = "#2ca02c";
 const sourceNodeColor = "#31a354";
 const selectedNodeColor = "#8dd3c7";
 
@@ -32,13 +33,97 @@ layoutSelect.addEventListener("change", () => {
     }).run();
 });
 
+function applyWeightFilter(minWeight) {
+    // Hide edges with weight less than minWeight
+    if (minWeight === 1) return;
+
+    // Hide edges with weight less than minWeight and their connected elements
+    cy.edges().forEach((edge) => {
+        if (edge.data("weight") < minWeight) {
+            hideConnectedElements(edge);
+        }
+    });
+
+    // Hide singleton nodes
+    hideSingletonNodes();
+}
+
+function hideSingletonNodes() {
+    cy.nodes().forEach((node) => {
+        // Check if all connected edges of the node are hidden
+        if (node.connectedEdges(":visible").length === 0) {
+            node.hide();
+        }
+    });
+}
+
+// Existing hideConnectedElements, hideUpstream, and hideDownstream functions...
+function hideConnectedElements(edge) {
+    edge.hide(); // Hide the edge itself
+    const sourceNode = edge.source();
+    const targetNode = edge.target();
+
+    // Hide upstream nodes and edges recursively
+    hideUpstream(sourceNode);
+
+    // Hide downstream nodes and edges recursively
+    hideDownstream(targetNode);
+}
+
+function hideUpstream(node) {
+    if (node.indegree() === 0 || node.data("visibleInPath") === false) return;
+    node.hide();
+    node.incomers("edge").forEach((edge) => {
+        edge.hide();
+        hideUpstream(edge.source());
+    });
+}
+
+function hideDownstream(node) {
+    if (node.outdegree() === 0 || node.data("visibleInPath") === false) return;
+    node.hide();
+    node.outgoers("edge").forEach((edge) => {
+        edge.hide();
+        hideDownstream(edge.target());
+    });
+}
+
+// Function to update graph based on edge weight
+function updateGraph(minWeight) {
+    // Reset graph to original data
+    cy.elements().remove();
+    cy.add(originalGraphData);
+
+    // Apply the new weight filter
+    applyWeightFilter(minWeight);
+
+    // Optionally, you can re-run layout here
+    cy.layout({
+        name: "dagre",
+        fit: true,
+        padding: 10,
+        avoidOverlap: true,
+        rankDir: "LR",
+    }).run();
+}
+
+document
+    .getElementById("minEdgeWeight")
+    .addEventListener("change", function() {
+        const minWeight = parseFloat(this.value) || 1;
+        if (Number.isNaN(minWeight)) return;
+        updateGraph(minWeight);
+    });
+
 function loadGraphDataFromServer(graphData) {
     //check if graphData has elements
     // if has elements, initialize graph using elements
     // if not has elements, initialize graph using graphData
     if (graphData.elements) {
+        originalGraphData = graphData.elements;
         initializeGraph(graphData.elements);
     } else {
+        originalGraphData = graphData;
         initializeGraph(graphData);
     }
     setupGraphInteractions();
@@ -196,13 +281,33 @@ document.addEventListener("DOMContentLoaded", () => {
     resizePanels();
 });
 
+// Function to get color based on weight
+function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
+    if (weight <= minWeight) {
+        return colorScale[0];
+    }
+    if (weight >= maxWeight) {
+        return colorScale[colorScale.length - 1];
+    }
+
+    let index = Math.floor(
+        ((colorScale.length - 1) * (weight - minWeight)) / (maxWeight - minWeight),
+    );
+    return colorScale[index];
+}
+
 function initializeGraph(graphData) {
-    // ... [All the code inside your fetch(jsonfile).then((graphData) => {...}) block]
     const maxWeight = Math.max(
         ...graphData.edges.map((edge) => edge.data.weight),
     );
-    const minWidth = 1;
-    const maxWidth = 10; // Maximum width you prefer
+
+    // Assume minWeight and maxWeight are known (you can calculate these based on your data)
+    const minWeight = 1; // e.g., 1
+    // gray to black
+    const colorScale = chroma
+        .scale(["gray", "black"])
+        .mode("lch")
+        .colors(maxWeight);
 
     cy = cytoscape({
         container: document.getElementById("cy"),
@@ -224,7 +329,6 @@ function initializeGraph(graphData) {
             {
                 selector: "edge.highlighted",
                 style: {
-                    width: "4px",
                     "line-color": hightColor,
                     "target-arrow-color": hightColor,
                 },
@@ -234,6 +338,11 @@ function initializeGraph(graphData) {
                 style: {
                     label: "data(name)",
                     "background-color": nodeColor,
+                    "border-color": "#000",
+                    "border-width": 2,
+                    width: "mapData(degree, 0, 10, 20, 50)", // Size based on degree
+                    height: "mapData(degree, 0, 10, 20, 50)",
+                    shape: "ellipse", // Shape of the nodes
                 },
             },
             {
@@ -245,18 +354,20 @@ function initializeGraph(graphData) {
             {
                 selector: "edge",
                 style: {
-                    width: (edge) => {
-                        // Normalize the edge width and ensure it's between minWidth and maxWidth
-                        const normalizedWidth =
-                            (edge.data("weight") / maxWeight) * (maxWidth - minWidth) +
-                            minWidth;
-                        return normalizedWidth;
+                    width: 5,
+                    "line-color": (ele) => {
+                        const weight = ele.data("weight");
+                        return getColorForWeight(weight, minWeight, maxWeight, colorScale);
                     },
-
+                    "target-arrow-color": (ele) => {
+                        const weight = ele.data("weight");
+                        return getColorForWeight(weight, minWeight, maxWeight, colorScale);
+                    },
                     label: "data(weight)",
                     "text-rotation": "autorotate",
-                    "curve-style": "bezier",
-                    "target-arrow-shape": "triangle",
+                    "target-arrow-shape": "triangle", // Arrow shape
+                    "curve-style": "bezier", // Edge style (curved or straight)
+                    "text-margin-y": -10,
                 },
             },
         ],
