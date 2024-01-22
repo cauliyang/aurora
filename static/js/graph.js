@@ -2,6 +2,7 @@ const walks = [];
 let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
+let originalGraphData = null;
 
 const nodeColor = "#666";
 const hightColor = "#FF5733";
@@ -32,13 +33,45 @@ layoutSelect.addEventListener("change", () => {
     }).run();
 });
 
+// Function to update graph based on edge weight
+function updateGraph(minWeight) {
+    // Reset graph to original data
+    cy.elements().remove();
+    cy.add(originalGraphData);
+
+    // Hide edges with weight less than minWeight
+    cy.edges().forEach((edge) => {
+        if (edge.data("weight") < minWeight) {
+            edge.hide();
+        }
+    });
+    // Optionally, you can re-run layout here
+    cy.layout({
+        name: "dagre",
+        fit: true,
+        padding: 10,
+        avoidOverlap: true,
+        rankDir: "LR",
+    }).run();
+}
+
+document
+    .getElementById("minEdgeWeight")
+    .addEventListener("change", function() {
+        const minWeight = parseFloat(this.value) || 1;
+        if (Number.isNaN(minWeight)) return;
+        updateGraph(minWeight);
+    });
+
 function loadGraphDataFromServer(graphData) {
     //check if graphData has elements
     // if has elements, initialize graph using elements
     // if not has elements, initialize graph using graphData
     if (graphData.elements) {
+        originalGraphData = graphData.elements;
         initializeGraph(graphData.elements);
     } else {
+        originalGraphData = graphData;
         initializeGraph(graphData);
     }
     setupGraphInteractions();
