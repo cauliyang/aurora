@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "start": "parcel src/index.html src/app.html src/igv.html",
+    "build": "parcel build src/index.html src/app.html src/igv.html"
   },
   "keywords": [],
   "author": "",
