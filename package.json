@@ -10,12 +10,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel",
-    "build": "parcel build"
+    "build": "parcel build --dist-dir public"
   },
   "keywords": [
     "bioinformatics"
   ],
-  "author": "",
+  "author": "Yangyang Li",
   "license": "ISC",
   "devDependencies": {
     "parcel": "^2.11.0"

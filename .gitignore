@@ -17,3 +17,4 @@ node_modules/
 aurora
 .parcel-cache
 dist
+public
