@@ -14,7 +14,12 @@ cytoscape.use(spread);
 import chroma from "chroma-js";
 import interact from "interactjs";
 
-const walks = [];
+let sourceNodes = null;
+let sinkNodes = null;
+
+let walks = [];
+let minEdgeWeight = 1;
+
 let cy;
 let previousClickedElement = null;
 let previousClickedElementStyle = null;
@@ -49,21 +54,6 @@ layoutSelect.addEventListener("change", () => {
     }).run();
 });
 
-function applyWeightFilter(minWeight) {
-    // Hide edges with weight less than minWeight
-    if (minWeight <= 1) return;
-
-    // Hide edges with weight less than minWeight and their connected elements
-    cy.edges().forEach((edge) => {
-        if (edge.data("weight") < minWeight) {
-            hideConnectedElements(edge);
-        }
-    });
-
-    // Hide singleton nodes
-    hideSingletonNodes();
-}
-
 function hideSingletonNodes() {
     cy.nodes().forEach((node) => {
         // Check if all connected edges of the node are hidden
@@ -73,47 +63,22 @@ function hideSingletonNodes() {
     });
 }
 
-// Existing hideConnectedElements, hideUpstream, and hideDownstream functions...
-function hideConnectedElements(edge) {
-    edge.hide(); // Hide the edge itself
-    const sourceNode = edge.source();
-    const targetNode = edge.target();
-
-    // Hide upstream nodes and edges recursively
-    hideUpstream(sourceNode);
-
-    // Hide downstream nodes and edges recursively
-    hideDownstream(targetNode);
-}
-
-function hideUpstream(node) {
-    if (node.indegree() === 0 || node.data("visibleInPath") === false) return;
-    node.hide();
-    node.incomers("edge").forEach((edge) => {
-        edge.hide();
-        hideUpstream(edge.source());
-    });
-}
-
-function hideDownstream(node) {
-    if (node.outdegree() === 0 || node.data("visibleInPath") === false) return;
-    node.hide();
-    node.outgoers("edge").forEach((edge) => {
-        edge.hide();
-        hideDownstream(edge.target());
-    });
-}
-
 // Function to update graph based on edge weight
-function updateGraph(minWeight) {
+function updateGraph() {
     // TODO: Update walks <01-22-24, Yangyang Li yangyang.li@northwestern.edu>
 
     // Reset graph to original data
     cy.elements().remove();
     cy.add(originalGraphData);
 
-    // Apply the new weight filter
-    applyWeightFilter(minWeight);
+    // update walks
+    walks = [];
+    sourceNodes.forEach((sourceNode) => {
+        dfs(sourceNode, [], sinkNodes);
+    });
+
+    hideUninvolvedElements();
+    hideSingletonNodes();
 
     // Optionally, you can re-run layout here
     cy.layout({
@@ -123,14 +88,46 @@ function updateGraph(minWeight) {
         avoidOverlap: true,
         rankDir: "LR",
     }).run();
+
+    setupGraphInteractions();
+}
+
+function hideUninvolvedElements() {
+    const involvedNodes = new Set();
+    const involvedEdges = new Set();
+
+    // Mark all nodes and edges involved in the walks
+    walks.forEach((walk) => {
+        walk.forEach((node, index) => {
+            involvedNodes.add(node.id());
+            if (index < walk.length - 1) {
+                const nextNode = walk[index + 1];
+                const connectingEdge = node.edgesTo(nextNode);
+                involvedEdges.add(connectingEdge.id());
+            }
+        });
+    });
+
+    // Hide nodes and edges not involved in any walk
+    cy.nodes().forEach((node) => {
+        if (!involvedNodes.has(node.id())) {
+            node.hide();
+        }
+    });
+
+    cy.edges().forEach((edge) => {
+        if (!involvedEdges.has(edge.id())) {
+            edge.hide();
+        }
+    });
 }
 
 document
     .getElementById("minEdgeWeight")
     .addEventListener("change", function() {
-        const minWeight = parseFloat(this.value) || 1;
-        if (Number.isNaN(minWeight)) return;
-        updateGraph(minWeight);
+        minEdgeWeight = parseFloat(this.value) || 1;
+        if (Number.isNaN(minEdgeWeight)) return;
+        updateGraph(minEdgeWeight);
     });
 
 function loadGraphDataFromServer(graphData) {
@@ -419,9 +416,10 @@ function initializeGraph(graphData) {
         }
     });
 
-    walks.length = 0;
-    const sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
-    const sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
+    // clear walks
+    walks = [];
+    sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
+    sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
 
     sourceNodes.forEach((sourceNode) => {
         dfs(sourceNode, [], sinkNodes);
@@ -435,7 +433,6 @@ function setupGraphInteractions() {
             resetPreviousElementStyle();
             previousClickedElement = null;
             previousClickedElementStyle = null;
-
             cy.elements().removeClass("highlighted");
         }
     });
@@ -485,15 +482,22 @@ function highlightWalk(walk) {
     }
 }
 
-function dfs(node, currentPath, sinkNodes) {
+function dfs(node, currentPath, sinkNodes, isPathValid = true) {
+    if (!isPathValid) return;
+
     currentPath.push(node);
 
     if (sinkNodes.includes(node)) {
         walks.push([...currentPath]); // Found a path
     } else {
-        const neighbors = node.outgoers().nodes();
-        neighbors.forEach((neighbor) => {
-            dfs(neighbor, currentPath, sinkNodes);
+        // Correctly use outgoers as a method call
+        node.outgoers("node").forEach((neighbor) => {
+            const connectingEdge = node.edgesTo(neighbor);
+            if (connectingEdge.data("weight") >= minEdgeWeight) {
+                dfs(neighbor, currentPath, sinkNodes, true);
+            } else {
+                dfs(neighbor, currentPath, sinkNodes, false);
+            }
         });
     }
 
