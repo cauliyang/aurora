@@ -1,4 +1,4 @@
-import { loadGraphDataFromServer } from "./main.js";
+import { loadGraphDataFromServer } from "./graph.js";
 
 let editor; // Global variable to store the editor instance
 
