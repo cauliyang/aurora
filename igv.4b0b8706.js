@@ -1,0 +1,2 @@
+!async function(a=null,e="1:1000000-1001000",n="hg38"){baiUrl=(a=a||"https://s3.amazonaws.com/1000genomes/data/HG00103/alignment/HG00103.alt_bwamem_GRCh38DH.20150718.GBR.low_coverage.cram").endsWith(".cram")?a+".crai":a+".bai";let t=document.getElementById("igvContainer"),i={genome:n,locus:e,tracks:[{name:"HG00103",url:a,indexURL:baiUrl,format:a.endsWith(".cram")?"cram":"bam"}]};igv.createBrowser(t,i).then(function(a){console.log("IGV browser is initialized.")})}();
+//# sourceMappingURL=igv.4b0b8706.js.map
