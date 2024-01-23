@@ -1,13 +1,20 @@
 {
-  "name": "project",
+  "name": "aurora",
   "version": "1.0.0",
-  "description": "",
+  "description": "NLGraph Visualization",
+  "source": [
+    "src/index.html",
+    "src/app.html",
+    "src/igv.html"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html src/app.html src/igv.html",
-    "build": "parcel build src/index.html src/app.html src/igv.html"
+    "start": "parcel",
+    "build": "parcel build"
   },
-  "keywords": [],
+  "keywords": [
+    "bioinformatics"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
