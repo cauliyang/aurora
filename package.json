@@ -41,6 +41,7 @@
     "cross-spawn": "^7.0.3",
     "cssesc": "^3.0.0",
     "cytoscape": "^3.28.1",
+    "cytoscape-euler": "^1.2.2",
     "cytoscape-klay": "^3.1.4",
     "cytoscape-tidytree": "^0.1.1",
     "debug": "^2.6.9",
