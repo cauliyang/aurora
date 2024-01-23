@@ -25,9 +25,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      - name: Create CNAME File
-        run: echo "yangyangli.top" > CNAME
-
       - name: Install dependencies
         run: npm ci
 
@@ -37,9 +34,9 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: public
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          cname: yangyangli.top
