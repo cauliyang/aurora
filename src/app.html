@@ -6,15 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Visualization</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/chroma-js@2.1.0/chroma.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.2/dagre.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.3.2/cytoscape-dagre.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cytoscape-tidytree/dist/cytoscape-tidytree.js"></script>
-
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -29,10 +20,10 @@
     <!-- PERFORMANCE -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
-    <link rel="preload" as="style" href="static/style.css">
+    <link rel="preload" as="style" href="./styles/style.css">
 
-    <link rel="stylesheet" href="static/style.css">
-    <link rel="stylesheet" href="static/app.css">
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/app.css">
 
 </head>
 
@@ -132,8 +123,10 @@
                             <!-- <option value="elk">Elk Layout</option> -->
                             <!-- <option value="cola">Cola Layout</option> -->
                             <!-- <option value="cise">Cise Layout</option> -->
-                            <!-- <option value="klay">Klay Layout</option> -->
+                            <option value="klay">Klay Layout</option>
                             <!-- <option value="avsdf">Avsdf Layout</option> -->
+                            <option value="euler">Euler Layout</option>
+                            <option value="spread">Spread Layout</option>
 
                             <!-- https://blog.js.cytoscape.org/2020/05/11/layouts/#classes-of-layouts -->
                             <!-- Add more layout options as needed -->
@@ -151,7 +144,7 @@
                         <button id="openJsonEditor" type="button" class="btn btn-primary"><i
                                 class="bi bi-code-square"></i></button>
                         <button class="btn  btn-outline-primary" id="redirectToIgv"><img
-                                src="img/igv-logo-cooked-40x40.png" alt="IGV" class="img-fluid"
+                                src="./assets/igv-logo-cooked-40x40.png" alt="IGV" class="img-fluid"
                                 style="width:20px; height:20px;"> </button>
                     </div>
 
@@ -195,9 +188,9 @@
         </div>
     </div>
 
-    <script src="static/js/graph.js" , type="module"></script>
-    <script src="static/js/jseditor.js" , type="module"></script>
-    <script src="static/js/tooltip.js"></script>
+    <script src="./scripts/main.js" , type="module"></script>
+    <script src="./scripts/jseditor.js" , type="module"></script>
+    <script src="./scripts/tooltip.js"></script>
 
     <!-- Footer Start -->
     <footer class="mt-5 py-3 bg-dark text-white">

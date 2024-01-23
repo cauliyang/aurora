@@ -1,3 +1,19 @@
+import cytoscape from "cytoscape";
+import klay from "cytoscape-klay";
+import dagre from "cytoscape-dagre";
+import tidytree from "cytoscape-tidytree";
+import euler from "cytoscape-euler";
+import spread from "cytoscape-spread";
+
+cytoscape.use(dagre);
+cytoscape.use(klay);
+cytoscape.use(tidytree);
+cytoscape.use(euler);
+cytoscape.use(spread);
+
+import chroma from "chroma-js";
+import interact from "interactjs";
+
 const walks = [];
 let cy;
 let previousClickedElement = null;
