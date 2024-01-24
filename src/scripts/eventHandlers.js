@@ -1,3 +1,4 @@
+import { STATE } from "./graph";
 import { resizePanels } from "./graphUtilities";
 
 // Get references to the cy, info, and walks elements
@@ -26,6 +27,41 @@ maximizeButton.addEventListener("click", () => {
         walksPanel.style.display = "none";
         isMaximized = true;
     }
+});
+
+const HiddenLabelButton = document.getElementById("hiddenLabel");
+let labelsVisible = true; // Initially, labels are visible
+
+function toggleLabels() {
+    labelsVisible = !labelsVisible;
+
+    const labelStyle = labelsVisible ? "data(name)" : ""; // Toggles between showing the name and showing nothing
+
+    STATE.cy
+        .style()
+        .selector("node") // Select nodes
+        .style({
+            label: labelStyle,
+        })
+        .selector("edge") // Select edges
+        .style({
+            label: labelsVisible ? "data(weight)" : "", // Toggles edge labels based on weight
+        })
+        .update(); // Important to update the style
+}
+document.getElementById("hiddenLabel").addEventListener("click", toggleLabels);
+
+document.getElementById("captureGraph").addEventListener("click", () => {
+    // Get the base64 representation of the graph
+    const base64Image = STATE.cy.png();
+
+    // Create a new anchor element to enable downloading
+    const downloadLink = document.createElement("a");
+    downloadLink.href = base64Image;
+    downloadLink.download = "graph_capture.png";
+
+    // Trigger the download
+    downloadLink.click();
 });
 
 document.getElementById("redirectToIgv").addEventListener("click", () => {

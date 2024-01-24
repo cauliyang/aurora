@@ -5,11 +5,7 @@ import tidytree from "cytoscape-tidytree";
 import euler from "cytoscape-euler";
 import spread from "cytoscape-spread";
 
-import {
-    hideSingletonNodes,
-    resetPreviousElementStyle,
-    setupClickEvent,
-} from "./graphUtilities";
+import { hideSingletonNodes, setupClickEvent } from "./graphUtilities";
 import { initializeGraph } from "./graphSetup";
 import { createTooltip } from "./tooltip";
 import { dfs } from "./graphUtilities";
@@ -151,15 +147,7 @@ export function loadGraphDataFromServer(graphData) {
 
 document.getElementById("resetGraph").addEventListener("click", () => {
     // Reset layout to default
-    // resetPreviousElementStyle();
-    STATE.previousClickedElement = null;
-    STATE.previousClickedElementStyle = null;
-
     STATE.cy.elements().removeClass("highlight");
-
-    // Clear info panel
-    document.getElementById("info").innerHTML = "<h3>Node/Edge Info:</h3>";
-
     layoutSelect.value = "dagre";
     STATE.cy
         .layout({
@@ -184,27 +172,14 @@ document.getElementById("resetGraph").addEventListener("click", () => {
     walksPanel.style.display = "";
 });
 
-document.getElementById("captureGraph").addEventListener("click", () => {
-    // Get the base64 representation of the graph
-    const base64Image = STATE.cy.png();
-
-    // Create a new anchor element to enable downloading
-    const downloadLink = document.createElement("a");
-    downloadLink.href = base64Image;
-    downloadLink.download = "graph_capture.png";
-
-    // Trigger the download
-    downloadLink.click();
-});
-
 // Function to get color based on weight
 
 function setupGraphInteractions() {
     STATE.cy.on("tap", (evt) => {
         if (evt.target === STATE.cy) {
             // resetPreviousElementStyle();
-            STATE.previousClickedElement = null;
-            STATE.previousClickedElementStyle = null;
+            // STATE.previousClickedElement = null;
+            // STATE.previousClickedElementStyle = null;
             STATE.cy.elements().removeClass("highlight");
         }
     });

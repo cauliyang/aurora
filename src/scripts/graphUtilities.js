@@ -74,7 +74,7 @@ export function setupClickEvent() {
             <p>Source: ${element.source().id()}<br>Target: ${element
                     .target()
                     .id()}</p>
-            
+
             <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}">
                 Data
             </button>
