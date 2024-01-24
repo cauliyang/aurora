@@ -65,7 +65,7 @@ function updateGraph() {
 
     // update walks
     sourceNodes.forEach((sourceNode) => {
-        dfs(sourceNodes, [], sinkNodes);
+        dfs(sourceNode, [], sinkNodes);
     });
 
     hideUninvolvedElements();

@@ -113,12 +113,11 @@ export function initializeGraph(graphData) {
         "background-color": "#ff5733", // Change to your preferred highlight color
     });
 
-    // clear walks
     const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
     const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
 
     STATE.walks.length = 0;
     sourceNodes.forEach((sourceNode) => {
-        dfs(sourceNodes, [], sinkNodes);
+        dfs(sourceNode, [], sinkNodes);
     });
 }
