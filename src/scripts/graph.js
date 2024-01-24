@@ -107,7 +107,6 @@ function hideDownstream(node) {
 // Function to update graph based on edge weight
 function updateGraph(minWeight) {
     // TODO: Update walks <01-22-24, Yangyang Li yangyang.li@northwestern.edu>
-
     // Reset graph to original data
     cy.elements().remove();
     cy.add(originalGraphData);
@@ -295,7 +294,6 @@ function resizePanels() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM Loaded");
     resizePanels();
 });
 
@@ -308,7 +306,7 @@ function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
         return colorScale[colorScale.length - 1];
     }
 
-    let index = Math.floor(
+    const index = Math.floor(
         ((colorScale.length - 1) * (weight - minWeight)) / (maxWeight - minWeight),
     );
     return colorScale[index];
