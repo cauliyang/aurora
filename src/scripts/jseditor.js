@@ -1,4 +1,7 @@
 import { loadGraphDataFromServer } from "./graph.js";
+import { Modal } from "bootstrap";
+import JSONEditor from "jsoneditor";
+import "jsoneditor/dist/jsoneditor.min.css";
 
 let editor; // Global variable to store the editor instance
 
@@ -94,14 +97,14 @@ document.getElementById("jsonModal").addEventListener("shown.bs.modal", () => {
 });
 
 document.getElementById("openJsonEditor").addEventListener("click", () => {
-    const jsonModal = new bootstrap.Modal(document.getElementById("jsonModal"));
+    const jsonModal = new Modal(document.getElementById("jsonModal"));
     jsonModal.show();
 });
 
 document.getElementById("closeEditor").addEventListener("click", () => {
     // You can add any cleanup or reset actions here, if needed.
     // For now, just close the modal.
-    const jsonModal = new bootstrap.Modal(document.getElementById("jsonModal"));
+    const jsonModal = new Modal(document.getElementById("jsonModal"));
     jsonModal.hide();
 });
 
@@ -112,7 +115,7 @@ document.getElementById("saveEditedJson").addEventListener("click", () => {
         loadGraphDataFromServer(editedData);
 
         // Close the modal
-        const jsonModalInstance = bootstrap.Modal.getInstance(
+        const jsonModalInstance = Modal.getInstance(
             document.getElementById("jsonModal"),
         );
         jsonModalInstance.hide();
