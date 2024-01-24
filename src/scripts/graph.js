@@ -15,7 +15,9 @@ import chroma from "chroma-js";
 import interact from "interactjs";
 
 let walks = [];
+
 let minEdgeWeight = 1;
+let maxPathLength = Infinity; // infinite
 
 let cy;
 let previousClickedElement = null;
