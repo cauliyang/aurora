@@ -14,9 +14,6 @@ cytoscape.use(spread);
 import chroma from "chroma-js";
 import interact from "interactjs";
 
-let sourceNodes = null;
-let sinkNodes = null;
-
 let walks = [];
 let minEdgeWeight = 1;
 
@@ -65,14 +62,15 @@ function hideSingletonNodes() {
 
 // Function to update graph based on edge weight
 function updateGraph() {
-    // TODO: Update walks <01-22-24, Yangyang Li yangyang.li@northwestern.edu>
-
     // Reset graph to original data
+    walks.length = 0;
     cy.elements().remove();
     cy.add(originalGraphData);
 
+    sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
+    sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
+
     // update walks
-    walks = [];
     sourceNodes.forEach((sourceNode) => {
         dfs(sourceNode, [], sinkNodes);
     });
@@ -355,8 +353,6 @@ function initializeGraph(graphData) {
                     "background-color": nodeColor,
                     "border-color": "#000",
                     "border-width": 2,
-                    width: "mapData(degree, 0, 10, 20, 50)", // Size based on degree
-                    height: "mapData(degree, 0, 10, 20, 50)",
                     shape: "ellipse", // Shape of the nodes
                 },
             },
@@ -417,17 +413,16 @@ function initializeGraph(graphData) {
     });
 
     // clear walks
-    walks = [];
     sourceNodes = cy.nodes().filter((node) => node.indegree() === 0);
     sinkNodes = cy.nodes().filter((node) => node.outdegree() === 0);
 
+    walks.length = 0;
     sourceNodes.forEach((sourceNode) => {
         dfs(sourceNode, [], sinkNodes);
     });
 }
 
 function setupGraphInteractions() {
-    // ... [Your cy.on("tap", ...), displayWalks(), setupClickEvent(), and Split functions calls]
     cy.on("tap", (evt) => {
         if (evt.target === cy) {
             resetPreviousElementStyle();
