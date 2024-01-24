@@ -114,8 +114,8 @@ export function initializeGraph(graphData) {
     });
 
     // clear walks
-    sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
-    sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
+    const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
+    const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
 
     STATE.walks.length = 0;
     sourceNodes.forEach((sourceNode) => {

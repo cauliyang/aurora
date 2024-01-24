@@ -60,12 +60,12 @@ function updateGraph() {
     STATE.cy.elements().remove();
     STATE.cy.add(STATE.originalGraphData);
 
-    sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
-    sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
+    const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
+    const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
 
     // update walks
     sourceNodes.forEach((sourceNode) => {
-        dfs(sourceNode, [], sinkNodes);
+        dfs(sourceNodes, [], sinkNodes);
     });
 
     hideUninvolvedElements();
