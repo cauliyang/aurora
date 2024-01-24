@@ -5,8 +5,11 @@ import tidytree from "cytoscape-tidytree";
 import euler from "cytoscape-euler";
 import spread from "cytoscape-spread";
 
-import { hideSingletonNodes } from "./graphUtilities";
-import { resizePanels } from "./graphUtilities";
+import {
+    hideSingletonNodes,
+    resetPreviousElementStyle,
+    setupClickEvent,
+} from "./graphUtilities";
 import { initializeGraph } from "./graphSetup";
 import { createTooltip } from "./tooltip";
 import { dfs } from "./graphUtilities";
@@ -27,7 +30,7 @@ export const STATE = {
     originalGraphData: null,
     selectedNodeColor: "#8dd3c7",
     nodeColor: "#1f77b4",
-    highlightColor: "red", //red
+    highlightColor: "#ff5733", //red
     sourceNodeColor: "#31a354",
 };
 
@@ -38,17 +41,19 @@ layoutSelect.addEventListener("change", () => {
     // Get the selected layout from the select element
     const selectedLayout = layoutSelect.value;
 
-    if (cy === undefined) return;
+    if (STATE.cy === null) return;
 
     // Apply the chosen layout
-    cy.layout({
-        name: selectedLayout,
-        animate: true, // You can adjust animation settings if needed
-        fit: true,
-        padding: 10,
-        avoidOverlap: true,
-        rankDir: "LR",
-    }).run();
+    STATE.cy
+        .layout({
+            name: selectedLayout,
+            animate: true, // You can adjust animation settings if needed
+            fit: true,
+            padding: 10,
+            avoidOverlap: true,
+            rankDir: "LR",
+        })
+        .run();
 });
 
 // Function to update graph based on edge weight
@@ -217,10 +222,6 @@ document.getElementById("captureGraph").addEventListener("click", () => {
     downloadLink.click();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    resizePanels();
-});
-
 // Function to get color based on weight
 
 function setupGraphInteractions() {
@@ -262,88 +263,17 @@ function displayWalks() {
 }
 
 function highlightWalk(walk) {
+    console.log("highlightWalk", walk);
+
     // Reset any previously highlighted nodes or edges
     STATE.cy.elements().removeClass("highlighted");
-    for (let i = 0; i < walk.length; i++) {
-        // Highlight every node in the walk
-        walk[i].addClass("highlighted");
 
-        // If it's not the last node in the walk, highlight the edge to the next node
-        if (i < walk.length - 1) {
-            const currentNode = walk[i];
-            const nextNode = walk[i + 1];
-            const connectingEdge = currentNode.edgesTo(nextNode);
-            connectingEdge.addClass("highlighted");
+    walk.forEach((node, index) => {
+        console.log(node.id());
+        node.addClass("highlighted");
+        if (index < walk.length - 1) {
+            const nextNode = walk[index + 1];
+            node.edgesTo(nextNode).addClass("highlighted");
         }
-    }
-}
-
-export function resetPreviousElementStyle() {
-    if (STATE.previousClickedElement) {
-        if (STATE.previousClickedElement.isNode()) {
-            STATE.previousClickedElement.style(STATE.previousClickedElementStyle);
-        } else if (STATE.previousClickedElement.isEdge()) {
-        }
-    }
-}
-
-function generateInfoHtml(title, details) {
-    let html = `<h3>${title} Information:</h3>`;
-    for (const [key, value] of Object.entries(details)) {
-        html += `<strong>${key}:</strong> ${value}<br>`;
-    }
-    return html;
-}
-
-function setupClickEvent() {
-    STATE.cy.on("tap", "node, edge", (evt) => {
-        resetPreviousElementStyle();
-        const element = evt.target;
-
-        const infoContainer = document.getElementById("info");
-        let infoHtml = "";
-        const uniqueID = Date.now(); // Generate a uni
-        if (element.isNode()) {
-            const indegree = element.indegree();
-            const outdegree = element.outdegree();
-            infoHtml += `<strong>Node ID:</strong> ${element.id()}<br>`;
-            infoHtml += `<strong>In-degree:</strong> ${indegree}<br>`;
-            infoHtml += `<strong>Out-degree:</strong> ${outdegree}<br>`;
-
-            // Interactive checking of JSON data attributes
-            infoHtml += `
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="fals">
-                    Attributes
-                </button>
-                <div class="collapse show" id="attributesNode-${uniqueID}">
-                    <pre>${JSON.stringify(element.data(), null, 2)}</pre>
-                </div>
-            `;
-            STATE.previousClickedElementStyle = element.style();
-            // Highlight the clicked node
-            element.style({
-                "background-color": STATE.selectedNodeColor,
-                "border-color": "#000",
-                "border-width": 2,
-            });
-
-            element.addClass("highlighted");
-        } else if (element.isEdge()) {
-            infoHtml += `
-                <strong>Source:</strong> ${element.source().id()}<br>
-                <strong>Target:</strong> ${element.target().id()}<br>
-
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}" aria-expanded="false">
-                    Data
-                </button>
-                <div class="collapse show" id="dataEdge-${uniqueID}">
-                    <pre>${JSON.stringify(element.data(), null, 2)}</pre>
-                </div>
-            `;
-        }
-
-        // Update the previously clicked item
-        STATE.previousClickedElement = element;
-        infoContainer.innerHTML = infoHtml;
     });
 }

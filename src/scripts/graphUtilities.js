@@ -26,7 +26,7 @@ export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
     currentPath.pop(); // backtrack
 }
 
-function resetPreviousElementStyle() {
+export function resetPreviousElementStyle() {
     if (STATE.previousClickedElement) {
         if (STATE.previousClickedElement.isNode()) {
             STATE.previousClickedElement.style(STATE.previousClickedElementStyle);
@@ -43,8 +43,8 @@ function generateInfoHtml(title, details) {
     return html;
 }
 
-function setupClickEvent(cy) {
-    cy.on("tap", "node, edge", (evt) => {
+export function setupClickEvent() {
+    STATE.cy.on("tap", "node, edge", (evt) => {
         resetPreviousElementStyle();
         const element = evt.target;
 
@@ -71,7 +71,8 @@ function setupClickEvent(cy) {
             // Highlight the clicked node
             element.style({
                 "background-color": STATE.selectedNodeColor,
-                "border-width": "0px",
+                "border-color": "#000",
+                "border-width": 2,
             });
 
             element.addClass("highlighted");
@@ -94,35 +95,6 @@ function setupClickEvent(cy) {
         infoContainer.innerHTML = infoHtml;
     });
 }
-
-// Get references to the cy, info, and walks elements
-const cyContainer = document.getElementById("cy");
-const infoPanel = document.getElementById("info");
-const walksPanel = document.getElementById("walks");
-
-// Get references to the maximize button and set initial state
-const maximizeButton = document.getElementById("toggleMaximize");
-let isMaximized = false;
-
-// Add click event listener to the maximize button
-maximizeButton.addEventListener("click", () => {
-    if (isMaximized) {
-        // Restore previous layout
-        cyContainer.style.width = "";
-        cyContainer.style.height = "";
-        infoPanel.style.display = "";
-        walksPanel.style.display = "";
-        isMaximized = false;
-    } else {
-        // Maximize cy panel
-        cyContainer.style.width = "100%";
-        cyContainer.style.height = "100vh";
-        infoPanel.style.display = "none";
-        walksPanel.style.display = "none";
-        isMaximized = true;
-    }
-});
-
 export function hideSingletonNodes() {
     STATE.cy.nodes().forEach((node) => {
         // Check if all connected edges of the node are hidden

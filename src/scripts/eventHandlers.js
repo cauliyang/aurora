@@ -1,3 +1,5 @@
+import { resizePanels } from "./graphUtilities";
+
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
 const infoPanel = document.getElementById("info");
@@ -28,4 +30,8 @@ maximizeButton.addEventListener("click", () => {
 
 document.getElementById("redirectToIgv").addEventListener("click", () => {
     window.open("igv.html", "_blank");
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    resizePanels();
 });
