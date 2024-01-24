@@ -151,7 +151,7 @@ export function loadGraphDataFromServer(graphData) {
 
 document.getElementById("resetGraph").addEventListener("click", () => {
     // Reset layout to default
-    resetPreviousElementStyle();
+    // resetPreviousElementStyle();
     STATE.previousClickedElement = null;
     STATE.previousClickedElementStyle = null;
 
@@ -202,7 +202,7 @@ document.getElementById("captureGraph").addEventListener("click", () => {
 function setupGraphInteractions() {
     STATE.cy.on("tap", (evt) => {
         if (evt.target === STATE.cy) {
-            resetPreviousElementStyle();
+            // resetPreviousElementStyle();
             STATE.previousClickedElement = null;
             STATE.previousClickedElementStyle = null;
             STATE.cy.elements().removeClass("highlight");
@@ -241,13 +241,8 @@ function highlightWalk(walk) {
     // Reset any previously highlight nodes or edges
     STATE.cy.elements().removeClass("highlight");
 
-    // set style highlight
-    STATE.cy.style().selector("node.highlight").style({
-        "background-color": "#ff5733", // Change to your preferred highlight color
-    });
-
     walk.forEach((node, index) => {
         node.addClass("highlight");
     });
-    // STATE.cy.style().update();
+    STATE.cy.style().update();
 }

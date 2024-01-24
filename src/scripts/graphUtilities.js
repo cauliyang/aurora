@@ -1,5 +1,6 @@
 import interact from "interactjs";
 import { STATE } from "./graph";
+import $ from "jquery";
 
 export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
     if (!isPathValid) return;
@@ -45,54 +46,46 @@ function generateInfoHtml(title, details) {
 
 export function setupClickEvent() {
     STATE.cy.on("tap", "node, edge", (evt) => {
-        resetPreviousElementStyle();
+        // resetPreviousElementStyle();
         const element = evt.target;
 
-        const infoContainer = document.getElementById("info");
-        let infoHtml = "";
+        let content = "";
+
         const uniqueID = Date.now(); // Generate a uni
         if (element.isNode()) {
             const indegree = element.indegree();
             const outdegree = element.outdegree();
-            infoHtml += `<strong>Node ID:</strong> ${element.id()}<br>`;
-            infoHtml += `<strong>In-degree:</strong> ${indegree}<br>`;
-            infoHtml += `<strong>Out-degree:</strong> ${outdegree}<br>`;
 
-            // Interactive checking of JSON data attributes
-            infoHtml += `
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}" aria-expanded="fals">
-                    Attributes
-                </button>
-                <div class="collapse show" id="attributesNode-${uniqueID}">
-                    <pre>${JSON.stringify(element.data(), null, 2)}</pre>
-                </div>
-            `;
-            STATE.previousClickedElementStyle = element.style();
-            // Highlight the clicked node
-            element.style({
-                "background-color": STATE.selectedNodeColor,
-                "border-color": "#000",
-                "border-width": 2,
-            });
+            content += `<h5>Node ID: ${element.id()}</h5>`;
+            content += `<p>In-degree: ${indegree}<br>Out-degree: ${outdegree}</p>`;
+            // content += `<p></p>`;
 
-            element.addClass("walkcolor");
+            // JSON data
+            content += `
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}">
+                Data
+            </button>
+            <div class="collapse" id="attributesNode-${uniqueID}">
+                <pre>${JSON.stringify(element.data(), null, 2)}</pre>
+            </div>
+        `;
         } else if (element.isEdge()) {
-            infoHtml += `
-                <strong>Source:</strong> ${element.source().id()}<br>
-                <strong>Target:</strong> ${element.target().id()}<br>
+            content += `
+            <h5>Edge</h5>
+            <p>Source: ${element.source().id()}<br>Target: ${element
+                    .target()
+                    .id()}</p>
 
-                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}" aria-expanded="false">
-                    Data
-                </button>
-                <div class="collapse show" id="dataEdge-${uniqueID}">
-                    <pre>${JSON.stringify(element.data(), null, 2)}</pre>
-                </div>
-            `;
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}">
+                Data
+            </button>
+            <div class="collapse" id="dataEdge-${uniqueID}">
+                <pre>${JSON.stringify(element.data(), null, 2)}</pre>
+            </div>
+        `;
         }
 
-        // Update the previously clicked item
-        STATE.previousClickedElement = element;
-        infoContainer.innerHTML = infoHtml;
+        $("#infoContent").html(content);
     });
 }
 export function hideSingletonNodes() {

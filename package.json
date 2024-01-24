@@ -34,6 +34,7 @@
     "cytoscape-spread": "^3.0.0",
     "cytoscape-tidytree": "^0.1.1",
     "interactjs": "^1.10.26",
+    "jquery": "^3.7.1",
     "jsoneditor": "^10.0.0"
   }
 }

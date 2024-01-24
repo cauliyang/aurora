@@ -108,6 +108,11 @@ export function initializeGraph(graphData) {
         }
     });
 
+    // set style highlight
+    STATE.cy.style().selector("node.highlight").style({
+        "background-color": "#ff5733", // Change to your preferred highlight color
+    });
+
     // clear walks
     sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
     sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
