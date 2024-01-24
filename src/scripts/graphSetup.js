@@ -42,17 +42,14 @@ export function initializeGraph(graphData) {
         },
         style: [
             {
-                selector: "node.highlighted",
+                selector: "node.walkcolor",
                 style: {
                     "background-color": "#ff5733", // Change to your preferred highlight color
-                    "border-color": "#ff5733",
-                    "border-width": 3,
                 },
             },
             {
-                selector: "edge.highlighted",
+                selector: "edge.walkcolor",
                 style: {
-                    width: 5, // Increase the width for highlight
                     "line-color": "#ff5733", // Change to your preferred highlight color
                     "target-arrow-color": "#ff5733",
                 },
@@ -111,7 +108,6 @@ export function initializeGraph(graphData) {
         desktopTapThreshold: 4,
         autolock: false,
         autoungrabify: false,
-        animate: true,
         elements: graphData,
     });
 

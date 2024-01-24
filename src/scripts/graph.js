@@ -156,7 +156,7 @@ document.getElementById("resetGraph").addEventListener("click", () => {
     STATE.previousClickedElement = null;
     STATE.previousClickedElementStyle = null;
 
-    STATE.cy.elements().removeClass("highlighted");
+    STATE.cy.elements().removeClass("walkcolor");
 
     // Clear info panel
     document.getElementById("info").innerHTML = "<h3>Node/Edge Info:</h3>";
@@ -206,7 +206,7 @@ function setupGraphInteractions() {
             resetPreviousElementStyle();
             STATE.previousClickedElement = null;
             STATE.previousClickedElementStyle = null;
-            STATE.cy.elements().removeClass("highlighted");
+            STATE.cy.elements().removeClass("walkcolor");
         }
     });
 
@@ -241,15 +241,16 @@ function displayWalks() {
 function highlightWalk(walk) {
     console.log("highlightWalk", walk);
 
-    // Reset any previously highlighted nodes or edges
-    STATE.cy.elements().removeClass("highlighted");
+    // Reset any previously walkcolor nodes or edges
+    STATE.cy.elements().removeClass("walkcolor");
 
     walk.forEach((node, index) => {
         console.log(node.id());
-        node.addClass("highlighted");
+        node.addClass("walkcolor");
+        // node change colors
         if (index < walk.length - 1) {
             const nextNode = walk[index + 1];
-            node.edgesTo(nextNode).addClass("highlighted");
+            node.edgesTo(nextNode).addClass("walkcolor");
         }
     });
 }

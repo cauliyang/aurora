@@ -75,7 +75,7 @@ export function setupClickEvent() {
                 "border-width": 2,
             });
 
-            element.addClass("highlighted");
+            element.addClass("walkcolor");
         } else if (element.isEdge()) {
             infoHtml += `
                 <strong>Source:</strong> ${element.source().id()}<br>
