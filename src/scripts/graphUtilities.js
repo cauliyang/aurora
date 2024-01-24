@@ -1,6 +1,8 @@
 import interact from "interactjs";
 import { STATE } from "./graph";
-import $ from "jquery";
+
+import JSONEditor from "jsoneditor";
+import "jsoneditor/dist/jsoneditor.min.css";
 
 export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
     if (!isPathValid) return;
@@ -27,66 +29,39 @@ export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
     currentPath.pop(); // backtrack
 }
 
-export function resetPreviousElementStyle() {
-    if (STATE.previousClickedElement) {
-        if (STATE.previousClickedElement.isNode()) {
-            STATE.previousClickedElement.style(STATE.previousClickedElementStyle);
-        } else if (STATE.previousClickedElement.isEdge()) {
-        }
-    }
-}
-
-function generateInfoHtml(title, details) {
-    let html = `<h3>${title} Information:</h3>`;
-    for (const [key, value] of Object.entries(details)) {
-        html += `<strong>${key}:</strong> ${value}<br>`;
-    }
-    return html;
-}
-
 export function setupClickEvent() {
     STATE.cy.on("tap", "node, edge", (evt) => {
-        // resetPreviousElementStyle();
         const element = evt.target;
+        const infoContainer = document.getElementById("infoContent");
+        infoContainer.innerHTML = ""; // Clear existing content
 
-        let content = "";
+        const uniqueID = Date.now();
+        const container = document.createElement("div");
+        container.id = `jsoneditor-${uniqueID}`;
+        container.style.height = "400px"; // Set a fixed height for the editor
+        infoContainer.appendChild(container);
 
-        const uniqueID = Date.now(); // Generate a uni
-        if (element.isNode()) {
-            const indegree = element.indegree();
-            const outdegree = element.outdegree();
+        // Create JSON Editor instance
+        const editor = new JSONEditor(container, { mode: "preview" });
 
-            content += `<h5>Node ID: ${element.id()}</h5>`;
-            content += `<p>In-degree: ${indegree}<br>Out-degree: ${outdegree}</p>`;
+        // Set data for the editor
+        const data = element.isNode()
+            ? {
+                id: element.id(),
+                indegree: element.indegree(),
+                outdegree: element.outdegree(),
+                data: element.data(),
+            }
+            : {
+                source: element.source().id(),
+                target: element.target().id(),
+                data: element.data(),
+            };
 
-            // JSON data
-            content += `
-            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#attributesNode-${uniqueID}">
-                Data
-            </button>
-            <div class="collapse" id="attributesNode-${uniqueID}">
-                <pre>${JSON.stringify(element.data(), null, 2)}</pre>
-            </div>
-        `;
-        } else if (element.isEdge()) {
-            content += `
-            <h5>Edge</h5>
-            <p>Source: ${element.source().id()}<br>Target: ${element
-                    .target()
-                    .id()}</p>
-
-            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}">
-                Data
-            </button>
-            <div class="collapse" id="dataEdge-${uniqueID}">
-                <pre>${JSON.stringify(element.data(), null, 2)}</pre>
-            </div>
-        `;
-        }
-
-        $("#infoContent").html(content);
+        editor.set(data);
     });
 }
+
 export function hideSingletonNodes() {
     STATE.cy.nodes().forEach((node) => {
         // Check if all connected edges of the node are hidden
