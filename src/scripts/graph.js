@@ -36,7 +36,6 @@ export const STATE = {
 
 // Get the "Change Layout" button element
 const layoutSelect = document.getElementById("layoutSelect");
-
 layoutSelect.addEventListener("change", () => {
     // Get the selected layout from the select element
     const selectedLayout = layoutSelect.value;
@@ -156,7 +155,7 @@ document.getElementById("resetGraph").addEventListener("click", () => {
     STATE.previousClickedElement = null;
     STATE.previousClickedElementStyle = null;
 
-    STATE.cy.elements().removeClass("walkcolor");
+    STATE.cy.elements().removeClass("highlight");
 
     // Clear info panel
     document.getElementById("info").innerHTML = "<h3>Node/Edge Info:</h3>";
@@ -206,7 +205,7 @@ function setupGraphInteractions() {
             resetPreviousElementStyle();
             STATE.previousClickedElement = null;
             STATE.previousClickedElementStyle = null;
-            STATE.cy.elements().removeClass("walkcolor");
+            STATE.cy.elements().removeClass("highlight");
         }
     });
 
@@ -239,18 +238,16 @@ function displayWalks() {
 }
 
 function highlightWalk(walk) {
-    console.log("highlightWalk", walk);
+    // Reset any previously highlight nodes or edges
+    STATE.cy.elements().removeClass("highlight");
 
-    // Reset any previously walkcolor nodes or edges
-    STATE.cy.elements().removeClass("walkcolor");
+    // set style highlight
+    STATE.cy.style().selector("node.highlight").style({
+        "background-color": "#ff5733", // Change to your preferred highlight color
+    });
 
     walk.forEach((node, index) => {
-        console.log(node.id());
-        node.addClass("walkcolor");
-        // node change colors
-        if (index < walk.length - 1) {
-            const nextNode = walk[index + 1];
-            node.edgesTo(nextNode).addClass("walkcolor");
-        }
+        node.addClass("highlight");
     });
+    // STATE.cy.style().update();
 }

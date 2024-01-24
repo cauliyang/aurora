@@ -43,19 +43,6 @@ export function initializeGraph(graphData) {
         },
         style: [
             {
-                selector: "node.walkcolor",
-                style: {
-                    "background-color": "#ff5733", // Change to your preferred highlight color
-                },
-            },
-            {
-                selector: "edge.walkcolor",
-                style: {
-                    "line-color": "#ff5733", // Change to your preferred highlight color
-                    "target-arrow-color": "#ff5733",
-                },
-            },
-            {
                 selector: "node",
                 style: {
                     label: "data(name)",
