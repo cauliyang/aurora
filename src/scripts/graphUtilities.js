@@ -58,7 +58,6 @@ export function setupClickEvent() {
 
             content += `<h5>Node ID: ${element.id()}</h5>`;
             content += `<p>In-degree: ${indegree}<br>Out-degree: ${outdegree}</p>`;
-            // content += `<p></p>`;
 
             // JSON data
             content += `
@@ -75,7 +74,7 @@ export function setupClickEvent() {
             <p>Source: ${element.source().id()}<br>Target: ${element
                     .target()
                     .id()}</p>
-
+            
             <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#dataEdge-${uniqueID}">
                 Data
             </button>
