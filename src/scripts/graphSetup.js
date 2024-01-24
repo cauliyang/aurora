@@ -119,6 +119,6 @@ export function initializeGraph(graphData) {
 
     STATE.walks.length = 0;
     sourceNodes.forEach((sourceNode) => {
-        dfs(sourceNode, [], sinkNodes);
+        dfs(sourceNodes, [], sinkNodes);
     });
 }
