@@ -6,22 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graph Visualization</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-        crossorigin="anonymous"></script>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.css" rel="stylesheet"
-        type="text/css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.js"></script>
-
     <!-- PERFORMANCE -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
     <link rel="preload" as="style" href="./styles/style.css">
 
+    <link rel="stylesheet" href="./styles/scss/styles.scss">
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="stylesheet" href="./styles/app.css">
 
@@ -135,9 +125,19 @@
 
                     <!-- Edge Weight Input -->
                     <div class="input-group me-1">
+                        <span class="input-group-text" id="inputGroup-sizing-default">MinEdge</span>
                         <input type="number" id="minEdgeWeight" class="form-control" placeholder="weight" , value="1" ,
-                            min="1" , style="width: 100px;">
+                            min="1" , style="width: 80px;">
                     </div>
+
+
+                    <div class="input-group me-1">
+                        <span class="input-group-text" id="inputGroup-sizing-default">MaxDepth</span>
+                        <input type="number" id="MaxDepth" class="form-control" placeholder="depth" , value="900" ,
+                            min="2" , style="width: 80px;">
+                    </div>
+
+
 
                     <!-- !-- JSON Editor and IGV Buttons -->
                     <div class="btn-group" role="group">
@@ -155,9 +155,12 @@
             <div class="col-lg-8 col-md-12 h-100" id="cy"></div>
 
             <div class="col-lg-4 col-md-12 d-flex flex-column h-100" id="right-container">
-                <div class="flex-grow-1 overflow-auto p-2" id="info">
-                    <h3>Node/Edge Info:</h3>
-                    <div id="info-content"></div>
+
+                <div id="info" class="card">
+                    <div class="card-header">Node/Edge Information</div>
+                    <div class="card-body" id="infoContent">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
                 </div>
 
                 <div class="flex-grow-1 overflow-auto p-1" id="walks">
@@ -190,7 +193,7 @@
 
     <script src="./scripts/graph.js" , type="module"></script>
     <script src="./scripts/jseditor.js" , type="module"></script>
-    <script src="./scripts/tooltip.js"></script>
+    <script src="./scripts/eventHandlers.js" , type="module"></script>
 
     <!-- Footer Start -->
     <footer class="mt-5 py-3 bg-dark text-white">

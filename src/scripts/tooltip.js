@@ -1,7 +1,8 @@
+import { STATE } from "./graph";
+
 function createTooltipContent(elementData) {
     let content = "<ul>";
     for (const key in elementData) {
-        // rome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
         if (elementData.hasOwnProperty(key)) {
             content += `<li><strong>${key}:</strong> ${elementData[key]}</li>`;
         }
@@ -10,8 +11,8 @@ function createTooltipContent(elementData) {
     return content;
 }
 
-function createTooltip(cy) {
-    cy.on("mouseover", "node, edge", (event) => {
+export function createTooltip() {
+    STATE.cy.on("mouseover", "node, edge", (event) => {
         const target = event.target;
         const elementData = target.data();
 
@@ -24,7 +25,7 @@ function createTooltip(cy) {
         tooltip.style.transform = "translateY(0px)";
     });
 
-    cy.on("mouseout", "node, edge", () => {
+    STATE.cy.on("mouseout", "node, edge", () => {
         const tooltip = document.getElementById("tooltip");
         tooltip.style.display = "none";
         tooltip.style.opacity = "0";
