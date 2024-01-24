@@ -3,7 +3,6 @@ import { STATE } from "./graph";
 function createTooltipContent(elementData) {
     let content = "<ul>";
     for (const key in elementData) {
-        // rome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
         if (elementData.hasOwnProperty(key)) {
             content += `<li><strong>${key}:</strong> ${elementData[key]}</li>`;
         }

@@ -21,16 +21,16 @@ cytoscape.use(euler);
 cytoscape.use(spread);
 
 export const STATE = {
+    cy: null,
     walks: [],
     minEdgeWeight: 1,
-    maxPathLength: 900, // infinite
-    cy: null,
+    maxPathLength: 900,
     previousClickedElement: null,
     previousClickedElementStyle: null,
     originalGraphData: null,
     selectedNodeColor: "#8dd3c7",
     nodeColor: "#1f77b4",
-    highlightColor: "#ff5733", //red
+    highlightColor: "#ff5733",
     sourceNodeColor: "#31a354",
 };
 
@@ -123,14 +123,14 @@ function hideUninvolvedElements() {
 document
     .getElementById("minEdgeWeight")
     .addEventListener("change", function() {
-        let minEdgeWeight = parseFloat(this.value) || 1;
+        const minEdgeWeight = parseFloat(this.value) || 1;
         if (Number.isNaN(minEdgeWeight)) return;
         STATE.minEdgeWeight = minEdgeWeight;
         updateGraph();
     });
 
 document.getElementById("MaxDepth").addEventListener("change", function() {
-    let MaxDepth = parseFloat(this.value) || 900;
+    const MaxDepth = parseFloat(this.value) || 900;
     if (Number.isNaN(MaxDepth)) return;
     STATE.maxPathLength = MaxDepth;
     updateGraph();

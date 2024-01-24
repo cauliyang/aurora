@@ -8,6 +8,7 @@ function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
     if (weight <= minWeight) {
         return colorScale[0];
     }
+
     if (weight >= maxWeight) {
         return colorScale[colorScale.length - 1];
     }
@@ -15,6 +16,7 @@ function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
     const index = Math.floor(
         ((colorScale.length - 1) * (weight - minWeight)) / (maxWeight - minWeight),
     );
+
     return colorScale[index];
 }
 
@@ -24,8 +26,7 @@ export function initializeGraph(graphData) {
     );
 
     // Assume minWeight and maxWeight are known (you can calculate these based on your data)
-    const minWeight = 1; // e.g., 1
-    // gray to black
+    const minWeight = 1;
     const colorScale = chroma
         .scale(["gray", "black"])
         .mode("lch")
