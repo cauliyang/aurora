@@ -20,14 +20,14 @@ cytoscape.use(spread);
 export const STATE = {
     walks: [],
     minEdgeWeight: 1,
-    maxPathLength: Infinity, // infinite
+    maxPathLength: 900, // infinite
     cy: null,
     previousClickedElement: null,
     previousClickedElementStyle: null,
     originalGraphData: null,
     selectedNodeColor: "#8dd3c7",
     nodeColor: "#1f77b4",
-    highColor: "#2ca02c",
+    highlightColor: "red", //red
     sourceNodeColor: "#31a354",
 };
 
@@ -123,6 +123,13 @@ document
         STATE.minEdgeWeight = minEdgeWeight;
         updateGraph();
     });
+
+document.getElementById("MaxDepth").addEventListener("change", function() {
+    let MaxDepth = parseFloat(this.value) || 900;
+    if (Number.isNaN(MaxDepth)) return;
+    STATE.maxPathLength = MaxDepth;
+    updateGraph();
+});
 
 export function loadGraphDataFromServer(graphData) {
     //check if graphData has elements
@@ -316,7 +323,8 @@ function setupClickEvent() {
             // Highlight the clicked node
             element.style({
                 "background-color": STATE.selectedNodeColor,
-                "border-width": "0px",
+                "border-color": "#000",
+                "border-width": 2,
             });
 
             element.addClass("highlighted");

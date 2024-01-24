@@ -44,14 +44,15 @@ export function initializeGraph(graphData) {
             {
                 selector: ".highlighted",
                 style: {
-                    "border-color": STATE.highColor,
+                    "border-color": STATE.highlightColor,
                 },
             },
             {
                 selector: "edge.highlighted",
                 style: {
-                    "line-color": STATE.highColor,
-                    "target-arrow-color": STATE.highColor,
+                    "line-color": STATE.highlightColor,
+                    "target-arrow-color": STATE.highlightColor,
+                    width: 10,
                 },
             },
             {
@@ -59,7 +60,6 @@ export function initializeGraph(graphData) {
                 style: {
                     label: "data(name)",
                     "background-color": STATE.nodeColor,
-
                     "border-color": "#000",
                     "border-width": 2,
                     shape: "ellipse", // Shape of the nodes

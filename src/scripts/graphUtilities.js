@@ -13,7 +13,10 @@ export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
         node.outgoers("node").forEach((neighbor) => {
             const connectingEdge = node.edgesTo(neighbor);
             if (connectingEdge.data("weight") >= STATE.minEdgeWeight) {
-                dfs(neighbor, currentPath, sinkNodes, true);
+                // if current path's leght is greater than maxdepth, don't continue
+                if (currentPath.length < STATE.maxPathLength) {
+                    dfs(neighbor, currentPath, sinkNodes, true);
+                }
             } else {
                 dfs(neighbor, currentPath, sinkNodes, false);
             }
