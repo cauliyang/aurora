@@ -35,3 +35,28 @@ document.getElementById("redirectToIgv").addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", () => {
     resizePanels();
 });
+
+document
+    .getElementById("uploadInput")
+    .addEventListener("change", handleFileUpload);
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    console.log(file);
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            try {
+                const jsonData = JSON.parse(content);
+                console.log(jsonData);
+                // Process and visualize the JSON data
+                // For example: visualizeGraph(jsonData);
+                loadGraphDataFromServer(jsonData);
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+            }
+        };
+        reader.readAsText(file);
+    }
+}

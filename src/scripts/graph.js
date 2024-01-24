@@ -150,36 +150,12 @@ export function loadGraphDataFromServer(graphData) {
     setupGraphInteractions();
 }
 
-document
-    .getElementById("uploadInput")
-    .addEventListener("change", handleFileUpload);
-
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    console.log(file);
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const content = e.target.result;
-            try {
-                const jsonData = JSON.parse(content);
-                console.log(jsonData);
-                // Process and visualize the JSON data
-                // For example: visualizeGraph(jsonData);
-                loadGraphDataFromServer(jsonData);
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
-            }
-        };
-        reader.readAsText(file);
-    }
-}
-
 document.getElementById("resetGraph").addEventListener("click", () => {
     // Reset layout to default
     resetPreviousElementStyle();
     STATE.previousClickedElement = null;
     STATE.previousClickedElementStyle = null;
+
     STATE.cy.elements().removeClass("highlighted");
 
     // Clear info panel
