@@ -1,5 +1,6 @@
 import { STATE } from "./graph";
 import { resizePanels } from "./graphUtilities";
+import { loadGraphDataFromServer } from "./graph";
 
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
