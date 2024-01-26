@@ -20,6 +20,7 @@ export const STATE = {
     cy: null,
     walks: [],
     minEdgeWeight: 1,
+    minPathLength: 1,
     maxPathLength: 900,
     previousClickedElement: null,
     previousClickedElementStyle: null,
@@ -55,7 +56,6 @@ layoutSelect.addEventListener("change", () => {
 function updateGraph() {
     // Reset graph to original data
     console.log("updateGraph", STATE);
-
     STATE.walks.length = 0;
     STATE.cy.elements().remove();
     STATE.cy.add(STATE.originalGraphData);
@@ -128,6 +128,29 @@ document.getElementById("MaxDepth").addEventListener("change", function() {
     const MaxDepth = parseFloat(this.value) || 900;
     if (Number.isNaN(MaxDepth)) return;
     STATE.maxPathLength = MaxDepth;
+
+    if (STATE.minPathLength > STATE.maxPathLength) {
+        // altert user
+        alert("Min Depth cannot be greater than Max Depth");
+        document.getElementById("MaxDepth").value = STATE.minPathLength;
+        return;
+    }
+
+    updateGraph();
+});
+
+document.getElementById("MinDepth").addEventListener("change", function() {
+    const MinDepth = parseFloat(this.value) || 2;
+    if (Number.isNaN(MinDepth)) return;
+    STATE.minPathLength = MinDepth;
+
+    if (STATE.minPathLength > STATE.maxPathLength) {
+        // altert user
+        alert("Min Depth cannot be greater than Max Depth");
+        document.getElementById("MinDepth").value = STATE.maxPathLength;
+        return;
+    }
+
     updateGraph();
 });
 

@@ -127,21 +127,25 @@
                         </select>
                     </div>
 
-                    <!-- Edge Weight Input -->
+                    <div id="liveAlertPlaceholder"></div>
+
                     <div class="input-group me-1">
                         <span class="input-group-text" id="inputGroup-sizing-default">MinEdge</span>
                         <input type="number" id="minEdgeWeight" class="form-control" placeholder="weight" , value="1" ,
                             min="1" , style="width: 80px;">
-                    </div>
 
+                        <span class="input-group-text" id="inputGroup-sizing-default">MinDepth</span>
+                        <input type="number" id="MinDepth" class="form-control" placeholder="depth" , value="2" ,
+                            min="2" , style="width: 80px;">
 
-                    <div class="input-group me-1">
                         <span class="input-group-text" id="inputGroup-sizing-default">MaxDepth</span>
                         <input type="number" id="MaxDepth" class="form-control" placeholder="depth" , value="900" ,
                             min="2" , style="width: 80px;">
                     </div>
 
 
+                    <!-- <div class="input-group me-1"> -->
+                    <!-- </div> -->
 
                     <!-- !-- JSON Editor and IGV Buttons -->
                     <div class="btn-group" role="group">

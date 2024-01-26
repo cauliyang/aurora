@@ -9,12 +9,13 @@ export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
 
     currentPath.push(node);
 
-    if (sinkNodes.includes(node)) {
+    if (sinkNodes.includes(node) && currentPath.length >= STATE.minPathLength) {
         STATE.walks.push([...currentPath]); // Found a path
     } else {
         // Correctly use outgoers as a method call
         node.outgoers("node").forEach((neighbor) => {
             const connectingEdge = node.edgesTo(neighbor);
+
             if (connectingEdge.data("weight") >= STATE.minEdgeWeight) {
                 // if current path's leght is greater than maxdepth, don't continue
                 if (currentPath.length < STATE.maxPathLength) {
