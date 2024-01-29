@@ -32,11 +32,10 @@ export const STATE = {
 };
 
 // Get the "Change Layout" button element
-const layoutSelect = document.getElementById("layoutSelect");
 
 layoutSelect.addEventListener("change", () => {
     // Get the selected layout from the select element
-    const selectedLayout = layoutSelect.value;
+    const selectedLayout = document.getElementById("layoutSelect").value;
 
     if (STATE.cy === null) return;
 
@@ -72,11 +71,12 @@ function updateGraph() {
     hideUninvolvedElements();
     hideSingletonNodes();
 
-    const selectedLayout = layoutSelect.value;
     // Optionally, you can re-run layout here
+    // change layout to dagre
+    document.getElementById("layoutSelect").value = "dagre";
     STATE.cy
         .layout({
-            name: selectedLayout,
+            name: "dagre",
             animate: false,
             fit: true,
             padding: 10,
