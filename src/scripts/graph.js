@@ -33,6 +33,7 @@ export const STATE = {
 
 // Get the "Change Layout" button element
 const layoutSelect = document.getElementById("layoutSelect");
+
 layoutSelect.addEventListener("change", () => {
     // Get the selected layout from the select element
     const selectedLayout = layoutSelect.value;
@@ -71,10 +72,12 @@ function updateGraph() {
     hideUninvolvedElements();
     hideSingletonNodes();
 
+    const selectedLayout = layoutSelect.value;
     // Optionally, you can re-run layout here
     STATE.cy
         .layout({
-            name: "dagre",
+            name: selectedLayout,
+            animate: false,
             fit: true,
             padding: 10,
             avoidOverlap: true,
