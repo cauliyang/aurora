@@ -72,11 +72,19 @@ function updateGraph() {
     hideSingletonNodes();
 
     // Optionally, you can re-run layout here
-    // change layout to dagre
-    document.getElementById("layoutSelect").value = "dagre";
+    // // change layout to dagre
+    // document.getElementById("layoutSelect").value = "dagre";
+
+    let currentLayout = document.getElementById("layoutSelect").value;
+
+    if (currentLayout === "euler") {
+        document.getElementById("layoutSelect").value = "dagre";
+        currentLayout = "dagre";
+    }
+
     STATE.cy
         .layout({
-            name: "dagre",
+            name: currentLayout,
             animate: false,
             fit: true,
             padding: 10,
