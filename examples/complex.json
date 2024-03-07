@@ -1,0 +1,3020 @@
+{
+    "data": [],
+    "directed": true,
+    "multigraph": true,
+    "elements": {
+        "nodes": [
+            {
+                "data": {
+                    "chrom": "chr14",
+                    "ref_start": 49862550,
+                    "ref_end": 49862849,
+                    "strand": "-",
+                    "is_head": true,
+                    "id": "chr14_49862550_49862849_H-",
+                    "value": "chr14_49862550_49862849_H-",
+                    "name": "chr14_49862550_49862849_H-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 12262361,
+                    "ref_end": 12263393,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr12_12262361_12263393_T-",
+                    "value": "chr12_12262361_12263393_T-",
+                    "name": "chr12_12262361_12263393_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 2678333,
+                    "ref_end": 2679950,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr11_2678333_2679950_T-",
+                    "value": "chr11_2678333_2679950_T-",
+                    "name": "chr11_2678333_2679950_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr19",
+                    "ref_start": 57300983,
+                    "ref_end": 57304418,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr19_57300983_57304418_T+",
+                    "value": "chr19_57300983_57304418_T+",
+                    "name": "chr19_57300983_57304418_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr5",
+                    "ref_start": 149352338,
+                    "ref_end": 149354582,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr5_149352338_149354582_T+",
+                    "value": "chr5_149352338_149354582_T+",
+                    "name": "chr5_149352338_149354582_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 162524933,
+                    "ref_end": 162529601,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr1_162524933_162529601_T+",
+                    "value": "chr1_162524933_162529601_T+",
+                    "name": "chr1_162524933_162529601_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr16",
+                    "ref_start": 2766053,
+                    "ref_end": 2771407,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr16_2766053_2771407_T+",
+                    "value": "chr16_2766053_2771407_T+",
+                    "name": "chr16_2766053_2771407_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 21017886,
+                    "ref_end": 21022069,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr17_21017886_21022069_T-",
+                    "value": "chr17_21017886_21022069_T-",
+                    "name": "chr17_21017886_21022069_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 108926663,
+                    "ref_end": 108929732,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr1_108926663_108929732_T-",
+                    "value": "chr1_108926663_108929732_T-",
+                    "name": "chr1_108926663_108929732_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 70516933,
+                    "ref_end": 70518307,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr12_70516933_70518307_T-",
+                    "value": "chr12_70516933_70518307_T-",
+                    "name": "chr12_70516933_70518307_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr8",
+                    "ref_start": 38517355,
+                    "ref_end": 38519803,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr8_38517355_38519803_T+",
+                    "value": "chr8_38517355_38519803_T+",
+                    "name": "chr8_38517355_38519803_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 94478613,
+                    "ref_end": 94519350,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr1_94478613_94519350_T+",
+                    "value": "chr1_94478613_94519350_T+",
+                    "name": "chr1_94478613_94519350_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr14",
+                    "ref_start": 67579131,
+                    "ref_end": 67589535,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr14_67579131_67589535_T+",
+                    "value": "chr14_67579131_67589535_T+",
+                    "name": "chr14_67579131_67589535_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 42662535,
+                    "ref_end": 42667004,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr17_42662535_42667004_T+",
+                    "value": "chr17_42662535_42667004_T+",
+                    "name": "chr17_42662535_42667004_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr19",
+                    "ref_start": 6469081,
+                    "ref_end": 6470109,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr19_6469081_6470109_T+",
+                    "value": "chr19_6469081_6470109_T+",
+                    "name": "chr19_6469081_6470109_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr5",
+                    "ref_start": 60630075,
+                    "ref_end": 60634634,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr5_60630075_60634634_T-",
+                    "value": "chr5_60630075_60634634_T-",
+                    "name": "chr5_60630075_60634634_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 66666963,
+                    "ref_end": 66668374,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr11_66666963_66668374_T+",
+                    "value": "chr11_66666963_66668374_T+",
+                    "name": "chr11_66666963_66668374_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 65305691,
+                    "ref_end": 65317936,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr7_65305691_65317936_T+",
+                    "value": "chr7_65305691_65317936_T+",
+                    "name": "chr7_65305691_65317936_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr18",
+                    "ref_start": 58399541,
+                    "ref_end": 58401540,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr18_58399541_58401540_T+",
+                    "value": "chr18_58399541_58401540_T+",
+                    "name": "chr18_58399541_58401540_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chrX",
+                    "ref_start": 19352141,
+                    "ref_end": 19359847,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chrX_19352141_19359847_T+",
+                    "value": "chrX_19352141_19359847_T+",
+                    "name": "chrX_19352141_19359847_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr14",
+                    "ref_start": 55601788,
+                    "ref_end": 55684576,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr14_55601788_55684576_T+",
+                    "value": "chr14_55601788_55684576_T+",
+                    "name": "chr14_55601788_55684576_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr18",
+                    "ref_start": 13516903,
+                    "ref_end": 13526454,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr18_13516903_13526454_T+",
+                    "value": "chr18_13516903_13526454_T+",
+                    "name": "chr18_13516903_13526454_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr6",
+                    "ref_start": 135032219,
+                    "ref_end": 135034615,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr6_135032219_135034615_T-",
+                    "value": "chr6_135032219_135034615_T-",
+                    "name": "chr6_135032219_135034615_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr5",
+                    "ref_start": 65950051,
+                    "ref_end": 65955067,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr5_65950051_65955067_T+",
+                    "value": "chr5_65950051_65955067_T+",
+                    "name": "chr5_65950051_65955067_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr4",
+                    "ref_start": 56225134,
+                    "ref_end": 56228604,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr4_56225134_56228604_T+",
+                    "value": "chr4_56225134_56228604_T+",
+                    "name": "chr4_56225134_56228604_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 57236090,
+                    "ref_end": 57242222,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr3_57236090_57242222_T+",
+                    "value": "chr3_57236090_57242222_T+",
+                    "name": "chr3_57236090_57242222_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 49938365,
+                    "ref_end": 50077248,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr3_49938365_50077248_T+",
+                    "value": "chr3_49938365_50077248_T+",
+                    "name": "chr3_49938365_50077248_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 149030127,
+                    "ref_end": 149051835,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr3_149030127_149051835_T-",
+                    "value": "chr3_149030127_149051835_T-",
+                    "name": "chr3_149030127_149051835_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr22",
+                    "ref_start": 35184460,
+                    "ref_end": 35189039,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr22_35184460_35189039_T-",
+                    "value": "chr22_35184460_35189039_T-",
+                    "name": "chr22_35184460_35189039_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr20",
+                    "ref_start": 49113526,
+                    "ref_end": 49179218,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr20_49113526_49179218_T-",
+                    "value": "chr20_49113526_49179218_T-",
+                    "name": "chr20_49113526_49179218_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 59904126,
+                    "ref_end": 59906249,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr17_59904126_59906249_T+",
+                    "value": "chr17_59904126_59906249_T+",
+                    "name": "chr17_59904126_59906249_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr16",
+                    "ref_start": 89719764,
+                    "ref_end": 89740356,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr16_89719764_89740356_T+",
+                    "value": "chr16_89719764_89740356_T+",
+                    "name": "chr16_89719764_89740356_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 158763309,
+                    "ref_end": 158765707,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr7_158763309_158765707_T-",
+                    "value": "chr7_158763309_158765707_T-",
+                    "name": "chr7_158763309_158765707_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr20",
+                    "ref_start": 25674214,
+                    "ref_end": 25689275,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr20_25674214_25689275_T-",
+                    "value": "chr20_25674214_25689275_T-",
+                    "name": "chr20_25674214_25689275_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr10",
+                    "ref_start": 13337294,
+                    "ref_end": 13342238,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr10_13337294_13342238_T-",
+                    "value": "chr10_13337294_13342238_T-",
+                    "name": "chr10_13337294_13342238_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 196049285,
+                    "ref_end": 196065956,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr3_196049285_196065956_T-",
+                    "value": "chr3_196049285_196065956_T-",
+                    "name": "chr3_196049285_196065956_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 43133684,
+                    "ref_end": 43137433,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr17_43133684_43137433_T+",
+                    "value": "chr17_43133684_43137433_T+",
+                    "name": "chr17_43133684_43137433_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr22",
+                    "ref_start": 41243473,
+                    "ref_end": 41276376,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr22_41243473_41276376_T-",
+                    "value": "chr22_41243473_41276376_T-",
+                    "name": "chr22_41243473_41276376_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chrX",
+                    "ref_start": 105584273,
+                    "ref_end": 105588002,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chrX_105584273_105588002_T-",
+                    "value": "chrX_105584273_105588002_T-",
+                    "name": "chrX_105584273_105588002_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 29645922,
+                    "ref_end": 29648824,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr7_29645922_29648824_T-",
+                    "value": "chr7_29645922_29648824_T-",
+                    "name": "chr7_29645922_29648824_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr22",
+                    "ref_start": 30886056,
+                    "ref_end": 30888600,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr22_30886056_30888600_T-",
+                    "value": "chr22_30886056_30888600_T-",
+                    "name": "chr22_30886056_30888600_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 32307141,
+                    "ref_end": 32308297,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr3_32307141_32308297_T+",
+                    "value": "chr3_32307141_32308297_T+",
+                    "name": "chr3_32307141_32308297_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr16",
+                    "ref_start": 32073128,
+                    "ref_end": 32075818,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr16_32073128_32075818_T-",
+                    "value": "chr16_32073128_32075818_T-",
+                    "name": "chr16_32073128_32075818_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chrY",
+                    "ref_start": 12702030,
+                    "ref_end": 12860832,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chrY_12702030_12860832_T+",
+                    "value": "chrY_12702030_12860832_T+",
+                    "name": "chrY_12702030_12860832_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr9",
+                    "ref_start": 76805030,
+                    "ref_end": 76806814,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr9_76805030_76806814_T-",
+                    "value": "chr9_76805030_76806814_T-",
+                    "name": "chr9_76805030_76806814_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr8",
+                    "ref_start": 43125410,
+                    "ref_end": 43131171,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr8_43125410_43131171_T+",
+                    "value": "chr8_43125410_43131171_T+",
+                    "name": "chr8_43125410_43131171_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 29645918,
+                    "ref_end": 29648918,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr7_29645918_29648918_T-",
+                    "value": "chr7_29645918_29648918_T-",
+                    "name": "chr7_29645918_29648918_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr6",
+                    "ref_start": 35573602,
+                    "ref_end": 35688893,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr6_35573602_35688893_T-",
+                    "value": "chr6_35573602_35688893_T-",
+                    "name": "chr6_35573602_35688893_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 29255839,
+                    "ref_end": 29259703,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr17_29255839_29259703_T-",
+                    "value": "chr17_29255839_29259703_T-",
+                    "name": "chr17_29255839_29259703_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr16",
+                    "ref_start": 2972792,
+                    "ref_end": 2978652,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr16_2972792_2978652_T-",
+                    "value": "chr16_2972792_2978652_T-",
+                    "name": "chr16_2972792_2978652_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 27693830,
+                    "ref_end": 27695563,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr12_27693830_27695563_T+",
+                    "value": "chr12_27693830_27695563_T+",
+                    "name": "chr12_27693830_27695563_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 48071736,
+                    "ref_end": 48073947,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr11_48071736_48073947_T+",
+                    "value": "chr11_48071736_48073947_T+",
+                    "name": "chr11_48071736_48073947_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 118583892,
+                    "ref_end": 118602921,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr11_118583892_118602921_T+",
+                    "value": "chr11_118583892_118602921_T+",
+                    "name": "chr11_118583892_118602921_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 117168918,
+                    "ref_end": 117170626,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr11_117168918_117170626_T+",
+                    "value": "chr11_117168918_117170626_T+",
+                    "name": "chr11_117168918_117170626_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr9",
+                    "ref_start": 120756975,
+                    "ref_end": 120762312,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr9_120756975_120762312_T-",
+                    "value": "chr9_120756975_120762312_T-",
+                    "name": "chr9_120756975_120762312_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 52692455,
+                    "ref_end": 52696161,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr3_52692455_52696161_T+",
+                    "value": "chr3_52692455_52696161_T+",
+                    "name": "chr3_52692455_52696161_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr4",
+                    "ref_start": 152977590,
+                    "ref_end": 152977635,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr4_152977590_152977635_T-",
+                    "value": "chr4_152977590_152977635_T-",
+                    "name": "chr4_152977590_152977635_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr4",
+                    "ref_start": 152977596,
+                    "ref_end": 152979669,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr4_152977596_152979669_T+",
+                    "value": "chr4_152977596_152979669_T+",
+                    "name": "chr4_152977596_152979669_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 29648784,
+                    "ref_end": 29648885,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr7_29648784_29648885_T+",
+                    "value": "chr7_29648784_29648885_T+",
+                    "name": "chr7_29648784_29648885_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr14",
+                    "ref_start": 49586579,
+                    "ref_end": 49586842,
+                    "strand": "+",
+                    "is_head": true,
+                    "id": "chr14_49586579_49586842_H+",
+                    "value": "chr14_49586579_49586842_H+",
+                    "name": "chr14_49586579_49586842_H+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 178513075,
+                    "ref_end": 178516461,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr2_178513075_178516461_T+",
+                    "value": "chr2_178513075_178516461_T+",
+                    "name": "chr2_178513075_178516461_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 50960862,
+                    "ref_end": 50962382,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr12_50960862_50962382_T-",
+                    "value": "chr12_50960862_50962382_T-",
+                    "name": "chr12_50960862_50962382_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr15",
+                    "ref_start": 68101512,
+                    "ref_end": 68106351,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr15_68101512_68106351_T+",
+                    "value": "chr15_68101512_68106351_T+",
+                    "name": "chr15_68101512_68106351_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr6",
+                    "ref_start": 43005904,
+                    "ref_end": 43012049,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr6_43005904_43012049_T+",
+                    "value": "chr6_43005904_43012049_T+",
+                    "name": "chr6_43005904_43012049_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 148807385,
+                    "ref_end": 148821635,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr7_148807385_148821635_T-",
+                    "value": "chr7_148807385_148821635_T-",
+                    "name": "chr7_148807385_148821635_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr6",
+                    "ref_start": 43620490,
+                    "ref_end": 43623366,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr6_43620490_43623366_T-",
+                    "value": "chr6_43620490_43623366_T-",
+                    "name": "chr6_43620490_43623366_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr5",
+                    "ref_start": 40759823,
+                    "ref_end": 40762081,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr5_40759823_40762081_T-",
+                    "value": "chr5_40759823_40762081_T-",
+                    "name": "chr5_40759823_40762081_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 235447222,
+                    "ref_end": 235496287,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr1_235447222_235496287_T-",
+                    "value": "chr1_235447222_235496287_T-",
+                    "name": "chr1_235447222_235496287_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 229764208,
+                    "ref_end": 229794379,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr2_229764208_229794379_T-",
+                    "value": "chr2_229764208_229794379_T-",
+                    "name": "chr2_229764208_229794379_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 56622864,
+                    "ref_end": 56648602,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr3_56622864_56648602_T-",
+                    "value": "chr3_56622864_56648602_T-",
+                    "name": "chr3_56622864_56648602_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 47875343,
+                    "ref_end": 47877107,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr2_47875343_47877107_T-",
+                    "value": "chr2_47875343_47877107_T-",
+                    "name": "chr2_47875343_47877107_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 240516939,
+                    "ref_end": 240530884,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr2_240516939_240530884_T-",
+                    "value": "chr2_240516939_240530884_T-",
+                    "name": "chr2_240516939_240530884_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 179839965,
+                    "ref_end": 179843020,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr1_179839965_179843020_T-",
+                    "value": "chr1_179839965_179843020_T-",
+                    "name": "chr1_179839965_179843020_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 168249284,
+                    "ref_end": 168253019,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr1_168249284_168253019_T+",
+                    "value": "chr1_168249284_168253019_T+",
+                    "name": "chr1_168249284_168253019_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr18",
+                    "ref_start": 9262844,
+                    "ref_end": 9266062,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr18_9262844_9266062_T+",
+                    "value": "chr18_9262844_9266062_T+",
+                    "name": "chr18_9262844_9266062_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 68840559,
+                    "ref_end": 68844184,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr12_68840559_68844184_T+",
+                    "value": "chr12_68840559_68844184_T+",
+                    "name": "chr12_68840559_68844184_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 111290788,
+                    "ref_end": 111292029,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr11_111290788_111292029_T-",
+                    "value": "chr11_111290788_111292029_T-",
+                    "name": "chr11_111290788_111292029_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 109594706,
+                    "ref_end": 109595830,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr1_109594706_109595830_T+",
+                    "value": "chr1_109594706_109595830_T+",
+                    "name": "chr1_109594706_109595830_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr20",
+                    "ref_start": 44931369,
+                    "ref_end": 44937450,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr20_44931369_44937450_T+",
+                    "value": "chr20_44931369_44937450_T+",
+                    "name": "chr20_44931369_44937450_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 22528728,
+                    "ref_end": 22530685,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr1_22528728_22530685_T+",
+                    "value": "chr1_22528728_22530685_T+",
+                    "name": "chr1_22528728_22530685_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 61348814,
+                    "ref_end": 61358305,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr11_61348814_61358305_T-",
+                    "value": "chr11_61348814_61358305_T-",
+                    "name": "chr11_61348814_61358305_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 99622861,
+                    "ref_end": 99632370,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr7_99622861_99632370_T+",
+                    "value": "chr7_99622861_99632370_T+",
+                    "name": "chr7_99622861_99632370_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 26190127,
+                    "ref_end": 26194358,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr7_26190127_26194358_T-",
+                    "value": "chr7_26190127_26194358_T-",
+                    "name": "chr7_26190127_26194358_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 56633228,
+                    "ref_end": 56668935,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr3_56633228_56668935_T-",
+                    "value": "chr3_56633228_56668935_T-",
+                    "name": "chr3_56633228_56668935_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr19",
+                    "ref_start": 57300981,
+                    "ref_end": 57308552,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr19_57300981_57308552_T+",
+                    "value": "chr19_57300981_57308552_T+",
+                    "name": "chr19_57300981_57308552_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 22630669,
+                    "ref_end": 22636004,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr12_22630669_22636004_T+",
+                    "value": "chr12_22630669_22636004_T+",
+                    "name": "chr12_22630669_22636004_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr14",
+                    "ref_start": 49862664,
+                    "ref_end": 49862849,
+                    "strand": "-",
+                    "is_head": true,
+                    "id": "chr14_49862664_49862849_H-",
+                    "value": "chr14_49862664_49862849_H-",
+                    "name": "chr14_49862664_49862849_H-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 102007701,
+                    "ref_end": 102014858,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr7_102007701_102014858_T+",
+                    "value": "chr7_102007701_102014858_T+",
+                    "name": "chr7_102007701_102014858_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 80209282,
+                    "ref_end": 80212126,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr17_80209282_80212126_T-",
+                    "value": "chr17_80209282_80212126_T-",
+                    "name": "chr17_80209282_80212126_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 54230949,
+                    "ref_end": 54234006,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr12_54230949_54234006_T-",
+                    "value": "chr12_54230949_54234006_T-",
+                    "name": "chr12_54230949_54234006_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 200973720,
+                    "ref_end": 200977708,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr2_200973720_200977708_T-",
+                    "value": "chr2_200973720_200977708_T-",
+                    "name": "chr2_200973720_200977708_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 41848521,
+                    "ref_end": 41851563,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr17_41848521_41851563_T-",
+                    "value": "chr17_41848521_41851563_T-",
+                    "name": "chr17_41848521_41851563_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr19",
+                    "ref_start": 1414260,
+                    "ref_end": 1435679,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr19_1414260_1435679_T+",
+                    "value": "chr19_1414260_1435679_T+",
+                    "name": "chr19_1414260_1435679_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr16",
+                    "ref_start": 89674735,
+                    "ref_end": 89675541,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr16_89674735_89675541_T+",
+                    "value": "chr16_89674735_89675541_T+",
+                    "name": "chr16_89674735_89675541_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 133005354,
+                    "ref_end": 133012563,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr12_133005354_133012563_T+",
+                    "value": "chr12_133005354_133012563_T+",
+                    "name": "chr12_133005354_133012563_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr22",
+                    "ref_start": 40858694,
+                    "ref_end": 40862918,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr22_40858694_40862918_T+",
+                    "value": "chr22_40858694_40862918_T+",
+                    "name": "chr22_40858694_40862918_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr5",
+                    "ref_start": 116241655,
+                    "ref_end": 116244642,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr5_116241655_116244642_T+",
+                    "value": "chr5_116241655_116244642_T+",
+                    "name": "chr5_116241655_116244642_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 135839633,
+                    "ref_end": 135842198,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr2_135839633_135842198_T-",
+                    "value": "chr2_135839633_135842198_T-",
+                    "name": "chr2_135839633_135842198_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 93517373,
+                    "ref_end": 93522080,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr1_93517373_93522080_T+",
+                    "value": "chr1_93517373_93522080_T+",
+                    "name": "chr1_93517373_93522080_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 71434416,
+                    "ref_end": 71438241,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr11_71434416_71438241_T-",
+                    "value": "chr11_71434416_71438241_T-",
+                    "name": "chr11_71434416_71438241_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 217443921,
+                    "ref_end": 217448175,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr1_217443921_217448175_T-",
+                    "value": "chr1_217443921_217448175_T-",
+                    "name": "chr1_217443921_217448175_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr9",
+                    "ref_start": 112312502,
+                    "ref_end": 112314815,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr9_112312502_112314815_T-",
+                    "value": "chr9_112312502_112314815_T-",
+                    "name": "chr9_112312502_112314815_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr21",
+                    "ref_start": 43897951,
+                    "ref_end": 43901320,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr21_43897951_43901320_T+",
+                    "value": "chr21_43897951_43901320_T+",
+                    "name": "chr21_43897951_43901320_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr4",
+                    "ref_start": 82366664,
+                    "ref_end": 82366760,
+                    "strand": "-",
+                    "is_head": true,
+                    "id": "chr4_82366664_82366760_H-",
+                    "value": "chr4_82366664_82366760_H-",
+                    "name": "chr4_82366664_82366760_H-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr9",
+                    "ref_start": 9442059,
+                    "ref_end": 9442294,
+                    "strand": "+",
+                    "is_head": true,
+                    "id": "chr9_9442059_9442294_H+",
+                    "value": "chr9_9442059_9442294_H+",
+                    "name": "chr9_9442059_9442294_H+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr13",
+                    "ref_start": 52696683,
+                    "ref_end": 52700748,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr13_52696683_52700748_T+",
+                    "value": "chr13_52696683_52700748_T+",
+                    "name": "chr13_52696683_52700748_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr12",
+                    "ref_start": 114882176,
+                    "ref_end": 114888934,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr12_114882176_114888934_T+",
+                    "value": "chr12_114882176_114888934_T+",
+                    "name": "chr12_114882176_114888934_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr7",
+                    "ref_start": 151511677,
+                    "ref_end": 151516585,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr7_151511677_151516585_T-",
+                    "value": "chr7_151511677_151516585_T-",
+                    "name": "chr7_151511677_151516585_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr13",
+                    "ref_start": 97349582,
+                    "ref_end": 97352016,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr13_97349582_97352016_T+",
+                    "value": "chr13_97349582_97352016_T+",
+                    "name": "chr13_97349582_97352016_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr3",
+                    "ref_start": 33083568,
+                    "ref_end": 33086042,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr3_33083568_33086042_T-",
+                    "value": "chr3_33083568_33086042_T-",
+                    "name": "chr3_33083568_33086042_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chrX",
+                    "ref_start": 123909090,
+                    "ref_end": 123912216,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chrX_123909090_123912216_T+",
+                    "value": "chrX_123909090_123912216_T+",
+                    "name": "chrX_123909090_123912216_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 8447007,
+                    "ref_end": 8451193,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr1_8447007_8451193_T-",
+                    "value": "chr1_8447007_8451193_T-",
+                    "name": "chr1_8447007_8451193_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chrX",
+                    "ref_start": 48913186,
+                    "ref_end": 48916437,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chrX_48913186_48916437_T-",
+                    "value": "chrX_48913186_48916437_T-",
+                    "name": "chrX_48913186_48916437_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr6",
+                    "ref_start": 53001310,
+                    "ref_end": 53003693,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr6_53001310_53003693_T-",
+                    "value": "chr6_53001310_53003693_T-",
+                    "name": "chr6_53001310_53003693_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr19",
+                    "ref_start": 41287054,
+                    "ref_end": 41290321,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr19_41287054_41290321_T+",
+                    "value": "chr19_41287054_41290321_T+",
+                    "name": "chr19_41287054_41290321_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr1",
+                    "ref_start": 193090872,
+                    "ref_end": 193094258,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr1_193090872_193094258_T-",
+                    "value": "chr1_193090872_193094258_T-",
+                    "name": "chr1_193090872_193094258_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr2",
+                    "ref_start": 183012804,
+                    "ref_end": 183018221,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr2_183012804_183018221_T-",
+                    "value": "chr2_183012804_183018221_T-",
+                    "name": "chr2_183012804_183018221_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr10",
+                    "ref_start": 102155353,
+                    "ref_end": 102162599,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr10_102155353_102162599_T+",
+                    "value": "chr10_102155353_102162599_T+",
+                    "name": "chr10_102155353_102162599_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr11",
+                    "ref_start": 118544545,
+                    "ref_end": 118562251,
+                    "strand": "-",
+                    "is_head": false,
+                    "id": "chr11_118544545_118562251_T-",
+                    "value": "chr11_118544545_118562251_T-",
+                    "name": "chr11_118544545_118562251_T-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr9",
+                    "ref_start": 9442059,
+                    "ref_end": 9442215,
+                    "strand": "+",
+                    "is_head": true,
+                    "id": "chr9_9442059_9442215_H+",
+                    "value": "chr9_9442059_9442215_H+",
+                    "name": "chr9_9442059_9442215_H+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr21",
+                    "ref_start": 29044158,
+                    "ref_end": 29054484,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr21_29044158_29054484_T+",
+                    "value": "chr21_29044158_29054484_T+",
+                    "name": "chr21_29044158_29054484_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr22",
+                    "ref_start": 29973686,
+                    "ref_end": 29978164,
+                    "strand": "+",
+                    "is_head": false,
+                    "id": "chr22_29973686_29978164_T+",
+                    "value": "chr22_29973686_29978164_T+",
+                    "name": "chr22_29973686_29978164_T+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr22",
+                    "ref_start": 37848498,
+                    "ref_end": 37849333,
+                    "strand": "-",
+                    "is_head": true,
+                    "id": "chr22_37848498_37849333_H-",
+                    "value": "chr22_37848498_37849333_H-",
+                    "name": "chr22_37848498_37849333_H-"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr20",
+                    "ref_start": 35899523,
+                    "ref_end": 35949218,
+                    "strand": "+",
+                    "is_head": true,
+                    "id": "chr20_35899523_35949218_H+",
+                    "value": "chr20_35899523_35949218_H+",
+                    "name": "chr20_35899523_35949218_H+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 42805393,
+                    "ref_end": 42805994,
+                    "strand": "+",
+                    "is_head": true,
+                    "id": "chr17_42805393_42805994_H+",
+                    "value": "chr17_42805393_42805994_H+",
+                    "name": "chr17_42805393_42805994_H+"
+                }
+            },
+            {
+                "data": {
+                    "chrom": "chr17",
+                    "ref_start": 19648775,
+                    "ref_end": 19676561,
+                    "strand": "+",
+                    "is_head": true,
+                    "id": "chr17_19648775_19676561_H+",
+                    "value": "chr17_19648775_19676561_H+",
+                    "name": "chr17_19648775_19676561_H+"
+                }
+            }
+        ],
+        "edges": [
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/62325082/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr12_12262361_12263393_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CGTG))_4",
+                    "weight": 4,
+                    "read_ids": [
+                        "m64135_201121_000710/23922723/ccs",
+                        "m64135_201121_000710/114164415/ccs",
+                        "m64135_201121_000710/165218953/ccs",
+                        "m64135_201121_000710/461501/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr19_57300983_57304418_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TGC))_2",
+                    "weight": 2,
+                    "read_ids": [
+                        "m64135_201121_000710/80217592/ccs",
+                        "m64135_201121_000710/53873402/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr5_149352338_149354582_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCCCAGG))_3",
+                    "weight": 3,
+                    "read_ids": [
+                        "m64135_201121_000710/146539621/ccs",
+                        "m64135_201121_000710/96012935/ccs",
+                        "m64135_201121_000710/95619447/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr1_162524933_162529601_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TCGGA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/102369507/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr16_2766053_2771407_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGAG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/148440475/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr17_21017886_21022069_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGAGCA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/112133118/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr1_108926663_108929732_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GTGC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/91491019/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr12_70516933_70518307_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TGA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/88212303/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr8_38517355_38519803_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCTGA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/73599553/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr1_94478613_94519350_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "INV_(False, MicroHomology(AG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/51447765/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr14_67579131_67589535_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GTAG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/9568670/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr17_42662535_42667004_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/111675120/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr19_6469081_6470109_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/118096467/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr5_60630075_60634634_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GTAGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/142476097/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr11_66666963_66668374_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/159974079/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr7_65305691_65317936_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/10814648/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr18_58399541_58401540_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/18875577/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chrX_19352141_19359847_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "INV_(False, MicroHomology(GC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/115343722/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr14_55601788_55684576_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(C))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/146409997/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr18_13516903_13526454_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/80020000/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr6_135032219_135034615_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/108855722/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr5_65950051_65955067_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/180028682/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr4_56225134_56228604_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/20646207/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr3_57236090_57242222_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/70451788/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr3_49938365_50077248_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/163056415/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr3_149030127_149051835_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/50988011/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr22_35184460_35189039_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/64357950/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr20_49113526_49179218_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/131729923/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr17_59904126_59906249_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/32178535/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr16_89719764_89740356_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/66520804/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr7_158763309_158765707_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/176358073/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr20_25674214_25689275_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/12059583/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr10_13337294_13342238_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_None_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/180028463/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr3_196049285_196065956_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_None_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/132909361/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr17_43133684_43137433_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TGTGA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/110955264/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr22_41243473_41276376_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/115149467/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chrX_105584273_105588002_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CAC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/141689981/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr7_29645922_29648824_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTGCACT))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/100468786/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr22_30886056_30888600_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCAGCCTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/22415454/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr3_32307141_32308297_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(CGTCTCTACTAAAAATACAAAAATTAGCC:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/128714340/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr16_32073128_32075818_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTGGTTCTGTTGGAAGAGATGCTGAGACTGGCCATCAAGAACCTGGCCC:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/142803932/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chrY_12702030_12860832_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAAATACAAAAATTAGT:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/141953880/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr9_76805030_76806814_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAGATACAAAAAAT:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/76744764/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr8_43125410_43131171_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAAATACAAAAAATTATACGGGCATGGTGGCATGTGCCTGTAATCCCAGCCA:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/52691196/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr7_29645918_29648918_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTGT:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/112264035/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr6_35573602_35688893_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAGAATACAAATTAGCCAGGTGTGGTGGTGTGCGC:2))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/115739416/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr17_29255839_29259703_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACCAAAAATACAAAAATTAGCTGGGTGTGGTGGTGCATGCCTGTAGT:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/29294819/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr16_2972792_2978652_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAAATGCAAAAATTAGCCAGGCATGGTGGTG:2))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/133172039/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr12_27693830_27695563_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTGAAAATACAAAAAT:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/173213338/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr11_48071736_48073947_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAATACA:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/174457019/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr11_118583892_118602921_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(AATAAAAATATAAAAAA:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/1180925/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr11_117168918_117170626_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAAATATAAAAATTA:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/141690188/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr9_120756975_120762312_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(ACTAAAAATACAAAAAT:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/79103740/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr3_52692455_52696161_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(True, Insertion(self.hit_num=1,chr4:152977590-152977635:-))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/111084263/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr4_152977590_152977635_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(True, Insertion(self.hit_num=1,chr7:29648784-29648885:+))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/120784876/ccs"
+                    ],
+                    "source": "chr14_49862550_49862849_H-",
+                    "target": "chr7_29648784_29648885_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_None_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/62325082/ccs"
+                    ],
+                    "source": "chr12_12262361_12263393_T-",
+                    "target": "chr11_2678333_2679950_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "INV_None_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/111084263/ccs"
+                    ],
+                    "source": "chr4_152977590_152977635_T-",
+                    "target": "chr4_152977596_152979669_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "INV_None_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/120784876/ccs"
+                    ],
+                    "source": "chr7_29648784_29648885_T+",
+                    "target": "chr7_29645918_29648918_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_2",
+                    "weight": 2,
+                    "read_ids": [
+                        "m64135_201121_000710/44042138/ccs",
+                        "m64135_201121_000710/7210584/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr2_178513075_178516461_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/72745149/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr12_50960862_50962382_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/91947612/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr15_68101512_68106351_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGCCACTGC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/96077133/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr6_43005904_43012049_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/144443036/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr7_148807385_148821635_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/7930338/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr6_43620490_43623366_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/88343243/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr5_40759823_40762081_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/53936588/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr1_235447222_235496287_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/33816911/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr2_229764208_229794379_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/159318773/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chrX_19352141_19359847_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/68093902/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr3_56622864_56648602_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/22742480/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr2_47875343_47877107_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/50595852/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr2_240516939_240530884_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/56165738/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr1_179839965_179843020_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_None_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/175310035/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr1_168249284_168253019_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/138283030/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr18_9262844_9266062_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/28967727/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr12_68840559_68844184_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/63179437/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr11_111290788_111292029_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(C))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/45286374/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr1_109594706_109595830_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/111872808/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr20_44931369_44937450_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/132908288/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr1_22528728_22530685_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TGGGAT))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/56689485/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr11_61348814_61358305_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/26675705/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr7_99622861_99632370_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/97388858/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr7_26190127_26194358_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/18940624/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr3_56633228_56668935_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGTGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/58982965/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr19_57300981_57308552_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/62326178/ccs"
+                    ],
+                    "source": "chr14_49586579_49586842_H+",
+                    "target": "chr12_22630669_22636004_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCTCCC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/6488083/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr7_102007701_102014858_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCCGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/163578368/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr17_80209282_80212126_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGTT))_2",
+                    "weight": 2,
+                    "read_ids": [
+                        "m64135_201121_000710/122816802/ccs",
+                        "m64135_201121_000710/1705412/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr12_54230949_54234006_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/158206512/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr2_200973720_200977708_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GTTGC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/59769988/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr17_41848521_41851563_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/60622352/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr19_1414260_1435679_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/23202015/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr16_89674735_89675541_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/87558800/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr12_133005354_133012563_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTAA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/94569404/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr22_40858694_40862918_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/151718225/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr5_116241655_116244642_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TAAGGA))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/19270262/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr2_135839633_135842198_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGAG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/173277214/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr1_93517373_93522080_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/122423753/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr11_71434416_71438241_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGAGGGGT))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/157354536/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr1_217443921_217448175_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GGT))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/151585569/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr9_112312502_112314815_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AAC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/19466249/ccs"
+                    ],
+                    "source": "chr14_49862664_49862849_H-",
+                    "target": "chr21_43897951_43901320_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/61081974/ccs"
+                    ],
+                    "source": "chr4_82366664_82366760_H-",
+                    "target": "chr1_162524933_162529601_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/85590276/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr13_52696683_52700748_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GTT))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/163316868/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr12_114882176_114888934_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/55642113/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr7_151511677_151516585_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(TGT:0))_2",
+                    "weight": 2,
+                    "read_ids": [
+                        "m64135_201121_000710/58263739/ccs",
+                        "m64135_201121_000710/30344924/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr1_162524933_162529601_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/113509521/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr13_97349582_97352016_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(G))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/50659706/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr3_33083568_33086042_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TGATC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/15534089/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chrX_123909090_123912216_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTCCC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/11207947/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr1_8447007_8451193_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCAGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/92015441/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chrX_48913186_48916437_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(C))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/145162461/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr6_53001310_53003693_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCCCAGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/48235612/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr19_41287054_41290321_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/149358410/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr1_193090872_193094258_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(CGGGGGACCACCAGGTTGCCTA:3))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/150405789/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr2_183012804_183018221_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(TG:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/52299684/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr10_102155353_102162599_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/159449533/ccs"
+                    ],
+                    "source": "chr9_9442059_9442294_H+",
+                    "target": "chr11_118544545_118562251_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, NovelInsertion(GACTCACCAGGTTGC:0))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/122749626/ccs"
+                    ],
+                    "source": "chr9_9442059_9442215_H+",
+                    "target": "chr21_29044158_29054484_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CCTCC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/119474166/ccs"
+                    ],
+                    "source": "chr9_9442059_9442215_H+",
+                    "target": "chr22_29973686_29978164_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(TC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/135792015/ccs"
+                    ],
+                    "source": "chr22_37848498_37849333_H-",
+                    "target": "chr1_162524933_162529601_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(CTCACTGC))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/124979770/ccs"
+                    ],
+                    "source": "chr20_35899523_35949218_H+",
+                    "target": "chr1_162524933_162529601_T+",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(AGGCTG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/152568260/ccs"
+                    ],
+                    "source": "chr17_42805393_42805994_H+",
+                    "target": "chr5_40759823_40762081_T-",
+                    "key": 0
+                }
+            },
+            {
+                "data": {
+                    "label": "TRA_(False, MicroHomology(GCAGG))_1",
+                    "weight": 1,
+                    "read_ids": [
+                        "m64135_201121_000710/66259490/ccs"
+                    ],
+                    "source": "chr17_19648775_19676561_H+",
+                    "target": "chr1_162524933_162529601_T+",
+                    "key": 0
+                }
+            }
+        ]
+    }
+}
