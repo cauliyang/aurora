@@ -32,7 +32,6 @@ export const STATE = {
 };
 
 // Get the "Change Layout" button element
-
 layoutSelect.addEventListener("change", () => {
     // Get the selected layout from the select element
     const selectedLayout = document.getElementById("layoutSelect").value;
