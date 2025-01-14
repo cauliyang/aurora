@@ -326,7 +326,7 @@ async function displayWalks(searchText = "") {
                 const walkText = walk.map((node) => node.id()).join(" -> ");
                 const auroraId = await getWalkAuroraId(walk);
 
-                // Convert search text and comparison text to lowercase for case-insensitive search
+                // Convert search text and comparison text for case-sensitive search
                 const searchLower = searchText.trim();
                 const walkLower = walkText;
                 const auroraLower = auroraId;
