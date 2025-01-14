@@ -274,7 +274,7 @@ async function getWalkAuroraId(walk) {
         const chrom = node.data('chrom') || '';
         const refStart = node.data('ref_start') || '';
         const refEnd = node.data('ref_end') || '';
-        const nodeId = node.id();
+        const nodeId = node.data("node_id");
         return `${chrom}_${refStart}_${refEnd}_${nodeId}`;
     }).join('-');
 
@@ -330,8 +330,6 @@ async function displayWalks(searchText = "") {
                 const searchLower = searchText.trim();
                 const walkLower = walkText;
                 const auroraLower = auroraId;
-
-                console.log("walklower", walkLower);
 
                 // Skip if there's a search term and neither walk text nor Aurora ID matches
                 if (searchLower && !walkLower.includes(searchLower) && !auroraLower.includes(searchLower)) {
