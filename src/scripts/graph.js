@@ -228,7 +228,7 @@ function setupGraphInteractions() {
  * @returns {Promise<string>} A valid identifier string derived from the SHA-256 hash
  * @throws {TypeError} If inputString is not a string or length is not a number/null
  * @throws {ValueError} If length is not positive
- * 
+ *
  * @example
  * const identifier = await toHashIdentifier("Hello World!");
  * console.log(identifier); // Outputs something like 'a591a6d40bf420'
@@ -293,10 +293,10 @@ async function displayWalks(searchText = "") {
     walksContainer.innerHTML = `
         <div class="input-group mb-3">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input 
-                type="text" 
-                class="form-control" 
-                id="walkSearch" 
+            <input
+                type="text"
+                class="form-control"
+                id="walkSearch"
                 placeholder="Search walks or Aurora ID... (Press Enter to search)"
                 aria-label="Search walks"
             >
