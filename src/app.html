@@ -1,68 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Graph Visualization</title>
 
     <!-- PERFORMANCE -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+    />
     <link rel="preload" as="style" href="./styles/style.css" />
 
     <link rel="stylesheet" href="./styles/scss/styles.scss" />
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/app.css" />
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white">
-        <!-- Container wrapper -->
-        <div class="container-fluid" style="padding-top: 15px">
-            <!-- Toggle button -->
-            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <!-- Container wrapper -->
+      <div class="container-fluid" style="padding-top: 15px">
+        <!-- Toggle button -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
           <i class="fas fa-bars"></i>
         </button>
 
-            <!-- Collapsible wrapper -->
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                    <em>Aurora</em> <i class="bi bi-lightning-charge-fill"></i>
-                </a>
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Navbar brand -->
+          <a class="navbar-brand mt-2 mt-lg-0" href="#">
+            <em>Aurora</em> <i class="bi bi-lightning-charge-fill"></i>
+          </a>
 
-                <!-- Left links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Project</a>
-                    </li>
-                </ul>
-                <!-- Left links -->
-            </div>
+          <!-- Left links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Project</a>
+            </li>
+          </ul>
+          <!-- Left links -->
+        </div>
 
-            <!-- Right elements -->
-            <div class="d-flex align-items-center">
-                <!-- Right elements -->
-                <div class="d-flex align-items-center">
-                    <a href="https://github.com/cauliyang">
-                        <i class="bi bi-github" style="font-size: 1.4rem"></i>
-                    </a>
-                </div>
-            </div>
+        <!-- Right elements -->
+        <div class="d-flex align-items-center">
+          <!-- Right elements -->
+          <div class="d-flex align-items-center">
+            <a href="https://github.com/cauliyang">
+              <i class="bi bi-github" style="font-size: 1.4rem"></i>
+            </a>
+          </div>
+        </div>
 
-            <!--
+        <!--
             <div class="d-flex align-items-center">
                 <a href="https://yangyangli.top/">
                     <img src="img/avatar.jpeg" alt="Avatar" class="avatar rounded" style="width: 25px; height: 25px;">
                 </a>
             </div> -->
-        </div>
-        <!-- Container wrapper -->
+      </div>
+      <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
 
@@ -71,34 +84,77 @@
     <div id="tooltip"></div>
 
     <div class="container-fluid h-100 p-3">
-        <div class="row h-100">
-            <div class="col-12 position-relative mb-2">
-                <div class="btn-toolbar" style="position: absolute; top: 10px; left: 10px; z-index: 1" role="toolbar" aria-label="Toolbar with button groups">
-                    <!-- ... (your button and form elements remain unchanged) ... -->
-                    <div class="btn-group me-2" role="group" aria-label="First group">
-                        <button id="toggleMaximize" class="btn btn-outline-primary">
+      <div class="row h-100">
+        <div class="col-12 position-relative mb-2">
+          <div
+            class="btn-toolbar"
+            style="position: absolute; top: 10px; left: 10px; z-index: 1"
+            role="toolbar"
+            aria-label="Toolbar with button groups"
+          >
+            <!-- ... (your button and form elements remain unchanged) ... -->
+            <div class="btn-group me-2" role="group" aria-label="First group">
+              <button
+                id="toggleMaximize"
+                class="btn btn-outline-primary"
+                title="Toggle fullscreen"
+              >
                 <i class="bi bi-arrows-fullscreen"></i>
               </button>
-                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload" class="btn btn-outline-primary">
-                            <input type="file" name="file" accept=".json" class="d-none" id="uploadInput" />
-                            <label for="uploadInput"><i class="bi bi-upload"></i></label>
-                        </form>
+              <form
+                id="uploadForm"
+                enctype="multipart/form-data"
+                method="post"
+                action="/upload"
+                class="btn btn-outline-primary"
+                title="Upload JSON file"
+              >
+                <input
+                  type="file"
+                  name="file"
+                  accept=".json"
+                  class="d-none"
+                  id="uploadInput"
+                />
+                <label for="uploadInput"><i class="bi bi-upload"></i></label>
+              </form>
 
-                        <button id="captureGraph" class="btn btn-outline-primary">
+              <button
+                id="captureGraph"
+                class="btn btn-outline-primary"
+                title="Capture graph as PNG"
+              >
                 <i class="bi bi-camera"></i>
               </button>
-                        <button id="hiddenLabel" class="btn btn-outline-primary">
+
+              <button
+                id="hiddenLabel"
+                class="btn btn-outline-primary"
+                title="Toggle node/edge labels"
+              >
                 <i class="bi bi-card-text"></i>
               </button>
 
-                        <button id="resetGraph" class="btn btn-outline-primary">
+              <button
+                id="toggleTooltip"
+                class="btn btn-outline-primary"
+                title="Toggle tooltips"
+              >
+                <i class="bi bi-info-circle"></i>
+              </button>
+
+              <button
+                id="resetGraph"
+                class="btn btn-outline-primary"
+                title="Reset graph layout"
+              >
                 <i class="bi bi-arrow-repeat"></i>
               </button>
-                    </div>
+            </div>
 
-                    <!-- Layout Selection -->
-                    <div class="btn-group me-2" role="group">
-                        <select id="layoutSelect" class="form-select w-auto">
+            <!-- Layout Selection -->
+            <div class="btn-group me-2" role="group">
+              <select id="layoutSelect" class="form-select w-auto">
                 <option value="dagre">DAG Layout</option>
                 <option value="grid">Grid Layout</option>
                 <option value="circle">Circle Layout</option>
@@ -119,12 +175,13 @@
                 <!-- https://blog.js.cytoscape.org/2020/05/11/layouts/#classes-of-layouts -->
                 <!-- Add more layout options as needed -->
               </select>
-                    </div>
+            </div>
 
-                    <div id="liveAlertPlaceholder"></div>
+            <div id="liveAlertPlaceholder"></div>
 
-                    <div class="input-group me-1">
-                        <span class="input-group-text" id="inputGroup-sizing-default">MinEdge</span
+            <div class="input-group me-1">
+              <span class="input-group-text" id="inputGroup-sizing-default"
+                >MinEdge</span
               >
               <input
                 type="number"
@@ -209,35 +266,57 @@
             <!-- Add search input box -->
             <div class="input-group mb-3">
               <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control" id="walkSearch" placeholder="Search walks... (Press Enter to search)" aria-label="Search walks" />
-                    </div>
-                    <h3>Graph Walks:</h3>
-                </div>
+              <input
+                type="text"
+                class="form-control"
+                id="walkSearch"
+                placeholder="Search walks... (Press Enter to search)"
+                aria-label="Search walks"
+              />
             </div>
+            <h3>Graph Walks:</h3>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Modal for JSON Editor -->
-    <div class="modal fade" id="jsonModal" tabindex="-1" aria-labelledby="jsonModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="jsonModalLabel">Edit JSON Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="jsoneditor"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditor">
+    <div
+      class="modal fade"
+      id="jsonModal"
+      tabindex="-1"
+      aria-labelledby="jsonModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="jsonModalLabel">Edit JSON Data</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div id="jsoneditor"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="closeEditor"
+            >
               Close
             </button>
-                    <button type="button" class="btn btn-primary" id="saveEditedJson">
+            <button type="button" class="btn btn-primary" id="saveEditedJson">
               Save Changes
             </button>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="./scripts/graph.js" type="module"></script>
@@ -246,46 +325,51 @@
 
     <!-- Footer Start -->
     <footer class="mt-5 py-3 bg-dark text-white">
-        <div class="container">
-            <div class="row">
-                <!-- Left: About/Links -->
-                <div class="col-md-4">
-                    <h5>About Aurora</h5>
-                    <p>
-                        Aurora is a state-of-the-art graph visualization platform. Dive deep into your data and extract meaningful insights.
-                    </p>
-                </div>
+      <div class="container">
+        <div class="row">
+          <!-- Left: About/Links -->
+          <div class="col-md-4">
+            <h5>About Aurora</h5>
+            <p>
+              Aurora is a state-of-the-art graph visualization platform. Dive
+              deep into your data and extract meaningful insights.
+            </p>
+          </div>
 
-                <!-- Center: Quick Links -->
-                <div class="col-md-3">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="index.html" class="text-white">Home</a></li>
-                        <li><a href="index.html" class="text-white">Features</a></li>
-                        <li><a href="#" class="text-white">Contact</a></li>
-                    </ul>
-                </div>
+          <!-- Center: Quick Links -->
+          <div class="col-md-3">
+            <h5>Quick Links</h5>
+            <ul class="list-unstyled">
+              <li><a href="index.html" class="text-white">Home</a></li>
+              <li><a href="index.html" class="text-white">Features</a></li>
+              <li><a href="#" class="text-white">Contact</a></li>
+            </ul>
+          </div>
 
-                <!-- Right: Social Media Links -->
-                <div class="col-md-3">
-                    <h5>Connect with Us</h5>
-                    <a href="https://yangyangli.top" class="text-white mr-3"><i class="bi bi-person-circle"></i
+          <!-- Right: Social Media Links -->
+          <div class="col-md-3">
+            <h5>Connect with Us</h5>
+            <a href="https://yangyangli.top" class="text-white mr-3"
+              ><i class="bi bi-person-circle"></i
             ></a>
-                    <a href="https://twitter.com/yangyangliz5" class="text-white mr-3"><i class="bi bi-twitter"></i
+            <a href="https://twitter.com/yangyangliz5" class="text-white mr-3"
+              ><i class="bi bi-twitter"></i
             ></a>
-                    <a href="https://github.com/cauliyang/aurora" class="text-white mr-3"><i class="fab fa-github"></i
+            <a
+              href="https://github.com/cauliyang/aurora"
+              class="text-white mr-3"
+              ><i class="fab fa-github"></i
             ></a>
-                </div>
-            </div>
-
-            <!-- Bottom: Copyright -->
-            <div class="row mt-3">
-                <div class="col-12 text-center">
-                    <p>&copy; 2025 Yangyang Li. All rights reserved.</p>
-                </div>
-            </div>
+          </div>
         </div>
-    </footer>
-</body>
 
+        <!-- Bottom: Copyright -->
+        <div class="row mt-3">
+          <div class="col-12 text-center">
+            <p>&copy; 2025 Yangyang Li. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

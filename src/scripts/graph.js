@@ -206,7 +206,6 @@ document.getElementById("resetGraph").addEventListener("click", () => {
 });
 
 // Function to get color based on weight
-
 function setupGraphInteractions() {
     STATE.cy.on("tap", (evt) => {
         if (evt.target === STATE.cy) {
