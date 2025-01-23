@@ -1,6 +1,7 @@
 import { STATE } from "./graph";
 import { resizePanels } from "./graphUtilities";
 import { loadGraphDataFromServer } from "./graph";
+import { getLabelsVisible, setLabelsVisible } from "./graphSetup";
 
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
@@ -30,26 +31,25 @@ maximizeButton.addEventListener("click", () => {
     }
 });
 
-const HiddenLabelButton = document.getElementById("hiddenLabel");
-let labelsVisible = true; // Initially, labels are visible
-
 function toggleLabels() {
-    labelsVisible = !labelsVisible;
-
-    const labelStyle = labelsVisible ? "data(name)" : ""; // Toggles between showing the name and showing nothing
+    // Update labelsVisible state
+    const nodelabelStyle = !getLabelsVisible() ? "data(name)" : ""; // Toggles between showing the name and showing nothing
+    const edgeLabelStyle = !getLabelsVisible() ? "data(weight)" : ""; // Toggles between showing the weight and showing nothing
 
     STATE.cy
         .style()
         .selector("node") // Select nodes
         .style({
-            label: labelStyle,
+            label: nodelabelStyle,
         })
         .selector("edge") // Select edges
         .style({
-            label: labelsVisible ? "data(weight)" : "", // Toggles edge labels based on weight
+            label: edgeLabelStyle, // Toggles edge labels based on weight
         })
         .update(); // Important to update the style
+    setLabelsVisible(!getLabelsVisible());
 }
+
 document.getElementById("hiddenLabel").addEventListener("click", toggleLabels);
 
 document.getElementById("captureGraph").addEventListener("click", () => {

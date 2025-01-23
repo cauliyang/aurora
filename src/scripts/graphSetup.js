@@ -20,6 +20,15 @@ function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
     return colorScale[index];
 }
 
+// Export a getter and setter for labelsVisible
+let labelsVisible = false;
+export function getLabelsVisible() {
+    return labelsVisible;
+}
+export function setLabelsVisible(value) {
+    labelsVisible = value;
+}
+
 export function initializeGraph(graphData) {
     const maxWeight = Math.max(
         ...graphData.edges.map((edge) => edge.data.weight),
@@ -32,6 +41,9 @@ export function initializeGraph(graphData) {
         .mode("lch")
         .colors(maxWeight);
 
+    let node_label = getLabelsVisible() ? "data(name)" : "";
+    let edge_label = getLabelsVisible() ? "data(weight)" : "";
+
     STATE.cy = cytoscape({
         container: document.getElementById("cy"),
         layout: {
@@ -41,11 +53,10 @@ export function initializeGraph(graphData) {
             avoidOverlap: true,
             rankDir: "LR",
         },
-        style: [
-            {
+        style: [{
                 selector: "node",
                 style: {
-                    label: "data(name)",
+                    label: node_label, // Initially, no labels are shown
                     "background-color": STATE.nodeColor,
                     "border-color": "#000",
                     "border-width": 2,
@@ -70,7 +81,7 @@ export function initializeGraph(graphData) {
                         const weight = ele.data("weight");
                         return getColorForWeight(weight, minWeight, maxWeight, colorScale);
                     },
-                    label: "data(weight)",
+                    label: edge_label, // Initially, no labels are shown
                     "text-rotation": "autorotate",
                     "target-arrow-shape": "triangle", // Arrow shape
                     "curve-style": "bezier", // Edge style (curved or straight)
