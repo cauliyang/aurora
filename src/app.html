@@ -129,16 +129,20 @@
 
               <button
                 id="hiddenLabel"
-                class="btn btn-outline-primary"
+                class="btn btn-outline-primary active"
                 title="Toggle node/edge labels"
+                data-tooltip-enabled="true"
+                onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))"
               >
                 <i class="bi bi-card-text"></i>
               </button>
 
               <button
                 id="toggleTooltip"
-                class="btn btn-outline-primary"
+                class="btn btn-outline-primary active"
                 title="Toggle tooltips"
+                data-tooltip-enabled="true"
+                onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))"
               >
                 <i class="bi bi-info-circle"></i>
               </button>
