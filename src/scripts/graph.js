@@ -271,9 +271,9 @@ async function toHashIdentifier(inputString, length = 16) {
  * Generates a unique Aurora ID for a given walk through the graph.
  * @param {Array} walk - Array of graph nodes representing a walk
  * @returns {Promise<string>} A unique identifier for the walk generated using toHashIdentifier
- * 
+ *
  * @example
- * const walk = [node1, node2, node3]; 
+ * const walk = [node1, node2, node3];
  * const auroraId = await getWalkAuroraId(walk);
  * console.log(auroraId); // Outputs something like 'a591a6d40bf420'
  */
