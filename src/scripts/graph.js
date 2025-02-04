@@ -267,6 +267,16 @@ async function toHashIdentifier(inputString, length = 16) {
     return result;
 }
 
+/**
+ * Generates a unique Aurora ID for a given walk through the graph.
+ * @param {Array} walk - Array of graph nodes representing a walk
+ * @returns {Promise<string>} A unique identifier for the walk generated using toHashIdentifier
+ * 
+ * @example
+ * const walk = [node1, node2, node3]; 
+ * const auroraId = await getWalkAuroraId(walk);
+ * console.log(auroraId); // Outputs something like 'a591a6d40bf420'
+ */
 async function getWalkAuroraId(walk) {
     // Create the walk info string by joining node information
     const walkInfo = walk.map(node => {
@@ -317,10 +327,12 @@ async function displayWalks(searchText = "") {
             }
         });
     }
-
     try {
+        // Sort walks by length (number of nodes) in descending order
+        const sortedWalks = [...STATE.walks].sort((a, b) => b.length - a.length);
+
         // Process all walks in parallel
-        const walkPromises = STATE.walks.map(async(walk, index) => {
+        const walkPromises = sortedWalks.map(async(walk, index) => {
             try {
                 const walkText = walk.map((node) => node.id()).join(" -> ");
                 const auroraId = await getWalkAuroraId(walk);
@@ -364,7 +376,6 @@ async function displayWalks(searchText = "") {
         console.error("Error displaying walks:", error);
         walksContainer.innerHTML += `<div class="alert alert-danger">Error displaying walks</div>`;
     }
-
 }
 
 function highlightWalk(walk) {
