@@ -387,3 +387,95 @@ function highlightWalk(walk) {
     });
     STATE.cy.style().update();
 }
+
+// node data
+// {
+//   "id": "chr8_62251376_62302403_T_349",
+//   "indegree": 1,
+//   "outdegree": 0,
+//   "data": {
+//     "chrom": "chr8",
+//     "ref_start": 62251376,
+//     "ref_end": 62302403,
+//     "strand": "-",
+//     "is_head": false,
+//     "node_id": 349,
+//     "exons": "[62251376-62252614,62284023-62284107,62284267-62284408,62284826-62284911,62302311-62302403]",
+//     "ptc": 1,
+//     "ptf": 0,
+//     "id": "chr8_62251376_62302403_T_349",
+//     "value": "chr8_62251376_62302403_T_349",
+//     "name": "chr8_62251376_62302403_T_349"
+//   }
+// }
+
+/**
+ * Generic function to rank nodes by a specified property
+ * @param {Array} nodes - Array of graph nodes to rank
+ * @param {string} property - Property name to rank by
+ * @param {boolean} descending - Sort in descending order if true, ascending if false
+ * @returns {Array} Sorted array of nodes by the specified property
+ */
+function rankNodesByProperty(nodes, property, descending = true) {
+    if (!nodes || !Array.isArray(nodes)) return [];
+
+    return nodes.slice().sort((a, b) => {
+        const valueA = a.data(property) || 0;
+        const valueB = b.data(property) || 0;
+        return descending ? (valueB - valueA) : (valueA - valueB);
+    });
+}
+
+/**
+ * Ranks nodes by their degree (number of connections)
+ * @param {Array} nodes - Array of graph nodes to rank
+ * @param {boolean} descending - Sort in descending order if true, ascending if false
+ * @returns {Array} Sorted array of nodes by degree (default: descending)
+ */
+function rankNodesByDegree(nodes, descending = true) {
+    if (!nodes || !Array.isArray(nodes)) return [];
+
+    return nodes.slice().sort((a, b) => {
+        const degreeA = a.degree() || 0;
+        const degreeB = b.degree() || 0;
+        return descending ? (degreeB - degreeA) : (degreeA - degreeB);
+    });
+}
+
+/**
+ * Gets top N nodes with highest degree values
+ * @param {Array} nodes - Array of graph nodes
+ * @param {number} n - Number of top nodes to return
+ * @returns {Array} Top N nodes with highest degree values
+ */
+function getTopDegreeNodes(nodes, n = 10) {
+    const rankedNodes = rankNodesByDegree(nodes);
+    return rankedNodes.slice(0, n);
+}
+
+/**
+ * Ranks nodes by their betweenness centrality
+ * @param {Array} nodes - Array of graph nodes to rank
+ * @param {boolean} descending - Sort in descending order if true, ascending if false
+ * @returns {Array} Sorted array of nodes by betweenness centrality (default: descending)
+ */
+function rankNodesByCentrality(nodes, descending = true) {
+    if (!nodes || !Array.isArray(nodes)) return [];
+
+    return nodes.slice().sort((a, b) => {
+        const centralityA = a.data('betweenness') || 0;
+        const centralityB = b.data('betweenness') || 0;
+        return descending ? (centralityB - centralityA) : (centralityA - centralityB);
+    });
+}
+
+/**
+ * Gets top N nodes with highest betweenness centrality
+ * @param {Array} nodes - Array of graph nodes
+ * @param {number} n - Number of top nodes to return
+ * @returns {Array} Top N nodes with highest betweenness centrality
+ */
+function getTopCentralityNodes(nodes, n = 10) {
+    const rankedNodes = rankNodesByCentrality(nodes);
+    return rankedNodes.slice(0, n);
+}
