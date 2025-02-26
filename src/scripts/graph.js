@@ -499,15 +499,21 @@ function updateNodeRankingModal(cy) {
 
 // Function to highlight a specific node
 function highlightNode(cy, nodeId) {
-    // Check if the node is already highlighted - if so, we'll clear instead
+    // Find the node by ID
     const node = cy.getElementById(nodeId);
-    const isAlreadyHighlighted = node.hasClass('highlighted');
 
-    if (isAlreadyHighlighted) {
-        // If the node is already highlighted, clear all highlights
-        clearNodeHighlights(cy);
-        if (node.length > 0) {
+    if (node.length > 0) {
+        // Check if the node is already highlighted
+        const isAlreadyHighlighted = node.hasClass('highlighted');
+
+        if (isAlreadyHighlighted) {
+            console.log("Node is already highlighted, clearing highlights");
+            // If the node is already highlighted, clear all highlights
+            clearNodeHighlights(cy);
+        } else {
             console.log("Highlighting node:", nodeId);
+            // Clear any existing highlights first
+            clearNodeHighlights(cy);
 
             // Add highlighted class to the node
             node.addClass('highlighted');
@@ -529,9 +535,9 @@ function highlightNode(cy, nodeId) {
             if (infoContent) {
                 displayElementInfo(node, infoContent);
             }
-        } else {
-            console.error("Node not found:", nodeId);
         }
+    } else {
+        console.error("Node not found:", nodeId);
     }
 }
 
@@ -543,7 +549,6 @@ export function clearNodeHighlights(cy) {
     cy.elements().removeClass('highlighted');
     cy.elements().removeClass('faded');
     cy.elements().removeClass("highlightWalk"); // Also clear walk highlights
-
     // Reset the view to fit all elements
     cy.fit(cy.elements().filter(':visible'), 50);
 }
