@@ -85,6 +85,8 @@ h3 {
     /* You can adjust this value as needed */
 }
 
+
+/* 
 #tooltip {
     position: absolute;
     display: none;
@@ -110,7 +112,7 @@ h3 {
     border-width: 6px;
     border-style: solid;
     border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-}
+} */
 
 pre {
     max-height: 100px;
