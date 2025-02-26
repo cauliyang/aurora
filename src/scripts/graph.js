@@ -28,7 +28,7 @@ export const STATE = {
     originalGraphData: null,
     selectedNodeColor: "#8dd3c7",
     nodeColor: "#1f77b4",
-    highlightColor: "#ff5733",
+    highlightWalkColor: "#ff5733",
     sourceNodeColor: "#31a354",
 };
 
@@ -181,7 +181,7 @@ export function loadGraphDataFromServer(graphData) {
 
 document.getElementById("resetGraph").addEventListener("click", () => {
     // Reset layout to default
-    STATE.cy.elements().removeClass("highlight");
+    STATE.cy.elements().removeClass("highlightWalk");
     layoutSelect.value = "dagre";
     STATE.cy
         .layout({
@@ -377,10 +377,10 @@ async function displayWalks(searchText = "") {
 
 function highlightWalk(walk) {
     // Reset any previously highlight nodes or edges
-    STATE.cy.elements().removeClass("highlight");
+    STATE.cy.elements().removeClass("highlightWalk");
 
     walk.forEach((node, index) => {
-        node.addClass("highlight");
+        node.addClass("highlightWalk");
     });
     STATE.cy.style().update();
 }
@@ -408,7 +408,9 @@ function highlightWalk(walk) {
 
 // Function to calculate node ranking by PTC
 function calculateNodeRanking(cy) {
-    const nodes = cy.nodes().toArray();
+    // Check if graph has nodes before getting the array
+    const nodes = cy.nodes().length > 0 ? cy.nodes().toArray() : [];
+
     const ranking = nodes
         .map(node => {
             return {
@@ -504,41 +506,44 @@ function highlightNode(cy, nodeId) {
     if (isAlreadyHighlighted) {
         // If the node is already highlighted, clear all highlights
         clearNodeHighlights(cy);
-        return;
-    }
+        if (node.length > 0) {
+            console.log("Highlighting node:", nodeId);
 
-    // Otherwise, proceed with highlighting
-    cy.elements().removeClass('highlighted').removeClass('faded');
+            // Add highlighted class to the node
+            node.addClass('highlighted');
 
-    // If the node exists
-    if (node.length > 0) {
-        // Add highlighted class to the node
-        node.addClass('highlighted');
+            // Fade all other nodes and edges
+            cy.elements().difference(node).addClass('faded');
 
-        // Fade all other nodes and edges
-        cy.elements().difference(node).addClass('faded');
+            // Center the view on the highlighted node
+            cy.animate({
+                fit: {
+                    eles: node,
+                    padding: 50
+                },
+                duration: 500
+            });
 
-        // Center the view on the highlighted node
-        cy.animate({
-            fit: {
-                eles: node,
-                padding: 50
-            },
-            duration: 500
-        });
-
-        // Update the info panel with node information
-        const infoContent = document.getElementById("infoContent");
-        if (infoContent) {
-            displayElementInfo(node, infoContent);
+            // Update the info panel with node information
+            const infoContent = document.getElementById("infoContent");
+            if (infoContent) {
+                displayElementInfo(node, infoContent);
+            }
+        } else {
+            console.error("Node not found:", nodeId);
         }
     }
 }
 
 // Function to clear all highlighting
 export function clearNodeHighlights(cy) {
-    // Remove highlighted and faded classes from all elements
-    cy.elements().removeClass('highlighted').removeClass('faded');
+    console.log("Clearing all highlights");
+
+    // Remove highlighting classes from all elements
+    cy.elements().removeClass('highlighted');
+    cy.elements().removeClass('faded');
+    cy.elements().removeClass("highlightWalk"); // Also clear walk highlights
+
     // Reset the view to fit all elements
     cy.fit(cy.elements().filter(':visible'), 50);
 }
