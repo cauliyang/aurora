@@ -289,6 +289,8 @@ async function getWalkAuroraId(walk) {
     return await toHashIdentifier(walkInfo);
 }
 
+// Update the displayWalks function for a more beautiful presentation
+
 async function displayWalks(searchText = "") {
     const walksContainer = document.getElementById("walks");
     if (!walksContainer) {
@@ -296,65 +298,165 @@ async function displayWalks(searchText = "") {
         return;
     }
 
-    // Clear previous walks display and add search box
+    // Clear previous walks display and add search box with improved styling
     walksContainer.innerHTML = `
-        <div class="input-group mb-3">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input
-                type="text"
-                class="form-control"
-                id="walkSearch"
-                placeholder="Search walks or Aurora ID... (Press Enter to search)"
-                aria-label="Search walks"
-            >
+        <div class="walks-header">
+            <h3>
+                <i class="bi bi-diagram-3"></i> Graph Walks 
+                <span class="badge bg-primary walks-count">0</span>
+            </h3>
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="walkSearch"
+                    placeholder="Search walks or Aurora ID..."
+                    aria-label="Search walks"
+                >
+                <button class="btn btn-outline-secondary" type="button" id="clearWalkSearch">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
         </div>
-        <h3>Graph Walks:</h3>
+        <div class="walk-list-container">
+            <!-- Walks will be loaded here -->
+            <div class="loading-walks">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Loading walks...</p>
+            </div>
+        </div>
     `;
 
-    // Add search event listener
+    // Add search event listener with improved functionality
     const searchInput = document.getElementById('walkSearch');
+    const clearSearchBtn = document.getElementById('clearWalkSearch');
+
     if (searchInput) {
         searchInput.value = searchText; // Preserve search text when redisplaying
+
         // Remove old event listeners before adding new one
         const newSearchInput = searchInput.cloneNode(true);
         searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-        newSearchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                displayWalks(e.target.value);
+
+        newSearchInput.addEventListener('input', (e) => {
+            // Real-time filtering as user types
+            const searchValue = e.target.value.trim().toLowerCase();
+            document.querySelectorAll('.walk-card').forEach(card => {
+                const walkText = card.getAttribute('data-walk-text').toLowerCase();
+                const auroraId = card.getAttribute('data-aurora-id').toLowerCase();
+
+                if (searchValue === '' || walkText.includes(searchValue) || auroraId.includes(searchValue)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update the count of visible walks
+            updateVisibleWalksCount();
+        });
+    }
+
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            if (searchInput) {
+                searchInput.value = '';
+                // Show all walks
+                document.querySelectorAll('.walk-card').forEach(card => {
+                    card.style.display = '';
+                });
+                updateVisibleWalksCount();
+                searchInput.focus();
             }
         });
     }
+
     try {
         // Sort walks by length (number of nodes) in descending order
         const sortedWalks = [...STATE.walks].sort((a, b) => b.length - a.length);
+        const walkListContainer = walksContainer.querySelector('.walk-list-container');
+
+        if (sortedWalks.length === 0) {
+            walkListContainer.innerHTML = `
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    No walks found in this graph
+                </div>
+            `;
+            return;
+        }
+
+        // Update walks count badge
+        const walksCountBadge = walksContainer.querySelector('.walks-count');
+        if (walksCountBadge) {
+            walksCountBadge.textContent = sortedWalks.length;
+        }
+
+        // Create container for walkCards
+        walkListContainer.innerHTML = '<div class="walks-accordion" id="walksAccordion"></div>';
+        const walksAccordion = document.getElementById('walksAccordion');
 
         // Process all walks in parallel
         const walkPromises = sortedWalks.map(async(walk, index) => {
             try {
-                const walkText = walk.map((node) => node.id()).join(" -> ");
+                const walkText = walk.map((node) => node.id()).join(" → ");
                 const auroraId = await getWalkAuroraId(walk);
 
-                // Convert search text and comparison text for case-sensitive search
-                const searchLower = searchText.trim();
-                const walkLower = walkText;
-                const auroraLower = auroraId;
+                // Create a more appealing card for each walk
+                const walkCard = document.createElement("div");
+                walkCard.className = "walk-card";
+                walkCard.setAttribute('data-walk-text', walkText);
+                walkCard.setAttribute('data-aurora-id', auroraId);
 
-                // Skip if there's a search term and neither walk text nor Aurora ID matches
+                // Check if the walk should be visible based on search text
+                const searchLower = searchText.trim().toLowerCase();
+                const walkLower = walkText.toLowerCase();
+                const auroraLower = auroraId.toLowerCase();
+
                 if (searchLower && !walkLower.includes(searchLower) && !auroraLower.includes(searchLower)) {
-                    return null;
+                    walkCard.style.display = 'none';
                 }
 
-                const walkDiv = document.createElement("div");
-                walkDiv.innerHTML = `Walk ${index + 1}: ${walkText}<br><small>Aurora ID: ${auroraId}</small>`;
-                walkDiv.title = "Click to highlight this walk in the graph";
-                walkDiv.style.cursor = "pointer";
-                walkDiv.style.marginBottom = "10px";
+                // Simplified display of the walk with copy feature, accordion for details
+                walkCard.innerHTML = `
+                    <div class="card mb-2">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <button class="btn btn-link btn-sm walk-toggle-btn" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#walk-${index}" aria-expanded="false" aria-controls="walk-${index}">
+                                <i class="bi bi-chevron-down chevron-icon"></i>
+                                Walk ${index + 1} <span class="badge bg-info ms-2">${walk.length} nodes</span>
+                            </button>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-primary highlight-walk-btn" title="Highlight this walk">
+                                    <i class="bi bi-lightbulb"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary copy-aurora-btn" title="Copy Aurora ID">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="walk-${index}" class="collapse">
+                            <div class="card-body">
+                                <div class="aurora-id-container">
+                                    <small class="text-muted d-flex align-items-center">
+                                        <span class="me-2">Aurora ID:</span>
+                                        <code class="aurora-id">${auroraId}</code>
+                                    </small>
+                                </div>
+                                <div class="walk-path mt-2">
+                                    <div class="path-visualization">
+                                        ${generatePathVisualization(walk)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
-                walkDiv.addEventListener("click", () => {
-                    highlightWalk(walk);
-                });
-
-                return walkDiv;
+                return walkCard;
             } catch (error) {
                 console.error(`Error processing walk ${index}:`, error);
                 return null;
@@ -362,17 +464,257 @@ async function displayWalks(searchText = "") {
         });
 
         // Wait for all walks to be processed
-        const walkDivs = await Promise.all(walkPromises);
+        const walkCards = await Promise.all(walkPromises);
 
-        // Append only the non-null walk divs
-        walkDivs
-            .filter(div => div !== null)
-            .forEach(div => walksContainer.appendChild(div));
+        // Clear loading indicator
+        walkListContainer.querySelector('.loading-walks') ? .remove();
+
+        // Append only the non-null walk cards
+        if (walksAccordion) {
+            walkCards
+                .filter(card => card !== null)
+                .forEach(card => walksAccordion.appendChild(card));
+
+            // Add event listeners to buttons after all cards are added
+            addWalkCardEventListeners();
+
+            // Update count of visible walks based on search
+            updateVisibleWalksCount();
+        }
 
     } catch (error) {
         console.error("Error displaying walks:", error);
-        walksContainer.innerHTML += `<div class="alert alert-danger">Error displaying walks</div>`;
+        walksContainer.innerHTML += `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Error displaying walks: ${error.message}
+            </div>
+        `;
     }
+
+    // Add styles for the walks section
+    addWalksStyles();
+}
+
+// Helper function to generate a visual representation of the path
+function generatePathVisualization(walk) {
+    let visualization = '<div class="path-nodes">';
+
+    walk.forEach((node, index) => {
+        const nodeData = node.data();
+        const displayName = (nodeData.name && nodeData.name !== nodeData.id) ?
+            nodeData.name : shortenNodeId(nodeData.id);
+
+        visualization += `
+            <div class="path-node${index === 0 ? ' start-node' : (index === walk.length - 1 ? ' end-node' : '')}">
+                <div class="node-dot"></div>
+                <div class="node-label" title="${nodeData.id}">${displayName}</div>
+                ${index < walk.length - 1 ? '<div class="node-arrow"><i class="bi bi-arrow-right"></i></div>' : ''}
+            </div>
+        `;
+    });
+
+    visualization += '</div>';
+    return visualization;
+}
+
+// Helper function to shorten node IDs for better display
+function shortenNodeId(id) {
+    if (id.length > 20) {
+        return id.substring(0, 8) + '...' + id.substring(id.length - 8);
+    }
+    return id;
+}
+
+// Helper function to add event listeners to walk cards
+function addWalkCardEventListeners() {
+    // Highlight walk buttons
+    document.querySelectorAll('.highlight-walk-btn').forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            const walkIndex = btn.closest('.walk-card').getAttribute('data-walk-index') || index;
+            highlightWalk(STATE.walks[walkIndex]);
+            // Add visual feedback
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 1000);
+        });
+    });
+
+    // Copy Aurora ID buttons
+    document.querySelectorAll('.copy-aurora-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const auroraId = btn.closest('.walk-card').getAttribute('data-aurora-id');
+            navigator.clipboard.writeText(auroraId).then(() => {
+                // Add visual feedback
+                const originalIcon = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check"></i>';
+                btn.classList.add('btn-success');
+                setTimeout(() => {
+                    btn.innerHTML = originalIcon;
+                    btn.classList.remove('btn-success');
+                }, 1500);
+            });
+        });
+    });
+
+    // Toggle buttons to animate chevron
+    document.querySelectorAll('.walk-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const chevron = btn.querySelector('.chevron-icon');
+            chevron.classList.toggle('rotated');
+        });
+    });
+}
+
+// Helper function to update the count of visible walks
+function updateVisibleWalksCount() {
+    const visibleWalks = document.querySelectorAll('.walk-card[style="display: none;"]');
+    const totalWalks = document.querySelectorAll('.walk-card').length;
+    const visibleCount = totalWalks - visibleWalks.length;
+
+    const walksCountBadge = document.querySelector('.walks-count');
+    if (walksCountBadge) {
+        walksCountBadge.textContent = `${visibleCount}/${totalWalks}`;
+    }
+}
+
+// Helper function to add styles for the walks section
+function addWalksStyles() {
+    // Check if styles are already added
+    if (document.getElementById('walks-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'walks-styles';
+    style.textContent = `
+        .walks-header {
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 15px;
+        }
+        
+        .walks-header h3 {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .walks-count {
+            margin-left: 10px;
+            font-size: 0.8em;
+        }
+        
+        .walk-list-container {
+            overflow-y: auto;
+            max-height: calc(100vh - 250px);
+        }
+        
+        .loading-walks {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 0;
+            color: #6c757d;
+        }
+        
+        .walk-card {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .walk-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .walk-toggle-btn {
+            color: #212529;
+            text-decoration: none;
+            width: 100%;
+            text-align: left;
+            padding: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .walk-toggle-btn:hover {
+            color: #0d6efd;
+        }
+        
+        .chevron-icon {
+            transition: transform 0.3s ease;
+            margin-right: 8px;
+        }
+        
+        .chevron-icon.rotated {
+            transform: rotate(180deg);
+        }
+        
+        .aurora-id-container {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .aurora-id {
+            background: transparent;
+            font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            color: #6610f2;
+        }
+        
+        .path-visualization {
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        
+        .path-nodes {
+            display: flex;
+            align-items: center;
+            min-width: 100%;
+            padding: 10px 0;
+        }
+        
+        .path-node {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .node-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            margin: 0 5px;
+        }
+        
+        .start-node .node-dot {
+            background-color: #28a745;
+        }
+        
+        .end-node .node-dot {
+            background-color: #dc3545;
+        }
+        
+        .node-label {
+            font-size: 0.8rem;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .node-arrow {
+            margin: 0 5px;
+            color: #adb5bd;
+        }
+        
+        .highlight-walk-btn.active {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+    `;
+
+    document.head.appendChild(style);
 }
 
 function highlightWalk(walk) {

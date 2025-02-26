@@ -73,63 +73,15 @@ h3 {
     /* Add this line to stack the panels vertically */
 }
 
-#walks div:hover {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 4px;
-}
-
 #jsoneditor {
     width: 100%;
     height: 400px;
     /* You can adjust this value as needed */
 }
 
-
-/* 
-#tooltip {
-    position: absolute;
-    display: none;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 9999;
-    font-size: 14px;
-    line-height: 1.4;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    transform: translateY(-10px);
-    opacity: 0;
-}
-
-#tooltip::before {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -6px;
-    border-width: 6px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-} */
-
-pre {
-    max-height: 100px;
-    transition: max-height 0.3s ease-in-out;
-    cursor: pointer;
-}
-
 pre.expanded {
     max-height: 500px;
     /* or whatever value you feel appropriate */
-}
-
-.card,
-#info,
-#walks {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 header {
