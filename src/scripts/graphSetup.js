@@ -88,6 +88,29 @@ export function initializeGraph(graphData) {
                     "text-margin-y": -10,
                 },
             },
+            // Add styles for highlighted and faded elements
+            {
+                selector: '.highlighted',
+                style: {
+                    'border-width': 4,
+                    'border-color': '#ff0000',
+                    'background-color': '#ffcccc',
+                    'color': '#000000',
+                    'font-weight': 'bold',
+                    'z-index': 999,
+                    'transition-property': 'border-width, border-color, background-color, color, font-weight, opacity, transform',
+                    'transition-duration': '0.3s',
+                    'transform': 'scale(1.2)'
+                }
+            },
+            {
+                selector: '.faded',
+                style: {
+                    'opacity': 0.25,
+                    'transition-property': 'opacity',
+                    'transition-duration': '0.3s'
+                }
+            }
         ],
 
         // initial viewport state:
@@ -130,5 +153,12 @@ export function initializeGraph(graphData) {
     STATE.walks.length = 0;
     sourceNodes.forEach((sourceNode) => {
         dfs(sourceNode, [], sinkNodes);
+    });
+
+    // Add this ready function to enhance styles after the graph is fully initialized
+    STATE.cy.ready(function() {
+        // The styles are already defined in the initial style array above
+        // No need to redefine them here
+        console.log("Graph is ready with highlight/fade styles");
     });
 }

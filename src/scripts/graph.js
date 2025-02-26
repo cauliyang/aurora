@@ -9,6 +9,7 @@ import { hideSingletonNodes, setupClickEvent } from "./graphUtilities";
 import { initializeGraph } from "./graphSetup";
 import { createTooltip } from "./tooltip";
 import { dfs } from "./graphUtilities";
+import { displayElementInfo } from "./graphUtilities";
 
 cytoscape.use(dagre);
 cytoscape.use(klay);
@@ -209,10 +210,7 @@ document.getElementById("resetGraph").addEventListener("click", () => {
 function setupGraphInteractions() {
     STATE.cy.on("tap", (evt) => {
         if (evt.target === STATE.cy) {
-            // resetPreviousElementStyle();
-            // STATE.previousClickedElement = null;
-            // STATE.previousClickedElementStyle = null;
-            STATE.cy.elements().removeClass("highlight");
+            clearNodeHighlights(STATE.cy);
         }
     });
 
@@ -290,7 +288,6 @@ async function getWalkAuroraId(walk) {
     // Generate hash identifier for the walk info
     return await toHashIdentifier(walkInfo);
 }
-
 
 async function displayWalks(searchText = "") {
     const walksContainer = document.getElementById("walks");
@@ -409,73 +406,151 @@ function highlightWalk(walk) {
 //   }
 // }
 
-/**
- * Generic function to rank nodes by a specified property
- * @param {Array} nodes - Array of graph nodes to rank
- * @param {string} property - Property name to rank by
- * @param {boolean} descending - Sort in descending order if true, ascending if false
- * @returns {Array} Sorted array of nodes by the specified property
- */
-function rankNodesByProperty(nodes, property, descending = true) {
-    if (!nodes || !Array.isArray(nodes)) return [];
+// Function to calculate node ranking by PTC
+function calculateNodeRanking(cy) {
+    const nodes = cy.nodes().toArray();
+    const ranking = nodes
+        .map(node => {
+            return {
+                id: node.id(),
+                name: node.data('name') || node.id(),
+                ptc: node.data('ptc') || 0,
+                class: node.data('class') || 'unknown'
+            };
+        })
+        .filter(node => node.ptc > 0)
+        .sort((a, b) => b.ptc - a.ptc);
 
-    return nodes.slice().sort((a, b) => {
-        const valueA = a.data(property) || 0;
-        const valueB = b.data(property) || 0;
-        return descending ? (valueB - valueA) : (valueA - valueB);
+    return ranking;
+}
+
+// Function to update the node ranking modal
+function updateNodeRankingModal(cy) {
+    const ranking = calculateNodeRanking(cy);
+    const nodeRankingList = document.getElementById('nodeRankingList');
+
+    // Clear the current list
+    nodeRankingList.innerHTML = '';
+
+    if (ranking.length === 0) {
+        nodeRankingList.innerHTML = '<li class="list-group-item">No nodes with PTC values found</li>';
+        return;
+    }
+
+    // Add clear highlights button at the top
+    const clearButtonItem = document.createElement('li');
+    clearButtonItem.className = 'list-group-item d-flex justify-content-end';
+    clearButtonItem.innerHTML = `
+    <button class="btn btn-outline-secondary btn-sm" id="clearHighlights">
+      <i class="bi bi-eraser"></i> Clear Highlights
+    </button>
+  `;
+    nodeRankingList.appendChild(clearButtonItem);
+
+    // Create header row
+    const headerItem = document.createElement('li');
+    headerItem.className = 'list-group-item active';
+    headerItem.innerHTML = `
+    <div class="row">
+      <div class="col-1"><strong>Rank</strong></div>
+      <div class="col-4"><strong>Name</strong></div>
+      <div class="col-3"><strong>PTC Value</strong></div>
+      <div class="col-2"><strong>Class</strong></div>
+      <div class="col-2"><strong>Action</strong></div>
+    </div>
+  `;
+    nodeRankingList.appendChild(headerItem);
+
+    // Add each node to the list
+    ranking.forEach((node, index) => {
+        const listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        listItem.innerHTML = `
+      <div class="row">
+        <div class="col-1">${index + 1}</div>
+        <div class="col-4">${node.name}</div>
+        <div class="col-3">${node.ptc.toFixed(4)}</div>
+        <div class="col-2">${node.class}</div>
+        <div class="col-2">
+          <button class="btn btn-sm btn-primary highlight-node" data-node-id="${node.id}">
+            Highlight
+          </button>
+        </div>
+      </div>
+    `;
+        nodeRankingList.appendChild(listItem);
+    });
+
+    // Add event listeners to highlight buttons
+    document.querySelectorAll('.highlight-node').forEach(button => {
+        button.addEventListener('click', event => {
+            const nodeId = event.currentTarget.getAttribute('data-node-id');
+            highlightNode(STATE.cy, nodeId);
+        });
+    });
+
+    // Add event listener for the clear highlights button
+    document.getElementById('clearHighlights').addEventListener('click', () => {
+        clearNodeHighlights(cy);
     });
 }
 
-/**
- * Ranks nodes by their degree (number of connections)
- * @param {Array} nodes - Array of graph nodes to rank
- * @param {boolean} descending - Sort in descending order if true, ascending if false
- * @returns {Array} Sorted array of nodes by degree (default: descending)
- */
-function rankNodesByDegree(nodes, descending = true) {
-    if (!nodes || !Array.isArray(nodes)) return [];
+// Function to highlight a specific node
+function highlightNode(cy, nodeId) {
+    // Check if the node is already highlighted - if so, we'll clear instead
+    const node = cy.getElementById(nodeId);
+    const isAlreadyHighlighted = node.hasClass('highlighted');
 
-    return nodes.slice().sort((a, b) => {
-        const degreeA = a.degree() || 0;
-        const degreeB = b.degree() || 0;
-        return descending ? (degreeB - degreeA) : (degreeA - degreeB);
-    });
+    if (isAlreadyHighlighted) {
+        // If the node is already highlighted, clear all highlights
+        clearNodeHighlights(cy);
+        return;
+    }
+
+    // Otherwise, proceed with highlighting
+    cy.elements().removeClass('highlighted').removeClass('faded');
+
+    // If the node exists
+    if (node.length > 0) {
+        // Add highlighted class to the node
+        node.addClass('highlighted');
+
+        // Fade all other nodes and edges
+        cy.elements().difference(node).addClass('faded');
+
+        // Center the view on the highlighted node
+        cy.animate({
+            fit: {
+                eles: node,
+                padding: 50
+            },
+            duration: 500
+        });
+
+        // Update the info panel with node information
+        const infoContent = document.getElementById("infoContent");
+        if (infoContent) {
+            displayElementInfo(node, infoContent);
+        }
+    }
 }
 
-/**
- * Gets top N nodes with highest degree values
- * @param {Array} nodes - Array of graph nodes
- * @param {number} n - Number of top nodes to return
- * @returns {Array} Top N nodes with highest degree values
- */
-function getTopDegreeNodes(nodes, n = 10) {
-    const rankedNodes = rankNodesByDegree(nodes);
-    return rankedNodes.slice(0, n);
+// Function to clear all highlighting
+export function clearNodeHighlights(cy) {
+    // Remove highlighted and faded classes from all elements
+    cy.elements().removeClass('highlighted').removeClass('faded');
+    // Reset the view to fit all elements
+    cy.fit(cy.elements().filter(':visible'), 50);
 }
 
-/**
- * Ranks nodes by their betweenness centrality
- * @param {Array} nodes - Array of graph nodes to rank
- * @param {boolean} descending - Sort in descending order if true, ascending if false
- * @returns {Array} Sorted array of nodes by betweenness centrality (default: descending)
- */
-function rankNodesByCentrality(nodes, descending = true) {
-    if (!nodes || !Array.isArray(nodes)) return [];
+// Add a global event listener for the escape key to clear highlights
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        clearNodeHighlights(STATE.cy);
+    }
+});
 
-    return nodes.slice().sort((a, b) => {
-        const centralityA = a.data('betweenness') || 0;
-        const centralityB = b.data('betweenness') || 0;
-        return descending ? (centralityB - centralityA) : (centralityA - centralityB);
-    });
-}
-
-/**
- * Gets top N nodes with highest betweenness centrality
- * @param {Array} nodes - Array of graph nodes
- * @param {number} n - Number of top nodes to return
- * @returns {Array} Top N nodes with highest betweenness centrality
- */
-function getTopCentralityNodes(nodes, n = 10) {
-    const rankedNodes = rankNodesByCentrality(nodes);
-    return rankedNodes.slice(0, n);
-}
+// Event listener for the node ranking button
+document.getElementById('showNodeRanking').addEventListener('click', () => {
+    updateNodeRankingModal(STATE.cy); // Use STATE.cy instead of just cy
+});

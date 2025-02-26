@@ -1,4 +1,4 @@
-import { STATE } from "./graph";
+import { STATE, clearNodeHighlights } from "./graph";
 import { resizePanels } from "./graphUtilities";
 import { loadGraphDataFromServer } from "./graph";
 import { getLabelsVisible, setLabelsVisible } from "./graphSetup";
@@ -97,3 +97,8 @@ function handleFileUpload(event) {
         reader.readAsText(file);
     }
 }
+
+// Add the clear highlights button event handler
+document.getElementById('clearHighlights').addEventListener('click', () => {
+    clearNodeHighlights(STATE.cy);
+});

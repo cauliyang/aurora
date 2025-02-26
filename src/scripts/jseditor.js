@@ -7,16 +7,15 @@ let editor; // Global variable to store the editor instance
 
 const exampleJson = {
     nodes: [
-        { data: { id: "S1", name: "S1" } },
+        { data: { id: "S1", name: "S1", ptc: 1, ptf: 0 } },
         { data: { id: "S2", name: "S2" } },
-        { data: { id: "A", name: "A" } },
-        { data: { id: "B", name: "B" } },
-        { data: { id: "C", name: "C" } },
-        { data: { id: "D", name: "D" } },
-        { data: { id: "E", name: "E" } },
+        { data: { id: "A", name: "A", ptc: 2, ptf: 0.2 } },
+        { data: { id: "B", name: "B", ptc: 3, ptf: 0.1 } },
+        { data: { id: "C", name: "C", ptc: 5, ptf: 0.1 } },
+        { data: { id: "D", name: "D", ptc: 1, ptf: 0.4 } },
+        { data: { id: "E", name: "E", ptc: 2, ptf: 0.3 } },
     ],
-    edges: [
-        {
+    edges: [{
             data: {
                 id: "S1A",
                 source: "S1",

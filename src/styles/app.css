@@ -1,215 +1,187 @@
 body,
 html {
-  background-color: #f5f5f520;
-  height: 100%;
-  margin: 0;
-  font-family: "Roboto", sans-serif;
+    background-color: #f5f5f520;
+    height: 100%;
+    margin: 0;
+    font-family: "Roboto", sans-serif;
 }
 
 .container {
-  padding: 20px;
+    padding: 20px;
 }
 
 h1,
 h2,
 h3 {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 h3 {
-  margin-top: 0;
-  color: #333;
-  border-bottom: 1px solid #e4e4e4;
-  padding-bottom: 2px;
-  font-size: 14px;
-  /* reduced font size */
-  margin-bottom: 5px;
-  /* added margin-bottom for spacing */
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #e4e4e4;
+    padding-bottom: 2px;
+    font-size: 14px;
+    /* reduced font size */
+    margin-bottom: 5px;
+    /* added margin-bottom for spacing */
 }
 
 .btn {
-  transition: all 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .btn:hover {
-  transform: scale(1.05);
+    transform: scale(1.05);
 }
 
 .btn-upload {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 .btn-upload:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transform: translateY(-2px);
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
 }
 
 #cy {
-  background-color: #e9ecef;
-  border: 1px solid #ccc;
-  height: 100%;
+    background-color: #e9ecef;
+    border: 1px solid #ccc;
+    height: 100%;
 }
 
 #info,
 #walks {
-  border: 1px solid #ccc;
-  overflow-y: auto;
-  flex: 1 1 auto;
-  height: 100%;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    height: 100%;
 }
 
 #right-container {
-  height: 100%;
-  display: flex;
-  /* Add this line to enable flex layout */
-  flex-direction: column;
-  /* Add this line to stack the panels vertically */
+    height: 100%;
+    display: flex;
+    /* Add this line to enable flex layout */
+    flex-direction: column;
+    /* Add this line to stack the panels vertically */
 }
 
 #walks div:hover {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 4px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 4px;
 }
 
 #jsoneditor {
-  width: 100%;
-  height: 400px;
-  /* You can adjust this value as needed */
+    width: 100%;
+    height: 400px;
+    /* You can adjust this value as needed */
 }
 
 #tooltip {
-  position: absolute;
-  display: none;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  z-index: 9999;
-  font-size: 14px;
-  line-height: 1.4;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-  transform: translateY(-10px);
-  opacity: 0;
+    position: absolute;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 9999;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(-10px);
+    opacity: 0;
 }
 
 #tooltip::before {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
 
 pre {
-  max-height: 100px;
-  transition: max-height 0.3s ease-in-out;
-  cursor: pointer;
+    max-height: 100px;
+    transition: max-height 0.3s ease-in-out;
+    cursor: pointer;
 }
 
 pre.expanded {
-  max-height: 500px;
-  /* or whatever value you feel appropriate */
-}
-
-/* Styling for the expandable list in the info panel */
-
-#infoContent .btn-link {
-  font-weight: bold;
-  color: #007bff;
-  text-decoration: none;
-  font-size: 1.2rem;
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-#infoContent .btn-link:hover {
-  text-decoration: underline;
-}
-
-#infoContent pre {
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-  font-size: 1.1rem;
-  max-height: 600px;
-  /* Adjust this value to increase the height */
-  overflow-y: auto;
+    max-height: 500px;
+    /* or whatever value you feel appropriate */
 }
 
 .card,
 #info,
 #walks {
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 header {
-  background-color: #333;
-  color: white;
+    background-color: #333;
+    color: white;
 }
 
 a:hover,
 .clickable:hover {
-  text-decoration: underline;
-  cursor: pointer;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .element:hover {
-  animation: pulse 1s infinite;
+    animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .file-upload-container {
-  justify-content: flex-start;
+    justify-content: flex-start;
 }
 
 .igv-container {
-  border: 1px solid #d6d6d6;
-  height: 100vh;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
+    border: 1px solid #d6d6d6;
+    height: 100vh;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
 }
 
 #selectedFileName {
-  color: #555;
+    color: #555;
 }
 
 .navbar {
-  height: 25px;
-  font-size: 0.9rem;
+    height: 25px;
+    font-size: 0.9rem;
 }
 
 .navbar-brand {
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-  padding-left: 1rem;
-  display: flex;
-  align-items: center;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    padding-left: 1rem;
+    display: flex;
+    align-items: center;
 }
