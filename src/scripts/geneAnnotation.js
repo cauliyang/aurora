@@ -1,7 +1,6 @@
 import pako from 'pako';
 import { displayElementInfo } from "./graphUtilities";
 import { STATE } from './graph';
-import { showAlert } from './alertUtils';
 
 // In-memory gene database
 let geneDatabase = [];
@@ -492,7 +491,7 @@ export function renderGeneAnnotations(node, container) {
  * @param {boolean} isError - Whether this is an error message
  */
 function updateAnnotationStatus(message, timeout = 0, isError = false) {
-    // Use the global showAlert function
+    // Use the global showAlert function instead of imported one
     const alertType = isError ? 'error' : 'info';
     
     // Check if showAlert is available globally and use it
@@ -677,23 +676,23 @@ function setupGeneAnnotationListeners() {
                     if (cy) {
                         const count = await annotateAllNodes(cy);
                         
-                        // Show success message
+                        // Show success message - use global function instead of imported one
                         if (count > 0) {
-                            showAlert(`Successfully annotated ${count} nodes with gene information.`, 'success', 3000);
+                            window.showAlert(`Successfully annotated ${count} nodes with gene information.`, 'success', 3000);
                         } else {
-                            showAlert('No nodes could be annotated. Make sure nodes have genomic coordinates.', 'info', 3000);
+                            window.showAlert('No nodes could be annotated. Make sure nodes have genomic coordinates.', 'info', 3000);
                         }
                         
                         // Close modal
                         const modal = bootstrap.Modal.getInstance(document.getElementById('geneAnnotationModal'));
                         if (modal) modal.hide();
                     } else {
-                        showAlert("No graph loaded", 'warning', 3000);
+                        window.showAlert("No graph loaded", 'warning', 3000);
                     }
                 }
             } catch (err) {
                 console.error("Error annotating nodes:", err);
-                showAlert(`Error: ${err.message}`, 'error', 4000);
+                window.showAlert(`Error: ${err.message}`, 'error', 4000);
             } finally {
                 newAnnotateAllBtn.disabled = false;
                 newAnnotateAllBtn.innerHTML = 'Annotate All Nodes';

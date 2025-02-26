@@ -367,8 +367,9 @@
     <!-- Status indicator for gene annotations -->
     <div id="annotationStatus" class="d-none"></div>
 
-    <!-- Scripts -->
-    <script src="./scripts/alertUtils.js" type="module"></script>
+    <!-- Scripts - Make sure alertUtils.js is loaded first and NOT as a module -->
+    <script src="./scripts/alertUtils.js"></script>
+    <!-- Keep other scripts as modules -->
     <script src="./scripts/graph.js" type="module"></script>
     <script src="./scripts/jseditor.js" type="module"></script>
     <script src="./scripts/eventHandlers.js" type="module"></script>
