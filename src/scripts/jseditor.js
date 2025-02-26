@@ -7,9 +7,12 @@ let editor; // Global variable to store the editor instance
 
 const exampleJson = {
     nodes: [
-        { data: { id: "S1", name: "S1", ptc: 1, ptf: 0 } },
-        { data: { id: "S2", name: "S2" } },
-        { data: { id: "A", name: "A", ptc: 2, ptf: 0.2 } },
+        { data: { id: "S1", name: "S1", ptc: 1, ptf: 0, exons: "[127793975-127794734]", } },
+        {
+            data: { id: "S2", name: "S2" },
+            exons: "[62250620-62252614,62302311-62302403]",
+        },
+        { data: { id: "A", name: "A", ptc: 2, ptf: 0.2, exons: '[62250799-62252614, 62302311-62302403]', } },
         { data: { id: "B", name: "B", ptc: 3, ptf: 0.1 } },
         { data: { id: "C", name: "C", ptc: 5, ptf: 0.1 } },
         { data: { id: "D", name: "D", ptc: 1, ptf: 0.4 } },

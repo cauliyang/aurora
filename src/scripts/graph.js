@@ -10,6 +10,7 @@ import { initializeGraph } from "./graphSetup";
 import { createTooltip } from "./tooltip";
 import { dfs } from "./graphUtilities";
 import { displayElementInfo } from "./graphUtilities";
+import { initGeneAnnotation } from './geneAnnotation';
 
 cytoscape.use(dagre);
 cytoscape.use(klay);
@@ -179,6 +180,9 @@ export function loadGraphDataFromServer(graphData) {
     setupGraphInteractions();
 }
 
+// Make loadGraphDataFromServer globally available to avoid circular dependencies
+window.loadGraphDataFromServer = loadGraphDataFromServer;
+
 document.getElementById("resetGraph").addEventListener("click", () => {
     // Reset layout to default
     STATE.cy.elements().removeClass("highlightWalk");
@@ -217,6 +221,9 @@ function setupGraphInteractions() {
     displayWalks();
     setupClickEvent();
     createTooltip();
+
+    // Initialize gene annotation functionality
+    initGeneAnnotation();
 }
 
 /**

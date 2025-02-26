@@ -1,5 +1,6 @@
 import interact from "interactjs";
 import { STATE } from "./graph";
+import { renderGeneAnnotations } from './geneAnnotation';
 
 import "jsoneditor/dist/jsoneditor.min.css";
 
@@ -162,7 +163,7 @@ export function displayElementInfo(element, container) {
     }
 
     // Additional properties section for any other data
-    const standardProps = type === "Node" ? ["id", "name", "chrom", "ref_start", "ref_end", "strand", "exons", "ptc", "ptf", "node_id", "is_head", "value", "source-node"] : ["id", "source", "target", "weight"];
+    const standardProps = type === "Node" ? ["id", "name", "chrom", "ref_start", "ref_end", "strand", "exons", "ptc", "ptf", "node_id", "is_head", "value", "source-node", "geneAnnotations"] : ["id", "source", "target", "weight"];
 
     const additionalProps = Object.keys(data).filter(key => !standardProps.includes(key));
 
@@ -192,6 +193,11 @@ export function displayElementInfo(element, container) {
 
     html += `</div>`;
     container.innerHTML = html;
+
+    // If this is a node, render gene annotations
+    if (type === "Node") {
+        renderGeneAnnotations(element, container);
+    }
 
     // Add custom styles for the info panel
     addInfoPanelStyles();
