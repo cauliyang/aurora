@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/app.css" />
     <link rel="stylesheet" href="./styles/gene-annotations.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -310,7 +311,7 @@
 
     <!-- Modal for Gene Annotation -->
     <div class="modal fade" id="geneAnnotationModal" tabindex="-1" aria-labelledby="geneAnnotationModalLabel" aria-hidden="true">
-        <div class="modal-dialog gene-annotation-modal">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="geneAnnotationModalLabel">
@@ -331,12 +332,9 @@
 
                     <div class="mb-4">
                         <h6>Upload Custom Gene File</h6>
-                        <div class="input-group">
-                            <input type="file" class="gene-file-input" id="geneFileInput" accept=".txt,.gz" />
-                            <label id="uploadGeneLabel" for="geneFileInput" class="form-control text-muted">
-                  Choose gene file...
-                </label>
-                            <button class="btn btn-outline-secondary" type="button" id="uploadGeneBtn" disabled>
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="geneFileInput" accept=".txt,.gz" />
+                            <button class="btn btn-outline-primary" type="button" id="uploadGeneBtn">
                   Upload & Process
                 </button>
                         </div>
@@ -374,12 +372,30 @@
     <script src="./scripts/jseditor.js" type="module"></script>
     <script src="./scripts/eventHandlers.js" type="module"></script>
 
-    <!-- Add script to handle the direct annotation button -->
+    <!-- Add Bootstrap and Popper.js before your other scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+    <!-- Additional script for gene annotation modal functionality -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            console.log(
+                "DOM fully loaded, initializing modals and gene annotation components"
+            );
+
+            // Initialize Bootstrap components
+            var tooltipTriggerList = [].slice.call(
+                document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            );
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Annotate Now button
             const annotateNowBtn = document.getElementById("annotateNowBtn");
             if (annotateNowBtn) {
                 annotateNowBtn.addEventListener("click", function() {
+                    console.log("Annotate Now button clicked");
                     // Close the modal
                     const modal = bootstrap.Modal.getInstance(
                         document.getElementById("geneAnnotationModal")
@@ -393,6 +409,28 @@
                     });
                     document.getElementById("geneAnnotationBtn").dispatchEvent(event);
                 });
+            }
+
+            // Fix gene file upload button
+            const geneFileInput = document.getElementById("geneFileInput");
+            const uploadGeneBtn = document.getElementById("uploadGeneBtn");
+
+            if (geneFileInput && uploadGeneBtn) {
+                console.log("Found gene file input and upload button");
+
+                // Enable/disable upload button based on file selection
+                geneFileInput.addEventListener("change", function() {
+                    console.log(
+                        "File input changed:",
+                        this.files.length > 0 ? this.files[0].name : "no file"
+                    );
+                    uploadGeneBtn.disabled = this.files.length === 0;
+                });
+
+                // Initially disable button
+                uploadGeneBtn.disabled = !geneFileInput.files.length;
+            } else {
+                console.warn("Gene file input or upload button not found");
             }
         });
     </script>

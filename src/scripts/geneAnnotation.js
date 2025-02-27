@@ -676,7 +676,7 @@ function setupGeneAnnotationListeners() {
                     if (cy) {
                         const count = await annotateAllNodes(cy);
                         
-                        // Show success message - use global function instead of imported one
+                        // Show success message
                         if (count > 0) {
                             window.showAlert(`Successfully annotated ${count} nodes with gene information.`, 'success', 3000);
                         } else {
@@ -698,32 +698,29 @@ function setupGeneAnnotationListeners() {
                 newAnnotateAllBtn.innerHTML = 'Annotate All Nodes';
             }
         });
-    } else {
-        console.warn("annotateAllNodesBtn not found in DOM");
     }
     
-    // Gene file upload event
+    // Fixed gene file upload event handling
     const fileInput = document.getElementById('geneFileInput');
-    const uploadLabel = document.getElementById('uploadGeneLabel');
     const uploadBtn = document.getElementById('uploadGeneBtn');
 
-    if (fileInput) {
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                uploadLabel.textContent = fileInput.files[0].name;
-                uploadBtn.disabled = false;
-            } else {
-                uploadLabel.textContent = 'Choose gene file...';
-                uploadBtn.disabled = true;
-            }
+    if (fileInput && uploadBtn) {
+        console.log("Setting up gene file upload listeners");
+        
+        // Handle file selection
+        fileInput.addEventListener('change', function() {
+            console.log("File selected:", this.files.length > 0 ? this.files[0].name : "none");
+            uploadBtn.disabled = this.files.length === 0;
         });
-    }
 
-    // Upload and process button
-    if (uploadBtn) {
+        // Handle upload button click
         uploadBtn.addEventListener('click', async() => {
-            if (!fileInput || fileInput.files.length === 0) return;
+            if (!fileInput || fileInput.files.length === 0) {
+                console.warn("No file selected for upload");
+                return;
+            }
 
+            console.log("Processing gene file upload");
             const file = fileInput.files[0];
             const progressBar = document.getElementById('geneUploadProgress');
             const progressIndicator = progressBar?.querySelector('.progress-bar');
@@ -735,6 +732,8 @@ function setupGeneAnnotationListeners() {
             }
 
             try {
+                window.showAlert(`Reading gene file: ${file.name}`, 'info');
+                
                 // Read file content
                 const fileContent = await readFileContent(file);
 
@@ -744,10 +743,12 @@ function setupGeneAnnotationListeners() {
                     progressIndicator.setAttribute('aria-valuenow', '50');
                 }
 
+                window.showAlert(`Parsing gene data from file...`, 'info');
+                
                 // Parse the data
                 const genes = parseGeneData(fileContent);
 
-                if (genes.length > 0) {
+                if (genes && genes.length > 0) {
                     // Success - set gene database
                     geneDatabase = genes;
                     isGeneDataLoaded = true;
@@ -758,29 +759,29 @@ function setupGeneAnnotationListeners() {
                         progressIndicator.setAttribute('aria-valuenow', '100');
                     }
 
-                    updateAnnotationStatus(`Loaded ${genes.length} gene annotations from file`, 3000);
+                    window.showAlert(`Loaded ${genes.length} gene annotations from file`, 'success', 3000);
 
                     // Close modal after short delay
                     setTimeout(() => {
                         const modal = bootstrap.Modal.getInstance(document.getElementById('geneAnnotationModal'));
                         if (modal) modal.hide();
-                    }, 1000);
+                    }, 1500);
                 } else {
-                    throw new Error('No genes found in file');
+                    throw new Error('No genes found in file or invalid format');
                 }
             } catch (error) {
                 console.error('Error processing gene file:', error);
-                progressBar?.classList.add('d-none');
-                updateAnnotationStatus(`Error processing gene file: ${error.message}`, 0, true);
+                if (progressBar) progressBar.classList.add('d-none');
+                window.showAlert(`Error processing gene file: ${error.message}`, 'error', 5000);
             }
         });
+    } else {
+        console.warn("Gene file input or upload button not found in the DOM");
     }
 
-    // Regular button in toolbar
+    // Regular button in toolbar (annotation button)
     const geneAnnotationBtn = document.getElementById('geneAnnotationBtn');
     if (geneAnnotationBtn) {
-        geneAnnotationBtn.addEventListener('click', () => {
-            // This just shows the modal, Bootstrap handles it from the data attributes
-        });
+        console.log("Found gene annotation button");
     }
 }
