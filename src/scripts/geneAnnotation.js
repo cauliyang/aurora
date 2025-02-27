@@ -6,6 +6,7 @@ import { STATE } from './graph';
 let geneDatabase = [];
 let isGeneDataLoaded = false;
 let isLoading = false;
+let assetLoadingAttempted = false;
 
 /**
  * Gene class to represent a gene annotation
@@ -140,9 +141,9 @@ function parseGeneData(text) {
 }
 
 /**
- * Ensure loadGeneData function is more robust
+ * Try to load gene data from different sources in a priority order
  */
-export async function loadGeneData(url = './assets/gene.txt') {
+export async function loadGeneData() {
     if (isLoading) {
         console.log("Gene data loading already in progress...");
         return false;
@@ -160,49 +161,42 @@ export async function loadGeneData(url = './assets/gene.txt') {
         // Show loading indicator
         updateAnnotationStatus("Loading gene annotations...");
 
-        // First try to use the fallback data immediately
-        // This ensures we at least have something to work with
-        geneDatabase = getFallbackGeneData();
-        console.log("Initialized with", geneDatabase.length, "fallback genes");
+        // Priority 1: Try to load genes.txt from assets directory
+        if (!assetLoadingAttempted) {
+            assetLoadingAttempted = true;
+            try {
+                console.log("Attempting to load gene data from assets/gene.txt");
+                const assetResponse = await fetch('../assets/gene.txt');
 
-        // Then try to fetch the file in parallel, which may provide more genes
-        let fetchedGenes = [];
-        try {
-            const response = await fetch(url);
-            if (response.ok) {
-                let geneText;
-
-                if (url.endsWith('.gz')) {
-                    // Handle gzipped file
-                    const compressedData = await response.arrayBuffer();
-                    geneText = pako.inflate(new Uint8Array(compressedData), { to: 'string' });
-                } else {
-                    // Handle plain text file
-                    geneText = await response.text();
-                }
-
-                // Only parse if we got actual text content
-                if (geneText && geneText.length > 0 && !geneText.includes('<!DOCTYPE html>')) {
-                    fetchedGenes = parseGeneData(geneText);
-                    console.log(`Parsed ${fetchedGenes.length} genes from file`);
-
-                    if (fetchedGenes.length > 0) {
-                        // Replace fallback with fetched genes if we got any
-                        geneDatabase = fetchedGenes;
+                if (assetResponse.ok) {
+                    const geneText = await assetResponse.text();
+                    if (geneText && geneText.length > 0) {
+                        const genes = parseGeneData(geneText);
+                        if (genes && genes.length > 0) {
+                            console.log(`Loaded ${genes.length} genes from asset file`);
+                            geneDatabase = genes;
+                            isGeneDataLoaded = true;
+                            updateAnnotationStatus(`Loaded ${genes.length} genes from asset file`, 3000);
+                            return true;
+                        }
                     }
+                } else {
+                    console.warn("Could not load gene.txt from assets:", assetResponse.statusText);
                 }
+            } catch (assetError) {
+                console.warn("Error loading gene data from asset:", assetError);
             }
-        } catch (fetchError) {
-            console.warn("Could not fetch gene data file:", fetchError);
-            // We already have the fallback data, so we can continue
         }
 
-        isGeneDataLoaded = true;
-        console.log(`Loaded ${geneDatabase.length} gene annotations`);
+        // Priority 3: Use fallback data
+        if (geneDatabase.length === 0) {
+            console.log("Using fallback gene data");
+            geneDatabase = getFallbackGeneData();
+            isGeneDataLoaded = true;
+            updateAnnotationStatus(`Using ${geneDatabase.length} fallback gene annotations`, 3000);
+        }
 
-        // Update status
-        updateAnnotationStatus(`${geneDatabase.length} gene annotations loaded`, 3000);
-        return true;
+        return isGeneDataLoaded && geneDatabase.length > 0;
     } catch (error) {
         console.error('Error in gene data loading process:', error);
         updateAnnotationStatus(`Error loading gene annotations: ${error.message}`, 0, true);
@@ -210,16 +204,13 @@ export async function loadGeneData(url = './assets/gene.txt') {
         // Make sure we have fallback data
         if (geneDatabase.length === 0) {
             geneDatabase = getFallbackGeneData();
+            isGeneDataLoaded = geneDatabase.length > 0;
+            if (isGeneDataLoaded) {
+                updateAnnotationStatus(`Using ${geneDatabase.length} fallback gene annotations`, 3000);
+            }
         }
 
-        if (geneDatabase.length > 0) {
-            isGeneDataLoaded = true;
-            console.log(`Using ${geneDatabase.length} fallback gene annotations`);
-            updateAnnotationStatus(`Using ${geneDatabase.length} fallback gene annotations`, 3000);
-            return true;
-        }
-
-        return false;
+        return isGeneDataLoaded && geneDatabase.length > 0;
     } finally {
         isLoading = false;
     }
