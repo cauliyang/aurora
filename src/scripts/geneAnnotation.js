@@ -63,10 +63,6 @@ function parseGeneData(text) {
     const genes = [];
 
     try {
-        // Clean up potential HTML content or comments
-        // Remove HTML tags that might be present in the data
-        text = text.replace(/<[^>]*>/g, '');
-
         // Split by newlines and process each line
         const lines = text.split(/\r?\n/);
         console.log(`Processing ${lines.length} lines from gene data`);

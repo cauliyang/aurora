@@ -754,11 +754,20 @@ function highlightWalk(walk) {
 //     "name": "chr8_62251376_62302403_T_349"
 //   }
 // }
-
 // Function to calculate node ranking by PTC
 function calculateNodeRanking(cy) {
+    if (!cy) {
+        console.warn("No graph provided to calculateNodeRanking");
+        return [];
+    }
+
     // Check if graph has nodes before getting the array
     const nodes = cy.nodes().length > 0 ? cy.nodes().toArray() : [];
+
+    // If there are no nodes, return an empty array
+    if (nodes.length === 0) {
+        return [];
+    }
 
     const ranking = nodes
         .map(node => {

@@ -151,6 +151,3 @@ async function handleGeneAnnotation() {
         window.showAlert("Error in gene annotation process.", "error");
     }
 }
-
-// REMOVE THIS DUPLICATED CODE that conflicts with modalInit.js
-// document.addEventListener("DOMContentLoaded", function() { ... });
