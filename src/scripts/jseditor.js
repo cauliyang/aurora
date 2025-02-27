@@ -7,16 +7,85 @@ let editor; // Global variable to store the editor instance
 
 const exampleJson = {
     nodes: [
-        { data: { id: "S1", name: "S1", ptc: 1, ptf: 0, exons: "[127793975-127794734]", } },
+        { data: { id: "S1", name: "S1", chrom: "chr8", ref_start: 127793975, ref_end: 127794734, strand: "+", ptc: 1, ptf: 0, exons: "[127793975-127794734]", } },
         {
-            data: { id: "S2", name: "S2" },
-            exons: "[62250620-62252614,62302311-62302403]",
+            data: {
+                id: "S2",
+                name: "S2",
+                chrom: "chr8",
+                ref_start: 62250799,
+                ref_end: 62302403,
+                strand: "-",
+                exons: "[62250620-62252614,62302311-62302403]",
+            },
+
         },
-        { data: { id: "A", name: "A", ptc: 2, ptf: 0.2, exons: '[62250799-62252614, 62302311-62302403]', } },
-        { data: { id: "B", name: "B", ptc: 3, ptf: 0.1 } },
-        { data: { id: "C", name: "C", ptc: 5, ptf: 0.1 } },
-        { data: { id: "D", name: "D", ptc: 1, ptf: 0.4 } },
-        { data: { id: "E", name: "E", ptc: 2, ptf: 0.3 } },
+        {
+            data: {
+                id: "A",
+                name: "A",
+                chrom: "chr8",
+                ref_start: 62251526,
+                ref_end: 62302403,
+                strand: "-",
+                ptc: 2,
+                ptf: 0.2,
+                exons: '[62250799-62252614, 62302311-62302403]',
+            }
+        },
+        {
+            data: {
+                id: "B",
+                name: "B",
+                ptc: 3,
+                ptf: 0.1,
+                chrom: "chr8",
+                ref_start: 62250799,
+                ref_end: 62302403,
+                strand: "-",
+                exons: "[62250799-62252614,62284023-62284107,62284814-62284911,62302311-62302403]",
+            }
+        },
+        {
+            data: {
+                id: "C",
+                name: "C",
+                ptc: 5,
+                ptf: 0.1,
+                chrom: "chr8",
+                ref_start: 62299562,
+                ref_end: 62302403,
+                strand: "-",
+                exons: "[62299562-62302403]",
+
+            }
+        },
+        {
+            data: {
+                id: "D",
+                name: "D",
+                ptc: 1,
+                ptf: 0.4,
+                chrom: "chr8",
+                ref_start: 62251531,
+                ref_end: 62302403,
+                strand: "-",
+                exons: "[62251531-62252614,62284023-62284107,62284826-62284911,62302311-62302403]",
+            }
+        },
+        {
+            data: {
+                id: "E",
+                name: "E",
+                ptc: 2,
+                ptf: 0.3,
+                chrom: "chr8",
+                ref_start: 62250651,
+                ref_end: 62302403,
+                strand: "-",
+                exons: "[62250651-62252614,62284023-62284107,62284814-62284911,62302311-62302403]",
+            }
+        },
     ],
     edges: [{
             data: {

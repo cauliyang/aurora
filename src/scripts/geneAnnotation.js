@@ -369,12 +369,13 @@ export async function annotateAllNodes(cy) {
 export function renderGeneAnnotations(node, container) {
     if (!node || !container) return;
 
-    const geneAnnotations = node.data('geneAnnotations');
+    const geneAnnotations = node.data('geneAnnotations') || [];
 
     if (!geneAnnotations || geneAnnotations.length === 0) {
         // If no annotations but node has genomic coordinates, show option to annotate
         const nodeData = node.data();
-        if (nodeData.chrom && nodeData.ref_start && nodeData.ref_end) {
+
+        if (nodeData && nodeData.chrom && nodeData.ref_start && nodeData.ref_end) {
             const noAnnotationsDiv = document.createElement('div');
             noAnnotationsDiv.className = 'card mb-3';
             noAnnotationsDiv.innerHTML = `
