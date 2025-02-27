@@ -33,6 +33,8 @@ export const STATE = {
     sourceNodeColor: "#31a354",
 };
 
+window.STATE = STATE;
+
 // Get the "Change Layout" button element
 layoutSelect.addEventListener("change", () => {
     // Get the selected layout from the select element
