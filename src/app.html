@@ -27,6 +27,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="./styles/jsoneditor-custom.css" />
   </head>
 
   <body>
@@ -352,10 +353,38 @@
       tabindex="-1"
       aria-labelledby="jsonModalLabel"
     >
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="jsonModalLabel">Edit JSON Data</h5>
+            <h5 class="modal-title" id="jsonModalLabel">
+              <i class="bi bi-braces-asterisk me-2"></i> Graph Data Editor
+            </h5>
+            <div class="editor-mode-selector btn-group btn-group-sm ms-3">
+              <button
+                type="button"
+                class="btn btn-outline-secondary editor-mode-btn"
+                data-mode="tree"
+                title="Tree View"
+              >
+                <i class="bi bi-diagram-3"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary editor-mode-btn"
+                data-mode="code"
+                title="Code View"
+              >
+                <i class="bi bi-code-slash"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary editor-mode-btn"
+                data-mode="form"
+                title="Form View"
+              >
+                <i class="bi bi-ui-checks"></i>
+              </button>
+            </div>
             <button
               type="button"
               class="btn-close"
@@ -363,8 +392,13 @@
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body">
-            <div id="jsoneditor"></div>
+          <div class="modal-body p-0">
+            <div class="jsoneditor-container">
+              <div id="jsoneditor"></div>
+              <div class="editor-shortcuts">
+                Shortcuts: Ctrl+F (Search), Ctrl+Z (Undo), Ctrl+Shift+Z (Redo)
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -373,10 +407,10 @@
               data-bs-dismiss="modal"
               id="closeEditor"
             >
-              Close
+              <i class="bi bi-x-lg me-1"></i> Cancel
             </button>
             <button type="button" class="btn btn-primary" id="saveEditedJson">
-              Save Changes
+              <i class="bi bi-check-lg me-1"></i> Apply Changes
             </button>
           </div>
         </div>
