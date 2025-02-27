@@ -299,8 +299,7 @@ async function getWalkAuroraId(walk) {
 }
 
 // Update the displayWalks function for a more beautiful presentation
-
-async function displayWalks(searchText = "") {
+async function displayWalks(searchText = "", auroraIds = []) {
     const walksContainer = document.getElementById("walks");
     if (!walksContainer) {
         console.error("Walks container not found");
@@ -327,6 +326,22 @@ async function displayWalks(searchText = "") {
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
+            <div class="input-group mb-3">
+                <input
+                    type="file"
+                    class="form-control"
+                    id="auroraIdsFile"
+                    accept=".txt"
+                    aria-label="Upload Aurora IDs file"
+                />
+                <button class="btn btn-outline-primary" type="button" id="uploadAuroraIds">
+                    <i class="bi bi-upload"></i> Batch Search
+                </button>
+            </div>
+            ${auroraIds.length > 0 ? `<div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i> Searching for ${auroraIds.length} Aurora IDs
+                <button class="btn btn-sm btn-outline-secondary float-end" id="clearAuroraIds">Clear</button>
+            </div>` : ''}
         </div>
         <div class="walk-list-container">
             <!-- Walks will be loaded here -->
@@ -342,6 +357,9 @@ async function displayWalks(searchText = "") {
     // Add search event listener with improved functionality
     const searchInput = document.getElementById('walkSearch');
     const clearSearchBtn = document.getElementById('clearWalkSearch');
+    const auroraIdsFileInput = document.getElementById('auroraIdsFile');
+    const uploadAuroraIdsBtn = document.getElementById('uploadAuroraIds');
+    const clearAuroraIdsBtn = document.getElementById('clearAuroraIds');
 
     if (searchInput) {
         searchInput.value = searchText; // Preserve search text when redisplaying
@@ -353,19 +371,7 @@ async function displayWalks(searchText = "") {
         newSearchInput.addEventListener('input', (e) => {
             // Real-time filtering as user types
             const searchValue = e.target.value.trim().toLowerCase();
-            document.querySelectorAll('.walk-card').forEach(card => {
-                const walkText = card.getAttribute('data-walk-text').toLowerCase();
-                const auroraId = card.getAttribute('data-aurora-id').toLowerCase();
-
-                if (searchValue === '' || walkText.includes(searchValue) || auroraId.includes(searchValue)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            // Update the count of visible walks
-            updateVisibleWalksCount();
+            filterWalkCards(searchValue, auroraIds);
         });
     }
 
@@ -373,13 +379,23 @@ async function displayWalks(searchText = "") {
         clearSearchBtn.addEventListener('click', () => {
             if (searchInput) {
                 searchInput.value = '';
-                // Show all walks
-                document.querySelectorAll('.walk-card').forEach(card => {
-                    card.style.display = '';
-                });
-                updateVisibleWalksCount();
+                // Only filter by Aurora IDs if they exist
+                filterWalkCards('', auroraIds);
                 searchInput.focus();
             }
+        });
+    }
+
+    if (uploadAuroraIdsBtn && auroraIdsFileInput) {
+        uploadAuroraIdsBtn.addEventListener('click', () => {
+            handleAuroraIdsFileUpload();
+        });
+    }
+
+    if (clearAuroraIdsBtn) {
+        clearAuroraIdsBtn.addEventListener('click', () => {
+            // Redisplay walks without Aurora ID filtering
+            displayWalks(searchText);
         });
     }
 
@@ -419,13 +435,26 @@ async function displayWalks(searchText = "") {
                 walkCard.className = "walk-card";
                 walkCard.setAttribute('data-walk-text', walkText);
                 walkCard.setAttribute('data-aurora-id', auroraId);
+                walkCard.setAttribute('data-walk-index', index);
 
-                // Check if the walk should be visible based on search text
+                // Check if the walk should be visible based on search text and aurora IDs
                 const searchLower = searchText.trim().toLowerCase();
                 const walkLower = walkText.toLowerCase();
                 const auroraLower = auroraId.toLowerCase();
 
+                let shouldHide = false;
+                
+                // Hide based on text search
                 if (searchLower && !walkLower.includes(searchLower) && !auroraLower.includes(searchLower)) {
+                    shouldHide = true;
+                }
+                
+                // Hide based on Aurora IDs, unless it's in the list
+                if (auroraIds.length > 0 && !auroraIds.includes(auroraId)) {
+                    shouldHide = true;
+                }
+
+                if (shouldHide) {
                     walkCard.style.display = 'none';
                 }
 
@@ -503,6 +532,68 @@ async function displayWalks(searchText = "") {
 
     // Add styles for the walks section
     addWalksStyles();
+}
+
+// Function to handle Aurora IDs file upload
+async function handleAuroraIdsFileUpload() {
+    const fileInput = document.getElementById('auroraIdsFile');
+    
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        window.showAlert("Please select a text file containing Aurora IDs.", "warning");
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    try {
+        // Show a loading indicator
+        window.showAlert("Processing Aurora IDs file...", "info");
+        
+        const text = await file.text();
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+        
+        if (lines.length === 0) {
+            window.showAlert("No Aurora IDs found in the file.", "warning");
+            return;
+        }
+        
+        // Get the current search text
+        const searchInput = document.getElementById('walkSearch');
+        const searchText = searchInput ? searchInput.value : '';
+        
+        // Redisplay walks with the specified Aurora IDs
+        displayWalks(searchText, lines);
+        
+        window.showAlert(`Found ${lines.length} Aurora IDs in the file.`, "success");
+    } catch (error) {
+        console.error("Error reading Aurora IDs file:", error);
+        window.showAlert("Error reading the file. Please make sure it's a valid text file.", "danger");
+    }
+}
+
+// Function to filter walk cards based on search text and Aurora IDs
+function filterWalkCards(searchValue, auroraIds = []) {
+    document.querySelectorAll('.walk-card').forEach(card => {
+        const walkText = card.getAttribute('data-walk-text').toLowerCase();
+        const auroraId = card.getAttribute('data-aurora-id').toLowerCase();
+        
+        let shouldShow = true;
+        
+        // Filter by search text if provided
+        if (searchValue && !walkText.includes(searchValue) && !auroraId.includes(searchValue)) {
+            shouldShow = false;
+        }
+        
+        // Filter by Aurora IDs if provided
+        if (auroraIds.length > 0 && !auroraIds.includes(card.getAttribute('data-aurora-id'))) {
+            shouldShow = false;
+        }
+        
+        card.style.display = shouldShow ? '' : 'none';
+    });
+    
+    // Update the count of visible walks
+    updateVisibleWalksCount();
 }
 
 // Helper function to generate a visual representation of the path

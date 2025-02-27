@@ -3,7 +3,6 @@
  */
 
 import JSONEditor from 'jsoneditor';
-import 'jsoneditor/dist/jsoneditor.css';
 import { loadGraphDataFromServer } from "./graph.js";
 import { STATE } from './graph';
 

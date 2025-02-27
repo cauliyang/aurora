@@ -2,8 +2,10 @@ import pako from 'pako';
 import { displayElementInfo } from "./graphUtilities";
 import { STATE } from './graph';
 
-import geneDataUrl from '../assets/genes.txt?url';
-
+// Hard-code the path to the asset for development purposes
+// Define the path to the gene data file
+const geneDataUrl = new URL('../assets/genes.txt',
+    import.meta.url).href;
 
 // In-memory gene database
 let geneDatabase = [];

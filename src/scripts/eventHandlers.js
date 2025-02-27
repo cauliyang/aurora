@@ -151,3 +151,21 @@ async function handleGeneAnnotation() {
         window.showAlert("Error in gene annotation process.", "error");
     }
 }
+
+// Add event handler for Aurora IDs file upload
+document.addEventListener('click', (event) => {
+    if (event.target.id === 'uploadAuroraIds' ||
+        (event.target.parentElement && event.target.parentElement.id === 'uploadAuroraIds')) {
+
+        const fileInput = document.getElementById('auroraIdsFile');
+        if (fileInput && window.handleAuroraIdsFileUpload) {
+            window.handleAuroraIdsFileUpload();
+        }
+    }
+});
+
+// Make the Aurora ID file upload handler globally available
+if (typeof window !== 'undefined' && typeof window.handleAuroraIdsFileUpload === 'undefined' &&
+    typeof handleAuroraIdsFileUpload === 'function') {
+    window.handleAuroraIdsFileUpload = handleAuroraIdsFileUpload;
+}
