@@ -2,6 +2,9 @@ import pako from 'pako';
 import { displayElementInfo } from "./graphUtilities";
 import { STATE } from './graph';
 
+import geneDataUrl from '../assets/genes.txt?url';
+
+
 // In-memory gene database
 let geneDatabase = [];
 let isGeneDataLoaded = false;
@@ -165,8 +168,8 @@ export async function loadGeneData() {
         if (!assetLoadingAttempted) {
             assetLoadingAttempted = true;
             try {
-                console.log("Attempting to load gene data from assets/gene.txt");
-                const assetResponse = await fetch('../assets/gene.txt');
+                console.log(`Attempting to load gene data from ${geneDataUrl}`);
+                const assetResponse = await fetch(geneDataUrl);
 
                 if (assetResponse.ok) {
                     const geneText = await assetResponse.text();

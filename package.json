@@ -19,6 +19,7 @@
     "author": "Yangyang Li",
     "license": "ISC",
     "devDependencies": {
+        "@parcel/transformer-raw": "^2.13.3",
         "@parcel/transformer-sass": "^2.11.0",
         "parcel": "^2.11.0",
         "process": "^0.11.10",
