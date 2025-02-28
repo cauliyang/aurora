@@ -45,3 +45,5 @@ function showAlert(message, type = 'info', timeout = 0) {
 
     return alertDiv;
 }
+
+window.showAlert = showAlert;
