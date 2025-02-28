@@ -164,7 +164,6 @@ export function displayElementInfo(element, container) {
 
     // Additional properties section for any other data
     const standardProps = type === "Node" ? ["id", "name", "chrom", "ref_start", "ref_end", "strand", "exons", "ptc", "ptf", "node_id", "is_head", "value", "source-node", "geneAnnotations"] : ["id", "source", "target", "weight"];
-
     const additionalProps = Object.keys(data).filter(key => !standardProps.includes(key));
 
     if (additionalProps.length > 0) {

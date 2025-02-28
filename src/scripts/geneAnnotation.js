@@ -283,6 +283,9 @@ export function annotateNode(node) {
     // Find overlapping genes
     const overlappingGenes = findOverlappingGenes(chrom, start, end);
 
+    // sort by overlap percentage
+    overlappingGenes.sort((a, b) => b.calculateOverlapPercentage(start, end) - a.calculateOverlapPercentage(start, end));
+
     if (overlappingGenes.length > 0) {
         // Add the gene annotations to the node data
         node.data('geneAnnotations', overlappingGenes.map(gene => ({
