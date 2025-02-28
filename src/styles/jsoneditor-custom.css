@@ -1,0 +1,192 @@
+/* Custom styles for enhanced JSON editor */
+
+
+/* Main container for JSON editor */
+
+.jsoneditor-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Add better styling to JSONEditor */
+
+div.jsoneditor {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+
+/* Menu bar styling */
+
+div.jsoneditor-menu {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* Ensure better readability */
+
+div.jsoneditor-tree {
+    font-family: 'Roboto Mono', monospace;
+}
+
+
+/* Better field styling */
+
+div.jsoneditor-field {
+    color: #0066cc;
+    font-weight: 500;
+}
+
+
+/* Better value styling */
+
+div.jsoneditor-value {
+    color: #333;
+}
+
+
+/* Better string value styling */
+
+.jsoneditor-value.jsoneditor-string {
+    color: #008000;
+}
+
+
+/* Better number value styling */
+
+.jsoneditor-value.jsoneditor-number {
+    color: #0000ff;
+}
+
+
+/* Better boolean value styling */
+
+.jsoneditor-value.jsoneditor-boolean {
+    color: #ff8000;
+}
+
+
+/* Better null value styling */
+
+.jsoneditor-value.jsoneditor-null {
+    color: #999;
+}
+
+
+/* Search results highlighting */
+
+mark.jsoneditor-highlight {
+    background-color: rgba(255, 215, 0, 0.5);
+    border-radius: 2px;
+    color: inherit;
+}
+
+
+/* Improve node hovering */
+
+div.jsoneditor-tree button.jsoneditor-button:hover {
+    background-color: rgba(0, 102, 204, 0.1);
+}
+
+
+/* Style the modal containing the editor */
+
+#jsonModal .modal-content {
+    border-radius: 6px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#jsonModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 15px 20px;
+}
+
+#jsonModal .modal-body {
+    padding: 0;
+    /* Remove padding to make editor fit better */
+}
+
+#jsonModal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    padding: 15px 20px;
+}
+
+
+/* Custom buttons styling */
+
+#jsonModal .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    transition: all 0.2s ease;
+}
+
+#jsonModal .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+
+/* Editor mode buttons */
+
+.editor-mode-selector {
+    background-color: #f8f9fa;
+    padding: 0.25rem;
+    border-radius: 4px;
+}
+
+.editor-mode-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.editor-mode-btn.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+
+/* Make editor take full height */
+
+#jsoneditor {
+    height: 500px;
+    /* Default height */
+}
+
+@media (min-height: 800px) {
+    #jsoneditor {
+        height: 600px;
+    }
+}
+
+
+/* Add keyboard shortcut indicator */
+
+.jsoneditor-menu::after {
+    content: "Ctrl+F to search";
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    font-size: 11px;
+    color: #777;
+}
+
+
+/* Add animation to modal opening */
+
+.modal.fade .modal-dialog {
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.modal.fade.show .modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+}

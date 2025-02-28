@@ -1,7 +1,8 @@
-import { STATE } from "./graph";
+import { STATE, clearNodeHighlights } from "./graph";
 import { resizePanels } from "./graphUtilities";
 import { loadGraphDataFromServer } from "./graph";
 import { getLabelsVisible, setLabelsVisible } from "./graphSetup";
+import { loadGeneData, annotateAllNodes } from "./geneAnnotation";
 
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
@@ -96,4 +97,75 @@ function handleFileUpload(event) {
         };
         reader.readAsText(file);
     }
+}
+
+// Add the clear highlights button event handler
+document.getElementById('clearHighlights').addEventListener('click', () => {
+    clearNodeHighlights(STATE.cy);
+});
+
+// Gene annotation direct action (if modal doesn't work for some reason)
+document.getElementById('geneAnnotationBtn').addEventListener('click', async(e) => {
+    // Direct annotation without modal
+    if (e.ctrlKey || !window.bootstrap) {
+        e.preventDefault();
+        await handleGeneAnnotation();
+    } else {
+        // Bootstrap modal approach
+        try {
+            const modal = new bootstrap.Modal(document.getElementById('geneAnnotationModal'));
+            modal.show();
+        } catch (error) {
+            console.error("Error showing modal, falling back to direct annotation:", error);
+            await handleGeneAnnotation();
+        }
+    }
+});
+
+/**
+ * Handle direct gene annotation when modal is unavailable
+ */
+async function handleGeneAnnotation() {
+    try {
+        console.log("Starting gene annotation process directly...");
+
+        // Show loading alert - use the global function instead of imported one
+        window.showAlert("Loading gene annotations...", "info");
+
+        // Try loading the gene data 
+        const loaded = await loadGeneData();
+
+        if (loaded && STATE.cy) {
+            console.log("Gene data loaded successfully, annotating nodes...");
+            // Annotate all nodes in the graph
+            const annotatedCount = await annotateAllNodes(STATE.cy);
+
+            // Show success alert with auto-dismiss after 3 seconds - use global function
+            window.showAlert(`Annotated ${annotatedCount} nodes with gene information!`, "success", 3000);
+        } else {
+            console.error("Could not load gene data or graph not initialized");
+            window.showAlert("Failed to load gene annotations.", "error");
+        }
+    } catch (error) {
+        console.error("Error in gene annotation:", error);
+        window.showAlert("Error in gene annotation process.", "error");
+    }
+}
+
+// Add event handler for Aurora IDs file upload
+document.addEventListener('click', (event) => {
+    if (event.target.id === 'uploadAuroraIds' ||
+        (event.target.parentElement && event.target.parentElement.id === 'uploadAuroraIds')) {
+
+        const fileInput = document.getElementById('auroraIdsFile');
+        if (fileInput && window.handleAuroraIdsFileUpload) {
+            window.handleAuroraIdsFileUpload();
+        }
+    }
+});
+
+// Make the Aurora ID file upload handler globally available
+if (typeof window !== 'undefined' && typeof window.handleAuroraIdsFileUpload === 'undefined' &&
+    typeof handleAuroraIdsFileUpload === 'function') {
+    window.handleAuroraIdsFileUpload = handleAuroraIdsFileUpload;
 }

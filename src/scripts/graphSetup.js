@@ -88,12 +88,33 @@ export function initializeGraph(graphData) {
                     "text-margin-y": -10,
                 },
             },
+            // Add these style definitions for highlighted and faded elements
+            {
+                selector: '.highlighted',
+                style: {
+                    'border-width': 4,
+                    'border-color': '#ff0000',
+                    'background-color': '#ffcccc',
+                    'color': '#000000',
+                    'font-weight': 'bold',
+                    'z-index': 999,
+                    'transition-property': 'border-width, border-color, background-color, color, font-weight, opacity',
+                    'transition-duration': '0.3s',
+                }
+            },
+            {
+                selector: '.faded',
+                style: {
+                    'opacity': 0.25,
+                    'transition-property': 'opacity',
+                    'transition-duration': '0.3s'
+                }
+            }
         ],
 
         // initial viewport state:
         zoom: 1,
         pan: { x: 0, y: 0 },
-
         // interaction options:
         minZoom: 0.1,
         maxZoom: 3,
@@ -120,8 +141,8 @@ export function initializeGraph(graphData) {
     });
 
     // set style highlight
-    STATE.cy.style().selector("node.highlight").style({
-        "background-color": "#ff5733", // Change to your preferred highlight color
+    STATE.cy.style().selector("node.highlightWalk").style({
+        "background-color": STATE.highlightWalkColor,
     });
 
     const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
@@ -131,4 +152,16 @@ export function initializeGraph(graphData) {
     sourceNodes.forEach((sourceNode) => {
         dfs(sourceNode, [], sinkNodes);
     });
+
+    // Make sure displayWalks is available to the event handlers
+    if (typeof window !== 'undefined' && typeof window.displayWalks === 'undefined' &&
+        typeof displayWalks === 'function') {
+        window.displayWalks = displayWalks;
+    }
+
+    // Make sure handleAuroraIdsFileUpload is available to the event handlers
+    if (typeof window !== 'undefined' && typeof window.handleAuroraIdsFileUpload === 'undefined' &&
+        typeof handleAuroraIdsFileUpload === 'function') {
+        window.handleAuroraIdsFileUpload = handleAuroraIdsFileUpload;
+    }
 }
