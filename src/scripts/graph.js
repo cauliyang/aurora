@@ -287,14 +287,13 @@ async function toHashIdentifier(inputString, length = 16) {
 async function getWalkAuroraId(walk) {
     // Create the walk info string by joining node information
     const walkInfo = walk.map(node => {
-        const chrom = node.data('chrom') || '';
-        const refStart = node.data('ref_start') || '';
-        const refEnd = node.data('ref_end') || '';
-        const nodeId = node.data("node_id");
-        return `${chrom}_${refStart}_${refEnd}_${nodeId}`;
+        const nodeId = node.data("id");
+        return nodeId
     }).join('-');
 
     // Generate hash identifier for the walk info
+    console.log(`Generating Aurora ID for walk: ${walkInfo}`);
+
     return await toHashIdentifier(walkInfo);
 }
 

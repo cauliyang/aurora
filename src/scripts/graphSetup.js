@@ -41,8 +41,8 @@ export function initializeGraph(graphData) {
         .mode("lch")
         .colors(maxWeight);
 
-    let node_label = getLabelsVisible() ? "data(name)" : "";
-    let edge_label = getLabelsVisible() ? "data(weight)" : "";
+    let node_label = getLabelsVisible() ? "data(id)" : "";
+    let edge_label = getLabelsVisible() ? "data(id)" : "";
 
     STATE.cy = cytoscape({
         container: document.getElementById("cy"),

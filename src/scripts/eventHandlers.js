@@ -34,8 +34,8 @@ maximizeButton.addEventListener("click", () => {
 
 function toggleLabels() {
     // Update labelsVisible state
-    const nodelabelStyle = !getLabelsVisible() ? "data(name)" : ""; // Toggles between showing the name and showing nothing
-    const edgeLabelStyle = !getLabelsVisible() ? "data(weight)" : ""; // Toggles between showing the weight and showing nothing
+    const nodelabelStyle = !getLabelsVisible() ? "data(id)" : ""; // Toggles between showing the name and showing nothing
+    const edgeLabelStyle = !getLabelsVisible() ? "data(id)" : ""; // Toggles between showing the weight and showing nothing
 
     STATE.cy
         .style()

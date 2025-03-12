@@ -448,7 +448,7 @@ export function renderGeneAnnotations(node, container) {
             ${geneAnnotations.map(gene => `
               <tr>
                 <td>
-                  <a href="https://www.ncbi.nlm.nih.gov/gene/?term=${gene.geneName}" 
+                  <a href="https://www.ncbi.nlm.nih.gov/gene/?term=${gene.geneName}"
                      target="_blank" class="text-decoration-none">
                     ${gene.geneName}
                     <i class="bi bi-box-arrow-up-right text-muted small ms-1"></i>
