@@ -98,6 +98,8 @@ function handleFileUpload(event) {
       } else if (fileExtension === "tsg") {
         // Handle TSG file
         console.log("Loaded TSG data");
+        let graph_jsons = window.parse_tsgFile(content);
+        console.log("Loaded TSG data:", graph_jsons[0]);
       } else {
         throw new Error(`Unsupported file format: ${fileExtension}`);
       }

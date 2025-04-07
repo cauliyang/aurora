@@ -3,7 +3,7 @@
 export function start(): void;
 export function greet(): void;
 export function add(a: number, b: number): number;
-export function load_graph(raw_content: string): string;
+export function load_graph(raw_content: string): string[];
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -20,6 +20,7 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __externref_table_dealloc: (a: number) => void;
+  readonly __externref_drop_slice: (a: number, b: number) => void;
   readonly __wbindgen_start: () => void;
 }
 
