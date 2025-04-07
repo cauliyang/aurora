@@ -7,4 +7,13 @@ async function run() {
   console.log(result);
 }
 
+function parse_tsgFile(fileContent) {
+  // Parse the TSG file content
+  // This is a placeholder function. You need to implement the actual parsing logic.
+  console.log("Parsing TSG file content:", fileContent);
+  return {}; // Return parsed data
+}
+
+window.parse_tsgFile = parse_tsgFile;
+
 run();
