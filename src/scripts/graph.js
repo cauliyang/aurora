@@ -995,6 +995,12 @@ function highlightNode(cy, nodeId) {
 export function clearNodeHighlights(cy) {
     console.log("Clearing all highlights");
 
+    // Check if cy exists before accessing its elements
+    if (!cy) {
+        console.warn("Cannot clear highlights: graph object is null");
+        return;
+    }
+
     // Remove highlighting classes from all elements
     cy.elements().removeClass('highlighted');
     cy.elements().removeClass('faded');
