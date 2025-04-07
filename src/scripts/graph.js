@@ -437,9 +437,22 @@ async function displayWalks(searchText = "", auroraIds = []) {
       '<div class="walks-accordion" id="walksAccordion"></div>';
     const walksAccordion = document.getElementById("walksAccordion");
 
+    // Create a mapping between display order index and original STATE.walks index
+    const walkIndexMap = sortedWalks.map((walk, displayIndex) => {
+      // Find the original index in STATE.walks
+      const originalIndex = STATE.walks.findIndex((w) => w === walk);
+      return { displayIndex, originalIndex };
+    });
+
+    // Store this mapping in a window variable for reference
+    window.walkIndexMap = walkIndexMap;
+
     // Process all walks in parallel
-    const walkPromises = sortedWalks.map(async (walk, index) => {
+    const walkPromises = sortedWalks.map(async (walk, displayIndex) => {
       try {
+        // Get original walk index from STATE.walks array
+        const originalIndex = walkIndexMap[displayIndex].originalIndex;
+
         const walkText = walk.map((node) => node.id()).join(" → ");
         const auroraId = await getWalkAuroraId(walk);
 
@@ -448,7 +461,8 @@ async function displayWalks(searchText = "", auroraIds = []) {
         walkCard.className = "walk-card";
         walkCard.setAttribute("data-walk-text", walkText);
         walkCard.setAttribute("data-aurora-id", auroraId);
-        walkCard.setAttribute("data-walk-index", index);
+        walkCard.setAttribute("data-walk-index", originalIndex); // Store the ORIGINAL index, not display index
+        walkCard.setAttribute("data-display-index", displayIndex);
 
         // Check if the walk should be visible based on search text and aurora IDs
         const searchLower = searchText.trim().toLowerCase();
@@ -480,10 +494,10 @@ async function displayWalks(searchText = "", auroraIds = []) {
                     <div class="card mb-2">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <button class="btn btn-link btn-sm walk-toggle-btn" type="button" data-bs-toggle="collapse" 
-                                    data-bs-target="#walk-${index}" aria-expanded="false" aria-controls="walk-${index}">
+                                    data-bs-target="#walk-${displayIndex}" aria-expanded="false" aria-controls="walk-${displayIndex}">
                                 <i class="bi bi-chevron-down chevron-icon"></i>
                                 Walk ${
-                                  index + 1
+                                  displayIndex + 1
                                 } <span class="badge bg-info ms-2">${
           walk.length
         } nodes</span>
@@ -497,7 +511,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
                                 </button>
                             </div>
                         </div>
-                        <div id="walk-${index}" class="collapse">
+                        <div id="walk-${displayIndex}" class="collapse">
                             <div class="card-body">
                                 <div class="aurora-id-container">
                                     <small class="text-muted d-flex align-items-center">
@@ -517,7 +531,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
 
         return walkCard;
       } catch (error) {
-        console.error(`Error processing walk ${index}:`, error);
+        console.error(`Error processing walk ${displayIndex}:`, error);
         return null;
       }
     });
@@ -602,9 +616,13 @@ async function handleAuroraIdsFileUpload() {
 
 // Function to filter walk cards based on search text and Aurora IDs
 function filterWalkCards(searchValue, auroraIds = []) {
+  // Keep track of the visible cards and their corresponding walk indices
+  let visibleCardCount = 0;
+
   document.querySelectorAll(".walk-card").forEach((card) => {
     const walkText = card.getAttribute("data-walk-text").toLowerCase();
     const auroraId = card.getAttribute("data-aurora-id").toLowerCase();
+    const walkIndex = card.getAttribute("data-walk-index");
 
     let shouldShow = true;
 
@@ -625,8 +643,24 @@ function filterWalkCards(searchValue, auroraIds = []) {
       shouldShow = false;
     }
 
+    // Debug information
+    if (shouldShow && searchValue) {
+      console.log(
+        `Match found: "${searchValue}" in walk ${walkIndex} (${walkText.substring(
+          0,
+          50
+        )}...)`
+      );
+    }
+
     card.style.display = shouldShow ? "" : "none";
+
+    if (shouldShow) {
+      visibleCardCount++;
+    }
   });
+
+  console.log(`Filter results: ${visibleCardCount} walks match the criteria`);
 
   // Update the count of visible walks
   updateVisibleWalksCount();
@@ -679,14 +713,24 @@ function shortenNodeId(id) {
 // Helper function to add event listeners to walk cards
 function addWalkCardEventListeners() {
   // Highlight walk buttons
-  document.querySelectorAll(".highlight-walk-btn").forEach((btn, index) => {
+  document.querySelectorAll(".highlight-walk-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const walkIndex =
-        btn.closest(".walk-card").getAttribute("data-walk-index") || index;
-      highlightWalk(STATE.walks[walkIndex]);
-      // Add visual feedback
-      btn.classList.add("active");
-      setTimeout(() => btn.classList.remove("active"), 1000);
+      const walkCard = btn.closest(".walk-card");
+      const walkIndex = parseInt(walkCard.getAttribute("data-walk-index"), 10);
+
+      console.log(`Highlighting walk at index: ${walkIndex}`);
+      if (walkIndex >= 0 && walkIndex < STATE.walks.length) {
+        highlightWalk(STATE.walks[walkIndex]);
+        // Add visual feedback
+        btn.classList.add("active");
+        setTimeout(() => btn.classList.remove("active"), 1000);
+      } else {
+        console.error(
+          `Invalid walk index: ${walkIndex}, max index: ${
+            STATE.walks.length - 1
+          }`
+        );
+      }
     });
   });
 
