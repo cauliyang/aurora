@@ -1,44 +1,44 @@
 {
-    "name": "aurora",
-    "version": "1.0.0",
-    "description": "NLGraph Visualization",
-    "homepage": ".",
-    "source": [
-        "src/index.html",
-        "src/app.html",
-        "src/igv.html"
-    ],
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 0",
-        "start": "parcel",
-        "build": "parcel build --public-url /aurora/"
-    },
-    "keywords": [
-        "bioinformatics"
-    ],
-    "author": "Yangyang Li",
-    "license": "ISC",
-    "devDependencies": {
-        "@parcel/transformer-raw": "^2.13.3",
-        "@parcel/transformer-sass": "^2.11.0",
-        "parcel": "^2.11.0",
-        "process": "^0.11.10",
-        "svgo": "^3.3.2"
-    },
-    "dependencies": {
-        "@popperjs/core": "^2.11.8",
-        "bootstrap": "^5.3.2",
-        "bootstrap-icons": "^1.11.3",
-        "chroma-js": "^2.4.2",
-        "cytoscape": "^3.28.1",
-        "cytoscape-dagre": "^2.5.0",
-        "cytoscape-euler": "^1.2.2",
-        "cytoscape-klay": "^3.1.4",
-        "cytoscape-spread": "^3.0.0",
-        "cytoscape-tidytree": "^0.1.1",
-        "interactjs": "^1.10.26",
-        "jquery": "^3.7.1",
-        "jsoneditor": "^10.0.0",
-        "pako": "^2.1.0"
-    }
+  "name": "aurora",
+  "version": "1.0.0",
+  "description": "NLGraph Visualization",
+  "homepage": ".",
+  "source": [
+    "src/index.html",
+    "src/app.html",
+    "src/igv.html"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "start": "parcel",
+    "build": "parcel build --public-url /aurora/"
+  },
+  "keywords": [
+    "bioinformatics"
+  ],
+  "author": "Yangyang Li",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/transformer-raw": "^2.14.4",
+    "@parcel/transformer-sass": "^2.14.4",
+    "parcel": "^2.14.4",
+    "process": "^0.11.10",
+    "svgo": "^3.3.2"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.5",
+    "bootstrap-icons": "^1.11.3",
+    "chroma-js": "^3.1.2",
+    "cytoscape": "^3.31.2",
+    "cytoscape-dagre": "^2.5.0",
+    "cytoscape-euler": "^1.2.2",
+    "cytoscape-klay": "^3.1.4",
+    "cytoscape-spread": "^3.0.0",
+    "cytoscape-tidytree": "^0.2.0",
+    "interactjs": "^1.10.26",
+    "jquery": "^3.7.1",
+    "jsoneditor": "^10.2.0",
+    "pako": "^2.1.0"
+  }
 }
