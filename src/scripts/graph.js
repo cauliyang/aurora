@@ -10,7 +10,7 @@ import { initializeGraph } from "./graphSetup";
 import { createTooltip } from "./tooltip";
 import { dfs } from "./graphUtilities";
 import { displayElementInfo } from "./graphUtilities";
-import { initGeneAnnotation } from './geneAnnotation';
+import { initGeneAnnotation } from "./geneAnnotation";
 
 cytoscape.use(dagre);
 cytoscape.use(klay);
@@ -19,213 +19,213 @@ cytoscape.use(euler);
 cytoscape.use(spread);
 
 export const STATE = {
-    cy: null,
-    walks: [],
-    minEdgeWeight: 1,
-    minPathLength: 1,
-    maxPathLength: 900,
-    previousClickedElement: null,
-    previousClickedElementStyle: null,
-    originalGraphData: null,
-    selectedNodeColor: "#8dd3c7",
-    nodeColor: "#1f77b4",
-    highlightWalkColor: "#ff5733",
-    sourceNodeColor: "#31a354",
+  cy: null,
+  walks: [],
+  minEdgeWeight: 1,
+  minPathLength: 1,
+  maxPathLength: 900,
+  previousClickedElement: null,
+  previousClickedElementStyle: null,
+  originalGraphData: null,
+  selectedNodeColor: "#8dd3c7",
+  nodeColor: "#1f77b4",
+  highlightWalkColor: "#ff5733",
+  sourceNodeColor: "#31a354",
 };
 
 window.STATE = STATE;
 
 // Get the "Change Layout" button element
 layoutSelect.addEventListener("change", () => {
-    // Get the selected layout from the select element
-    const selectedLayout = document.getElementById("layoutSelect").value;
+  // Get the selected layout from the select element
+  const selectedLayout = document.getElementById("layoutSelect").value;
 
-    if (STATE.cy === null) return;
+  if (STATE.cy === null) return;
 
-    // Apply the chosen layout
-    STATE.cy
-        .layout({
-            name: selectedLayout,
-            animate: true, // You can adjust animation settings if needed
-            fit: true,
-            padding: 10,
-            avoidOverlap: true,
-            rankDir: "LR",
-        })
-        .run();
+  // Apply the chosen layout
+  STATE.cy
+    .layout({
+      name: selectedLayout,
+      animate: true, // You can adjust animation settings if needed
+      fit: true,
+      padding: 10,
+      avoidOverlap: true,
+      rankDir: "LR",
+    })
+    .run();
 });
 
 // Function to update graph based on edge weight
 function updateGraph() {
-    // Reset graph to original data
-    console.log("updateGraph", STATE);
-    STATE.walks.length = 0;
-    STATE.cy.elements().remove();
-    STATE.cy.add(STATE.originalGraphData);
+  // Reset graph to original data
+  console.log("updateGraph", STATE);
+  STATE.walks.length = 0;
+  STATE.cy.elements().remove();
+  STATE.cy.add(STATE.originalGraphData);
 
-    const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
-    const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
+  const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
+  const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
 
-    // update walks
-    sourceNodes.forEach((sourceNode) => {
-        dfs(sourceNode, [], sinkNodes);
-    });
+  // update walks
+  sourceNodes.forEach((sourceNode) => {
+    dfs(sourceNode, [], sinkNodes);
+  });
 
-    hideUninvolvedElements();
-    hideSingletonNodes();
+  hideUninvolvedElements();
+  hideSingletonNodes();
 
-    // Optionally, you can re-run layout here
-    // // change layout to dagre
-    // document.getElementById("layoutSelect").value = "dagre";
+  // Optionally, you can re-run layout here
+  // // change layout to dagre
+  // document.getElementById("layoutSelect").value = "dagre";
 
-    let currentLayout = document.getElementById("layoutSelect").value;
+  let currentLayout = document.getElementById("layoutSelect").value;
 
-    if (currentLayout === "euler") {
-        document.getElementById("layoutSelect").value = "dagre";
-        currentLayout = "dagre";
-    }
+  if (currentLayout === "euler") {
+    document.getElementById("layoutSelect").value = "dagre";
+    currentLayout = "dagre";
+  }
 
-    STATE.cy
-        .layout({
-            name: currentLayout,
-            animate: false,
-            fit: true,
-            padding: 10,
-            avoidOverlap: true,
-            rankDir: "LR",
-        })
-        .run();
+  STATE.cy
+    .layout({
+      name: currentLayout,
+      animate: false,
+      fit: true,
+      padding: 10,
+      avoidOverlap: true,
+      rankDir: "LR",
+    })
+    .run();
 
-    setupGraphInteractions();
+  setupGraphInteractions();
 }
 
 function hideUninvolvedElements() {
-    const involvedNodes = new Set();
-    const involvedEdges = new Set();
+  const involvedNodes = new Set();
+  const involvedEdges = new Set();
 
-    // Mark all nodes and edges involved in the walks
-    STATE.walks.forEach((walk) => {
-        walk.forEach((node, index) => {
-            involvedNodes.add(node.id());
-            if (index < walk.length - 1) {
-                const nextNode = walk[index + 1];
-                const connectingEdge = node.edgesTo(nextNode);
-                involvedEdges.add(connectingEdge.id());
-            }
-        });
+  // Mark all nodes and edges involved in the walks
+  STATE.walks.forEach((walk) => {
+    walk.forEach((node, index) => {
+      involvedNodes.add(node.id());
+      if (index < walk.length - 1) {
+        const nextNode = walk[index + 1];
+        const connectingEdge = node.edgesTo(nextNode);
+        involvedEdges.add(connectingEdge.id());
+      }
     });
+  });
 
-    // Hide nodes and edges not involved in any walk
-    STATE.cy.nodes().forEach((node) => {
-        if (!involvedNodes.has(node.id())) {
-            node.hide();
-        }
-    });
+  // Hide nodes and edges not involved in any walk
+  STATE.cy.nodes().forEach((node) => {
+    if (!involvedNodes.has(node.id())) {
+      node.hide();
+    }
+  });
 
-    STATE.cy.edges().forEach((edge) => {
-        if (!involvedEdges.has(edge.id())) {
-            edge.hide();
-        }
-    });
+  STATE.cy.edges().forEach((edge) => {
+    if (!involvedEdges.has(edge.id())) {
+      edge.hide();
+    }
+  });
 }
 
 document
-    .getElementById("minEdgeWeight")
-    .addEventListener("change", function() {
-        const minEdgeWeight = parseFloat(this.value) || 1;
-        if (Number.isNaN(minEdgeWeight)) return;
-        STATE.minEdgeWeight = minEdgeWeight;
-        updateGraph();
-    });
-
-document.getElementById("MaxDepth").addEventListener("change", function() {
-    const MaxDepth = parseFloat(this.value) || 900;
-    if (Number.isNaN(MaxDepth)) return;
-    STATE.maxPathLength = MaxDepth;
-
-    if (STATE.minPathLength > STATE.maxPathLength) {
-        // altert user
-        alert("Min Depth cannot be greater than Max Depth");
-        document.getElementById("MaxDepth").value = STATE.minPathLength;
-        return;
-    }
-
+  .getElementById("minEdgeWeight")
+  .addEventListener("change", function () {
+    const minEdgeWeight = parseFloat(this.value) || 1;
+    if (Number.isNaN(minEdgeWeight)) return;
+    STATE.minEdgeWeight = minEdgeWeight;
     updateGraph();
+  });
+
+document.getElementById("MaxDepth").addEventListener("change", function () {
+  const MaxDepth = parseFloat(this.value) || 900;
+  if (Number.isNaN(MaxDepth)) return;
+  STATE.maxPathLength = MaxDepth;
+
+  if (STATE.minPathLength > STATE.maxPathLength) {
+    // altert user
+    alert("Min Depth cannot be greater than Max Depth");
+    document.getElementById("MaxDepth").value = STATE.minPathLength;
+    return;
+  }
+
+  updateGraph();
 });
 
-document.getElementById("MinDepth").addEventListener("change", function() {
-    const MinDepth = parseFloat(this.value) || 2;
-    if (Number.isNaN(MinDepth)) return;
-    STATE.minPathLength = MinDepth;
+document.getElementById("MinDepth").addEventListener("change", function () {
+  const MinDepth = parseFloat(this.value) || 2;
+  if (Number.isNaN(MinDepth)) return;
+  STATE.minPathLength = MinDepth;
 
-    if (STATE.minPathLength > STATE.maxPathLength) {
-        // altert user
-        alert("Min Depth cannot be greater than Max Depth");
-        document.getElementById("MinDepth").value = STATE.maxPathLength;
-        return;
-    }
+  if (STATE.minPathLength > STATE.maxPathLength) {
+    // altert user
+    alert("Min Depth cannot be greater than Max Depth");
+    document.getElementById("MinDepth").value = STATE.maxPathLength;
+    return;
+  }
 
-    updateGraph();
+  updateGraph();
 });
 
 export function loadGraphDataFromServer(graphData) {
-    //check if graphData has elements
-    // if has elements, initialize graph using elements
-    // if not has elements, initialize graph using graphData
-    if (graphData.elements) {
-        STATE.originalGraphData = graphData.elements;
-        initializeGraph(graphData.elements);
-    } else {
-        STATE.originalGraphData = graphData;
-        initializeGraph(graphData);
-    }
-    setupGraphInteractions();
+  //check if graphData has elements
+  // if has elements, initialize graph using elements
+  // if not has elements, initialize graph using graphData
+  if (graphData.elements) {
+    STATE.originalGraphData = graphData.elements;
+    initializeGraph(graphData.elements);
+  } else {
+    STATE.originalGraphData = graphData;
+    initializeGraph(graphData);
+  }
+  setupGraphInteractions();
 }
 
 // Make loadGraphDataFromServer globally available to avoid circular dependencies
 window.loadGraphDataFromServer = loadGraphDataFromServer;
 
 document.getElementById("resetGraph").addEventListener("click", () => {
-    // Reset layout to default
-    STATE.cy.elements().removeClass("highlightWalk");
-    layoutSelect.value = "dagre";
-    STATE.cy
-        .layout({
-            name: "dagre",
-            animate: true,
-            fit: true,
-            padding: 10,
-            avoidOverlap: true,
-            rankDir: "LR",
-        })
-        .run();
+  // Reset layout to default
+  STATE.cy.elements().removeClass("highlightWalk");
+  layoutSelect.value = "dagre";
+  STATE.cy
+    .layout({
+      name: "dagre",
+      animate: true,
+      fit: true,
+      padding: 10,
+      avoidOverlap: true,
+      rankDir: "LR",
+    })
+    .run();
 
-    const cyContainer = document.getElementById("cy");
-    const infoPanel = document.getElementById("info");
-    const walksPanel = document.getElementById("walks");
+  const cyContainer = document.getElementById("cy");
+  const infoPanel = document.getElementById("info");
+  const walksPanel = document.getElementById("walks");
 
-    cyContainer.style.width = "";
-    cyContainer.style.height = "";
-    infoPanel.style.width = "";
-    walksPanel.style.width = "";
-    infoPanel.style.display = "";
-    walksPanel.style.display = "";
+  cyContainer.style.width = "";
+  cyContainer.style.height = "";
+  infoPanel.style.width = "";
+  walksPanel.style.width = "";
+  infoPanel.style.display = "";
+  walksPanel.style.display = "";
 });
 
 // Function to get color based on weight
 function setupGraphInteractions() {
-    STATE.cy.on("tap", (evt) => {
-        if (evt.target === STATE.cy) {
-            clearNodeHighlights(STATE.cy);
-        }
-    });
+  STATE.cy.on("tap", (evt) => {
+    if (evt.target === STATE.cy) {
+      clearNodeHighlights(STATE.cy);
+    }
+  });
 
-    displayWalks();
-    setupClickEvent();
-    createTooltip();
+  displayWalks();
+  setupClickEvent();
+  createTooltip();
 
-    // Initialize gene annotation functionality
-    initGeneAnnotation();
+  // Initialize gene annotation functionality
+  initGeneAnnotation();
 }
 
 /**
@@ -241,37 +241,42 @@ function setupGraphInteractions() {
  * console.log(identifier); // Outputs something like 'a591a6d40bf420'
  */
 async function toHashIdentifier(inputString, length = 16) {
-    // Type checking
-    if (typeof inputString !== 'string') {
-        throw new TypeError("Input must be a string");
-    }
+  // Type checking
+  if (typeof inputString !== "string") {
+    throw new TypeError("Input must be a string");
+  }
 
-    if (length !== null && (!Number.isInteger(length) || typeof length !== 'number')) {
-        throw new TypeError("Length must be an integer or null");
-    }
+  if (
+    length !== null &&
+    (!Number.isInteger(length) || typeof length !== "number")
+  ) {
+    throw new TypeError("Length must be an integer or null");
+  }
 
-    if (length !== null && length <= 0) {
-        throw new Error("Length must be positive");
-    }
+  if (length !== null && length <= 0) {
+    throw new Error("Length must be positive");
+  }
 
-    // Create SHA-256 hash
-    const encoder = new TextEncoder();
-    const data = encoder.encode(inputString);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  // Create SHA-256 hash
+  const encoder = new TextEncoder();
+  const data = encoder.encode(inputString);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-    // Convert buffer to hex string
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  // Convert buffer to hex string
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 
-    // Take specified length of hash if provided
-    let result = length ? hashHex.slice(0, length) : hashHex;
+  // Take specified length of hash if provided
+  let result = length ? hashHex.slice(0, length) : hashHex;
 
-    // Ensure the identifier starts with a letter (prefix with 'a' if it starts with a number)
-    if (/^[0-9]/.test(result)) {
-        result = 'a' + result.slice(1);
-    }
+  // Ensure the identifier starts with a letter (prefix with 'a' if it starts with a number)
+  if (/^[0-9]/.test(result)) {
+    result = "a" + result.slice(1);
+  }
 
-    return result;
+  return result;
 }
 
 /**
@@ -285,28 +290,30 @@ async function toHashIdentifier(inputString, length = 16) {
  * console.log(auroraId); // Outputs something like 'a591a6d40bf420'
  */
 async function getWalkAuroraId(walk) {
-    // Create the walk info string by joining node information
-    const walkInfo = walk.map(node => {
-        const nodeId = node.data("id");
-        return nodeId
-    }).join('-');
+  // Create the walk info string by joining node information
+  const walkInfo = walk
+    .map((node) => {
+      const nodeId = node.data("id");
+      return nodeId;
+    })
+    .join("-");
 
-    // Generate hash identifier for the walk info
-    console.log(`Generating Aurora ID for walk: ${walkInfo}`);
+  // Generate hash identifier for the walk info
+  console.log(`Generating Aurora ID for walk: ${walkInfo}`);
 
-    return await toHashIdentifier(walkInfo);
+  return await toHashIdentifier(walkInfo);
 }
 
 // Update the displayWalks function for a more beautiful presentation
 async function displayWalks(searchText = "", auroraIds = []) {
-    const walksContainer = document.getElementById("walks");
-    if (!walksContainer) {
-        console.error("Walks container not found");
-        return;
-    }
+  const walksContainer = document.getElementById("walks");
+  if (!walksContainer) {
+    console.error("Walks container not found");
+    return;
+  }
 
-    // Clear previous walks display and add search box with improved styling
-    walksContainer.innerHTML = `
+  // Clear previous walks display and add search box with improved styling
+  walksContainer.innerHTML = `
         <div class="walks-header">
             <h3>
                 <i class="bi bi-diagram-3"></i> Graph Walks 
@@ -337,10 +344,14 @@ async function displayWalks(searchText = "", auroraIds = []) {
                     <i class="bi bi-upload"></i> Batch Search
                 </button>
             </div>
-            ${auroraIds.length > 0 ? `<div class="alert alert-info">
+            ${
+              auroraIds.length > 0
+                ? `<div class="alert alert-info">
                 <i class="bi bi-info-circle me-2"></i> Searching for ${auroraIds.length} Aurora IDs
                 <button class="btn btn-sm btn-outline-secondary float-end" id="clearAuroraIds">Clear</button>
-            </div>` : ''}
+            </div>`
+                : ""
+            }
         </div>
         <div class="walk-list-container">
             <!-- Walks will be loaded here -->
@@ -353,118 +364,129 @@ async function displayWalks(searchText = "", auroraIds = []) {
         </div>
     `;
 
-    // Add search event listener with improved functionality
-    const searchInput = document.getElementById('walkSearch');
-    const clearSearchBtn = document.getElementById('clearWalkSearch');
-    const auroraIdsFileInput = document.getElementById('auroraIdsFile');
-    const uploadAuroraIdsBtn = document.getElementById('uploadAuroraIds');
-    const clearAuroraIdsBtn = document.getElementById('clearAuroraIds');
+  // Add search event listener with improved functionality
+  const searchInput = document.getElementById("walkSearch");
+  const clearSearchBtn = document.getElementById("clearWalkSearch");
+  const auroraIdsFileInput = document.getElementById("auroraIdsFile");
+  const uploadAuroraIdsBtn = document.getElementById("uploadAuroraIds");
+  const clearAuroraIdsBtn = document.getElementById("clearAuroraIds");
 
-    if (searchInput) {
-        searchInput.value = searchText; // Preserve search text when redisplaying
+  if (searchInput) {
+    searchInput.value = searchText; // Preserve search text when redisplaying
 
-        // Remove old event listeners before adding new one
-        const newSearchInput = searchInput.cloneNode(true);
-        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+    // Remove old event listeners before adding new one
+    const newSearchInput = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
 
-        newSearchInput.addEventListener('input', (e) => {
-            // Real-time filtering as user types
-            const searchValue = e.target.value.trim().toLowerCase();
-            filterWalkCards(searchValue, auroraIds);
-        });
-    }
+    newSearchInput.addEventListener("input", (e) => {
+      // Real-time filtering as user types
+      const searchValue = e.target.value.trim().toLowerCase();
+      filterWalkCards(searchValue, auroraIds);
+    });
+  }
 
-    if (clearSearchBtn) {
-        clearSearchBtn.addEventListener('click', () => {
-            if (searchInput) {
-                searchInput.value = '';
-                // Only filter by Aurora IDs if they exist
-                filterWalkCards('', auroraIds);
-                searchInput.focus();
-            }
-        });
-    }
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener("click", () => {
+      if (searchInput) {
+        searchInput.value = "";
+        // Only filter by Aurora IDs if they exist
+        filterWalkCards("", auroraIds);
+        searchInput.focus();
+      }
+    });
+  }
 
-    if (uploadAuroraIdsBtn && auroraIdsFileInput) {
-        uploadAuroraIdsBtn.addEventListener('click', () => {
-            handleAuroraIdsFileUpload();
-        });
-    }
+  if (uploadAuroraIdsBtn && auroraIdsFileInput) {
+    uploadAuroraIdsBtn.addEventListener("click", () => {
+      handleAuroraIdsFileUpload();
+    });
+  }
 
-    if (clearAuroraIdsBtn) {
-        clearAuroraIdsBtn.addEventListener('click', () => {
-            // Redisplay walks without Aurora ID filtering
-            displayWalks(searchText);
-        });
-    }
+  if (clearAuroraIdsBtn) {
+    clearAuroraIdsBtn.addEventListener("click", () => {
+      // Redisplay walks without Aurora ID filtering
+      displayWalks(searchText);
+    });
+  }
 
-    try {
-        // Sort walks by length (number of nodes) in descending order
-        const sortedWalks = [...STATE.walks].sort((a, b) => b.length - a.length);
-        const walkListContainer = walksContainer.querySelector('.walk-list-container');
+  try {
+    // Sort walks by length (number of nodes) in descending order
+    const sortedWalks = [...STATE.walks].sort((a, b) => b.length - a.length);
+    const walkListContainer = walksContainer.querySelector(
+      ".walk-list-container"
+    );
 
-        if (sortedWalks.length === 0) {
-            walkListContainer.innerHTML = `
+    if (sortedWalks.length === 0) {
+      walkListContainer.innerHTML = `
                 <div class="alert alert-info text-center">
                     <i class="bi bi-exclamation-circle me-2"></i>
                     No walks found in this graph
                 </div>
             `;
-            return;
+      return;
+    }
+
+    // Update walks count badge
+    const walksCountBadge = walksContainer.querySelector(".walks-count");
+    if (walksCountBadge) {
+      walksCountBadge.textContent = sortedWalks.length;
+    }
+
+    // Create container for walkCards
+    walkListContainer.innerHTML =
+      '<div class="walks-accordion" id="walksAccordion"></div>';
+    const walksAccordion = document.getElementById("walksAccordion");
+
+    // Process all walks in parallel
+    const walkPromises = sortedWalks.map(async (walk, index) => {
+      try {
+        const walkText = walk.map((node) => node.id()).join(" → ");
+        const auroraId = await getWalkAuroraId(walk);
+
+        // Create a more appealing card for each walk
+        const walkCard = document.createElement("div");
+        walkCard.className = "walk-card";
+        walkCard.setAttribute("data-walk-text", walkText);
+        walkCard.setAttribute("data-aurora-id", auroraId);
+        walkCard.setAttribute("data-walk-index", index);
+
+        // Check if the walk should be visible based on search text and aurora IDs
+        const searchLower = searchText.trim().toLowerCase();
+        const walkLower = walkText.toLowerCase();
+        const auroraLower = auroraId.toLowerCase();
+
+        let shouldHide = false;
+
+        // Hide based on text search
+        if (
+          searchLower &&
+          !walkLower.includes(searchLower) &&
+          !auroraLower.includes(searchLower)
+        ) {
+          shouldHide = true;
         }
 
-        // Update walks count badge
-        const walksCountBadge = walksContainer.querySelector('.walks-count');
-        if (walksCountBadge) {
-            walksCountBadge.textContent = sortedWalks.length;
+        // Hide based on Aurora IDs, unless it's in the list
+        if (auroraIds.length > 0 && !auroraIds.includes(auroraId)) {
+          shouldHide = true;
         }
 
-        // Create container for walkCards
-        walkListContainer.innerHTML = '<div class="walks-accordion" id="walksAccordion"></div>';
-        const walksAccordion = document.getElementById('walksAccordion');
+        if (shouldHide) {
+          walkCard.style.display = "none";
+        }
 
-        // Process all walks in parallel
-        const walkPromises = sortedWalks.map(async(walk, index) => {
-            try {
-                const walkText = walk.map((node) => node.id()).join(" → ");
-                const auroraId = await getWalkAuroraId(walk);
-
-                // Create a more appealing card for each walk
-                const walkCard = document.createElement("div");
-                walkCard.className = "walk-card";
-                walkCard.setAttribute('data-walk-text', walkText);
-                walkCard.setAttribute('data-aurora-id', auroraId);
-                walkCard.setAttribute('data-walk-index', index);
-
-                // Check if the walk should be visible based on search text and aurora IDs
-                const searchLower = searchText.trim().toLowerCase();
-                const walkLower = walkText.toLowerCase();
-                const auroraLower = auroraId.toLowerCase();
-
-                let shouldHide = false;
-                
-                // Hide based on text search
-                if (searchLower && !walkLower.includes(searchLower) && !auroraLower.includes(searchLower)) {
-                    shouldHide = true;
-                }
-                
-                // Hide based on Aurora IDs, unless it's in the list
-                if (auroraIds.length > 0 && !auroraIds.includes(auroraId)) {
-                    shouldHide = true;
-                }
-
-                if (shouldHide) {
-                    walkCard.style.display = 'none';
-                }
-
-                // Simplified display of the walk with copy feature, accordion for details
-                walkCard.innerHTML = `
+        // Simplified display of the walk with copy feature, accordion for details
+        walkCard.innerHTML = `
                     <div class="card mb-2">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <button class="btn btn-link btn-sm walk-toggle-btn" type="button" data-bs-toggle="collapse" 
                                     data-bs-target="#walk-${index}" aria-expanded="false" aria-controls="walk-${index}">
                                 <i class="bi bi-chevron-down chevron-icon"></i>
-                                Walk ${index + 1} <span class="badge bg-info ms-2">${walk.length} nodes</span>
+                                Walk ${
+                                  index + 1
+                                } <span class="badge bg-info ms-2">${
+          walk.length
+        } nodes</span>
                             </button>
                             <div class="btn-group btn-group-sm" role="group">
                                 <button class="btn btn-outline-primary highlight-walk-btn" title="Highlight this walk">
@@ -493,197 +515,229 @@ async function displayWalks(searchText = "", auroraIds = []) {
                     </div>
                 `;
 
-                return walkCard;
-            } catch (error) {
-                console.error(`Error processing walk ${index}:`, error);
-                return null;
-            }
-        });
+        return walkCard;
+      } catch (error) {
+        console.error(`Error processing walk ${index}:`, error);
+        return null;
+      }
+    });
 
-        // Wait for all walks to be processed
-        const walkCards = await Promise.all(walkPromises);
+    // Wait for all walks to be processed
+    const walkCards = await Promise.all(walkPromises);
 
-        // Clear loading indicator
-        walkListContainer.querySelector('.loading-walks') ? .remove();
+    // Clear loading indicator
+    walkListContainer.querySelector(".loading-walks")?.remove();
 
-        // Append only the non-null walk cards
-        if (walksAccordion) {
-            walkCards
-                .filter(card => card !== null)
-                .forEach(card => walksAccordion.appendChild(card));
+    // Append only the non-null walk cards
+    if (walksAccordion) {
+      walkCards
+        .filter((card) => card !== null)
+        .forEach((card) => walksAccordion.appendChild(card));
 
-            // Add event listeners to buttons after all cards are added
-            addWalkCardEventListeners();
+      // Add event listeners to buttons after all cards are added
+      addWalkCardEventListeners();
 
-            // Update count of visible walks based on search
-            updateVisibleWalksCount();
-        }
-
-    } catch (error) {
-        console.error("Error displaying walks:", error);
-        walksContainer.innerHTML += `
+      // Update count of visible walks based on search
+      updateVisibleWalksCount();
+    }
+  } catch (error) {
+    console.error("Error displaying walks:", error);
+    walksContainer.innerHTML += `
             <div class="alert alert-danger">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 Error displaying walks: ${error.message}
             </div>
         `;
-    }
+  }
 
-    // Add styles for the walks section
-    addWalksStyles();
+  // Add styles for the walks section
+  addWalksStyles();
 }
 
 // Function to handle Aurora IDs file upload
 async function handleAuroraIdsFileUpload() {
-    const fileInput = document.getElementById('auroraIdsFile');
-    
-    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-        window.showAlert("Please select a text file containing Aurora IDs.", "warning");
-        return;
+  const fileInput = document.getElementById("auroraIdsFile");
+
+  if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    window.showAlert(
+      "Please select a text file containing Aurora IDs.",
+      "warning"
+    );
+    return;
+  }
+
+  const file = fileInput.files[0];
+
+  try {
+    // Show a loading indicator
+    window.showAlert("Processing Aurora IDs file...", "info");
+
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "");
+
+    if (lines.length === 0) {
+      window.showAlert("No Aurora IDs found in the file.", "warning");
+      return;
     }
-    
-    const file = fileInput.files[0];
-    
-    try {
-        // Show a loading indicator
-        window.showAlert("Processing Aurora IDs file...", "info");
-        
-        const text = await file.text();
-        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-        
-        if (lines.length === 0) {
-            window.showAlert("No Aurora IDs found in the file.", "warning");
-            return;
-        }
-        
-        // Get the current search text
-        const searchInput = document.getElementById('walkSearch');
-        const searchText = searchInput ? searchInput.value : '';
-        
-        // Redisplay walks with the specified Aurora IDs
-        displayWalks(searchText, lines);
-        
-        window.showAlert(`Found ${lines.length} Aurora IDs in the file.`, "success");
-    } catch (error) {
-        console.error("Error reading Aurora IDs file:", error);
-        window.showAlert("Error reading the file. Please make sure it's a valid text file.", "danger");
-    }
+
+    // Get the current search text
+    const searchInput = document.getElementById("walkSearch");
+    const searchText = searchInput ? searchInput.value : "";
+
+    // Redisplay walks with the specified Aurora IDs
+    displayWalks(searchText, lines);
+
+    window.showAlert(
+      `Found ${lines.length} Aurora IDs in the file.`,
+      "success"
+    );
+  } catch (error) {
+    console.error("Error reading Aurora IDs file:", error);
+    window.showAlert(
+      "Error reading the file. Please make sure it's a valid text file.",
+      "danger"
+    );
+  }
 }
 
 // Function to filter walk cards based on search text and Aurora IDs
 function filterWalkCards(searchValue, auroraIds = []) {
-    document.querySelectorAll('.walk-card').forEach(card => {
-        const walkText = card.getAttribute('data-walk-text').toLowerCase();
-        const auroraId = card.getAttribute('data-aurora-id').toLowerCase();
-        
-        let shouldShow = true;
-        
-        // Filter by search text if provided
-        if (searchValue && !walkText.includes(searchValue) && !auroraId.includes(searchValue)) {
-            shouldShow = false;
-        }
-        
-        // Filter by Aurora IDs if provided
-        if (auroraIds.length > 0 && !auroraIds.includes(card.getAttribute('data-aurora-id'))) {
-            shouldShow = false;
-        }
-        
-        card.style.display = shouldShow ? '' : 'none';
-    });
-    
-    // Update the count of visible walks
-    updateVisibleWalksCount();
+  document.querySelectorAll(".walk-card").forEach((card) => {
+    const walkText = card.getAttribute("data-walk-text").toLowerCase();
+    const auroraId = card.getAttribute("data-aurora-id").toLowerCase();
+
+    let shouldShow = true;
+
+    // Filter by search text if provided
+    if (
+      searchValue &&
+      !walkText.includes(searchValue) &&
+      !auroraId.includes(searchValue)
+    ) {
+      shouldShow = false;
+    }
+
+    // Filter by Aurora IDs if provided
+    if (
+      auroraIds.length > 0 &&
+      !auroraIds.includes(card.getAttribute("data-aurora-id"))
+    ) {
+      shouldShow = false;
+    }
+
+    card.style.display = shouldShow ? "" : "none";
+  });
+
+  // Update the count of visible walks
+  updateVisibleWalksCount();
 }
 
 // Helper function to generate a visual representation of the path
 function generatePathVisualization(walk) {
-    let visualization = '<div class="path-nodes">';
+  let visualization = '<div class="path-nodes">';
 
-    walk.forEach((node, index) => {
-        const nodeData = node.data();
-        const displayName = (nodeData.name && nodeData.name !== nodeData.id) ?
-            nodeData.name : shortenNodeId(nodeData.id);
+  walk.forEach((node, index) => {
+    const nodeData = node.data();
+    const displayName =
+      nodeData.name && nodeData.name !== nodeData.id
+        ? nodeData.name
+        : shortenNodeId(nodeData.id);
 
-        visualization += `
-            <div class="path-node${index === 0 ? ' start-node' : (index === walk.length - 1 ? ' end-node' : '')}">
+    visualization += `
+            <div class="path-node${
+              index === 0
+                ? " start-node"
+                : index === walk.length - 1
+                ? " end-node"
+                : ""
+            }">
                 <div class="node-dot"></div>
-                <div class="node-label" title="${nodeData.id}">${displayName}</div>
-                ${index < walk.length - 1 ? '<div class="node-arrow"><i class="bi bi-arrow-right"></i></div>' : ''}
+                <div class="node-label" title="${
+                  nodeData.id
+                }">${displayName}</div>
+                ${
+                  index < walk.length - 1
+                    ? '<div class="node-arrow"><i class="bi bi-arrow-right"></i></div>'
+                    : ""
+                }
             </div>
         `;
-    });
+  });
 
-    visualization += '</div>';
-    return visualization;
+  visualization += "</div>";
+  return visualization;
 }
 
 // Helper function to shorten node IDs for better display
 function shortenNodeId(id) {
-    if (id.length > 20) {
-        return id.substring(0, 8) + '...' + id.substring(id.length - 8);
-    }
-    return id;
+  if (id.length > 20) {
+    return id.substring(0, 8) + "..." + id.substring(id.length - 8);
+  }
+  return id;
 }
 
 // Helper function to add event listeners to walk cards
 function addWalkCardEventListeners() {
-    // Highlight walk buttons
-    document.querySelectorAll('.highlight-walk-btn').forEach((btn, index) => {
-        btn.addEventListener('click', () => {
-            const walkIndex = btn.closest('.walk-card').getAttribute('data-walk-index') || index;
-            highlightWalk(STATE.walks[walkIndex]);
-            // Add visual feedback
-            btn.classList.add('active');
-            setTimeout(() => btn.classList.remove('active'), 1000);
-        });
+  // Highlight walk buttons
+  document.querySelectorAll(".highlight-walk-btn").forEach((btn, index) => {
+    btn.addEventListener("click", () => {
+      const walkIndex =
+        btn.closest(".walk-card").getAttribute("data-walk-index") || index;
+      highlightWalk(STATE.walks[walkIndex]);
+      // Add visual feedback
+      btn.classList.add("active");
+      setTimeout(() => btn.classList.remove("active"), 1000);
     });
+  });
 
-    // Copy Aurora ID buttons
-    document.querySelectorAll('.copy-aurora-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const auroraId = btn.closest('.walk-card').getAttribute('data-aurora-id');
-            navigator.clipboard.writeText(auroraId).then(() => {
-                // Add visual feedback
-                const originalIcon = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check"></i>';
-                btn.classList.add('btn-success');
-                setTimeout(() => {
-                    btn.innerHTML = originalIcon;
-                    btn.classList.remove('btn-success');
-                }, 1500);
-            });
-        });
+  // Copy Aurora ID buttons
+  document.querySelectorAll(".copy-aurora-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const auroraId = btn.closest(".walk-card").getAttribute("data-aurora-id");
+      navigator.clipboard.writeText(auroraId).then(() => {
+        // Add visual feedback
+        const originalIcon = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check"></i>';
+        btn.classList.add("btn-success");
+        setTimeout(() => {
+          btn.innerHTML = originalIcon;
+          btn.classList.remove("btn-success");
+        }, 1500);
+      });
     });
+  });
 
-    // Toggle buttons to animate chevron
-    document.querySelectorAll('.walk-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const chevron = btn.querySelector('.chevron-icon');
-            chevron.classList.toggle('rotated');
-        });
+  // Toggle buttons to animate chevron
+  document.querySelectorAll(".walk-toggle-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const chevron = btn.querySelector(".chevron-icon");
+      chevron.classList.toggle("rotated");
     });
+  });
 }
 
 // Helper function to update the count of visible walks
 function updateVisibleWalksCount() {
-    const visibleWalks = document.querySelectorAll('.walk-card[style="display: none;"]');
-    const totalWalks = document.querySelectorAll('.walk-card').length;
-    const visibleCount = totalWalks - visibleWalks.length;
+  const visibleWalks = document.querySelectorAll(
+    '.walk-card[style="display: none;"]'
+  );
+  const totalWalks = document.querySelectorAll(".walk-card").length;
+  const visibleCount = totalWalks - visibleWalks.length;
 
-    const walksCountBadge = document.querySelector('.walks-count');
-    if (walksCountBadge) {
-        walksCountBadge.textContent = `${visibleCount}/${totalWalks}`;
-    }
+  const walksCountBadge = document.querySelector(".walks-count");
+  if (walksCountBadge) {
+    walksCountBadge.textContent = `${visibleCount}/${totalWalks}`;
+  }
 }
 
 // Helper function to add styles for the walks section
 function addWalksStyles() {
-    // Check if styles are already added
-    if (document.getElementById('walks-styles')) return;
+  // Check if styles are already added
+  if (document.getElementById("walks-styles")) return;
 
-    const style = document.createElement('style');
-    style.id = 'walks-styles';
-    style.textContent = `
+  const style = document.createElement("style");
+  style.id = "walks-styles";
+  style.textContent = `
         .walks-header {
             padding: 10px 0;
             border-bottom: 1px solid #e5e5e5;
@@ -813,17 +867,17 @@ function addWalksStyles() {
         }
     `;
 
-    document.head.appendChild(style);
+  document.head.appendChild(style);
 }
 
 function highlightWalk(walk) {
-    // Reset any previously highlight nodes or edges
-    STATE.cy.elements().removeClass("highlightWalk");
+  // Reset any previously highlight nodes or edges
+  STATE.cy.elements().removeClass("highlightWalk");
 
-    walk.forEach((node, index) => {
-        node.addClass("highlightWalk");
-    });
-    STATE.cy.style().update();
+  walk.forEach((node, index) => {
+    node.addClass("highlightWalk");
+  });
+  STATE.cy.style().update();
 }
 
 // node data
@@ -848,61 +902,62 @@ function highlightWalk(walk) {
 // }
 // Function to calculate node ranking by PTC
 function calculateNodeRanking(cy) {
-    if (!cy) {
-        console.warn("No graph provided to calculateNodeRanking");
-        return [];
-    }
+  if (!cy) {
+    console.warn("No graph provided to calculateNodeRanking");
+    return [];
+  }
 
-    // Check if graph has nodes before getting the array
-    const nodes = cy.nodes().length > 0 ? cy.nodes().toArray() : [];
+  // Check if graph has nodes before getting the array
+  const nodes = cy.nodes().length > 0 ? cy.nodes().toArray() : [];
 
-    // If there are no nodes, return an empty array
-    if (nodes.length === 0) {
-        return [];
-    }
+  // If there are no nodes, return an empty array
+  if (nodes.length === 0) {
+    return [];
+  }
 
-    const ranking = nodes
-        .map(node => {
-            return {
-                id: node.id(),
-                name: node.data('name') || node.id(),
-                ptc: node.data('ptc') || 0,
-                class: node.data('class') || 'unknown'
-            };
-        })
-        .filter(node => node.ptc > 0)
-        .sort((a, b) => b.ptc - a.ptc);
+  const ranking = nodes
+    .map((node) => {
+      return {
+        id: node.id(),
+        name: node.data("name") || node.id(),
+        ptc: node.data("ptc") || 0,
+        class: node.data("class") || "unknown",
+      };
+    })
+    .filter((node) => node.ptc > 0)
+    .sort((a, b) => b.ptc - a.ptc);
 
-    return ranking;
+  return ranking;
 }
 
 // Function to update the node ranking modal
 function updateNodeRankingModal(cy) {
-    const ranking = calculateNodeRanking(cy);
-    const nodeRankingList = document.getElementById('nodeRankingList');
+  const ranking = calculateNodeRanking(cy);
+  const nodeRankingList = document.getElementById("nodeRankingList");
 
-    // Clear the current list
-    nodeRankingList.innerHTML = '';
+  // Clear the current list
+  nodeRankingList.innerHTML = "";
 
-    if (ranking.length === 0) {
-        nodeRankingList.innerHTML = '<li class="list-group-item">No nodes with PTC values found</li>';
-        return;
-    }
+  if (ranking.length === 0) {
+    nodeRankingList.innerHTML =
+      '<li class="list-group-item">No nodes with PTC values found</li>';
+    return;
+  }
 
-    // Add clear highlights button at the top
-    const clearButtonItem = document.createElement('li');
-    clearButtonItem.className = 'list-group-item d-flex justify-content-end';
-    clearButtonItem.innerHTML = `
+  // Add clear highlights button at the top
+  const clearButtonItem = document.createElement("li");
+  clearButtonItem.className = "list-group-item d-flex justify-content-end";
+  clearButtonItem.innerHTML = `
     <button class="btn btn-outline-secondary btn-sm" id="clearHighlights">
       <i class="bi bi-eraser"></i> Clear Highlights
     </button>
   `;
-    nodeRankingList.appendChild(clearButtonItem);
+  nodeRankingList.appendChild(clearButtonItem);
 
-    // Create header row
-    const headerItem = document.createElement('li');
-    headerItem.className = 'list-group-item active';
-    headerItem.innerHTML = `
+  // Create header row
+  const headerItem = document.createElement("li");
+  headerItem.className = "list-group-item active";
+  headerItem.innerHTML = `
     <div class="row">
       <div class="col-1"><strong>Rank</strong></div>
       <div class="col-4"><strong>Name</strong></div>
@@ -911,112 +966,114 @@ function updateNodeRankingModal(cy) {
       <div class="col-2"><strong>Action</strong></div>
     </div>
   `;
-    nodeRankingList.appendChild(headerItem);
+  nodeRankingList.appendChild(headerItem);
 
-    // Add each node to the list
-    ranking.forEach((node, index) => {
-        const listItem = document.createElement('li');
-        listItem.className = 'list-group-item';
-        listItem.innerHTML = `
+  // Add each node to the list
+  ranking.forEach((node, index) => {
+    const listItem = document.createElement("li");
+    listItem.className = "list-group-item";
+    listItem.innerHTML = `
       <div class="row">
         <div class="col-1">${index + 1}</div>
         <div class="col-4">${node.name}</div>
         <div class="col-3">${node.ptc.toFixed(4)}</div>
         <div class="col-2">${node.class}</div>
         <div class="col-2">
-          <button class="btn btn-sm btn-primary highlight-node" data-node-id="${node.id}">
+          <button class="btn btn-sm btn-primary highlight-node" data-node-id="${
+            node.id
+          }">
             Highlight
           </button>
         </div>
       </div>
     `;
-        nodeRankingList.appendChild(listItem);
-    });
+    nodeRankingList.appendChild(listItem);
+  });
 
-    // Add event listeners to highlight buttons
-    document.querySelectorAll('.highlight-node').forEach(button => {
-        button.addEventListener('click', event => {
-            const nodeId = event.currentTarget.getAttribute('data-node-id');
-            highlightNode(STATE.cy, nodeId);
-        });
+  // Add event listeners to highlight buttons
+  document.querySelectorAll(".highlight-node").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const nodeId = event.currentTarget.getAttribute("data-node-id");
+      highlightNode(STATE.cy, nodeId);
     });
+  });
 
-    // Add event listener for the clear highlights button
-    document.getElementById('clearHighlights').addEventListener('click', () => {
-        clearNodeHighlights(cy);
-    });
+  // Add event listener for the clear highlights button
+  document.getElementById("clearHighlights").addEventListener("click", () => {
+    clearNodeHighlights(cy);
+  });
 }
 
 // Function to highlight a specific node
 function highlightNode(cy, nodeId) {
-    // Find the node by ID
-    const node = cy.getElementById(nodeId);
+  // Find the node by ID
+  const node = cy.getElementById(nodeId);
 
-    if (node.length > 0) {
-        // Check if the node is already highlighted
-        const isAlreadyHighlighted = node.hasClass('highlighted');
+  if (node.length > 0) {
+    // Check if the node is already highlighted
+    const isAlreadyHighlighted = node.hasClass("highlighted");
 
-        if (isAlreadyHighlighted) {
-            console.log("Node is already highlighted, clearing highlights");
-            // If the node is already highlighted, clear all highlights
-            clearNodeHighlights(cy);
-        } else {
-            console.log("Highlighting node:", nodeId);
-            // Clear any existing highlights first
-            clearNodeHighlights(cy);
-
-            // Add highlighted class to the node
-            node.addClass('highlighted');
-
-            // Fade all other nodes and edges
-            cy.elements().difference(node).addClass('faded');
-
-            // Center the view on the highlighted node
-            cy.animate({
-                fit: {
-                    eles: node,
-                    padding: 50
-                },
-                duration: 500
-            });
-
-            // Update the info panel with node information
-            const infoContent = document.getElementById("infoContent");
-            if (infoContent) {
-                displayElementInfo(node, infoContent);
-            }
-        }
+    if (isAlreadyHighlighted) {
+      console.log("Node is already highlighted, clearing highlights");
+      // If the node is already highlighted, clear all highlights
+      clearNodeHighlights(cy);
     } else {
-        console.error("Node not found:", nodeId);
+      console.log("Highlighting node:", nodeId);
+      // Clear any existing highlights first
+      clearNodeHighlights(cy);
+
+      // Add highlighted class to the node
+      node.addClass("highlighted");
+
+      // Fade all other nodes and edges
+      cy.elements().difference(node).addClass("faded");
+
+      // Center the view on the highlighted node
+      cy.animate({
+        fit: {
+          eles: node,
+          padding: 50,
+        },
+        duration: 500,
+      });
+
+      // Update the info panel with node information
+      const infoContent = document.getElementById("infoContent");
+      if (infoContent) {
+        displayElementInfo(node, infoContent);
+      }
     }
+  } else {
+    console.error("Node not found:", nodeId);
+  }
 }
 
 // Function to clear all highlighting
 export function clearNodeHighlights(cy) {
-    console.log("Clearing all highlights");
+  console.log("Clearing all highlights");
 
-    // Check if cy exists before accessing its elements
-    if (!cy) {
-        console.warn("Cannot clear highlights: graph object is null");
-        return;
-    }
+  // Check if cy exists before accessing its elements
+  if (!cy) {
+    console.warn("Cannot clear highlights: graph object is null");
+    return;
+  }
 
-    // Remove highlighting classes from all elements
-    cy.elements().removeClass('highlighted');
-    cy.elements().removeClass('faded');
-    cy.elements().removeClass("highlightWalk"); // Also clear walk highlights
-    // Reset the view to fit all elements
-    cy.fit(cy.elements().filter(':visible'), 50);
+  // Remove highlighting classes from all elements
+  cy.elements().removeClass("highlighted");
+  cy.elements().removeClass("faded");
+  cy.elements().removeClass("highlightWalk"); // Also clear walk highlights
+  // Reset the view to fit all elements
+  cy.fit(cy.elements().filter(":visible"), 50);
 }
 
 // Add a global event listener for the escape key to clear highlights
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        clearNodeHighlights(STATE.cy);
-    }
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    clearNodeHighlights(STATE.cy);
+  }
 });
 
 // Event listener for the node ranking button
-document.getElementById('showNodeRanking').addEventListener('click', () => {
-    updateNodeRankingModal(STATE.cy); // Use STATE.cy instead of just cy
+document.getElementById("showNodeRanking").addEventListener("click", () => {
+  updateNodeRankingModal(STATE.cy); // Use STATE.cy instead of just cy
 });
