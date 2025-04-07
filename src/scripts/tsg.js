@@ -1,4 +1,4 @@
-import * as wasm from "./pkg/tsg_core_js.js";
+import * as wasm from "../assets/pkg/tsg_core_js.js";
 
 async function run() {
   const wasmModule = await wasm.default();

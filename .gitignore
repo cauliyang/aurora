@@ -18,3 +18,5 @@ aurora
 .parcel-cache
 dist
 public
+# Make sure WebAssembly files are included in git
+!./src/assets/pkg/
