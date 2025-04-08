@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2025-04-08
+
+### 🚀 Features
+
+- Add initial project changelog and configuration files
+- Add svgo dependency
+- Add functions to rank nodes by property, degree, and centrality in graph.js
+- Add clear highlights button functionality and enhance graph styles
+- Enhance tooltip functionality with improved styling and content display
+- Update walks panel with enhanced search functionality and loading placeholder
+- Add gene annotation functionality and enhance graph data structure
+- Implement global alert utility and update script loading order
+- Integrate Bootstrap for improved styling and enhance gene file upload functionality
+- Refactor gene annotation modal functionality and improve file upload handling
+- Enhance footer layout and styling with Bootstrap for improved user experience
+- Remove duplicated DOMContentLoaded event listener and streamline gene data loading process
+- Add support for raw text file transformation and update gene data loading mechanism
+- Remove duplicated DOMContentLoaded event listener and clean up gene data parsing logic
+- Enhance gene annotation data structure and improve node rendering logic
+- Expose STATE object to the global window for accessibility in graph layout changes
+- Enhance JSON editor with new styling, mode selection, and keyboard shortcuts
+- Add Aurora IDs file upload functionality and enhance walk filtering
+- Add window.showAlert function to alertUtils
+
+### 🐛 Bug Fixes
+
+- Improve highlightNode function to handle existing highlights and node not found errors
+
+### 💼 Other
+
+- Update actions/cache version to v4
+
+### 🚜 Refactor
+
+- Update toggleLabels function to use getLabelsVisible and setLabelsVisible
+- Update walk sorting logic in displayWalks function
+- Update highlight functionality and improve graph styling
+- Sort overlapping genes by overlap percentage
+- Update label data attributes to use 'id' instead of 'name' and 'weight'
+
+### 🎨 Styling
+
+- Improve code formatting in app.html
+- Update button classes and add data attribute and onclick handler
+- Clean up comments and formatting in graph.js
+
+### ⚙️ Miscellaneous Tasks
+
+- Update pre-commit hooks and button tooltip status
+
 ## [1.0.0] - 2025-01-14
 
 ### 🚀 Features
