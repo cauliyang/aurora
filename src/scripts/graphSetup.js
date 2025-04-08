@@ -48,7 +48,7 @@ export function initializeGraph(graphData) {
 
   let edge_label = function (ele) {
     if (!getLabelsVisible()) return "";
-    return ele.data("name") ? ele.data("name") : ele.data("id");
+    return ele.data("weight") ? ele.data("weight") : "";
   };
 
   STATE.cy = cytoscape({

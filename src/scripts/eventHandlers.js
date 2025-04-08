@@ -45,7 +45,7 @@ function toggleLabels() {
     : "";
   const edgeLabelStyle = !getLabelsVisible()
     ? function (ele) {
-        return ele.data("name") || ele.data("id");
+        return ele.data("weight") ? ele.data("weight") : "";
       }
     : "";
 
