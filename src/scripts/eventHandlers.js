@@ -95,12 +95,27 @@ function handleFileUpload(event) {
         const jsonData = JSON.parse(content);
         console.log("Loaded JSON data:", jsonData);
         loadGraphDataFromServer(jsonData);
+
+        // Hide graph selector for single JSON files
+        document.getElementById("graphSelectorContainer").style.display =
+          "none";
       } else if (fileExtension === "tsg") {
         // Handle TSG file
         console.log("Loaded TSG data");
         // wait for the result from promise
         STATE.graph_jsons = await window.parse_tsgFile(content);
         console.log(`Number of graph JSONs: ${STATE.graph_jsons.length}`);
+
+        // Show graph selector if multiple graphs are available
+        const graphCount = STATE.graph_jsons.length;
+        if (graphCount > 1) {
+          setupGraphSelector(graphCount);
+        } else {
+          document.getElementById("graphSelectorContainer").style.display =
+            "none";
+        }
+
+        // Load the first graph by default
         const jsonData = JSON.parse(STATE.graph_jsons[0]);
         loadGraphDataFromServer(jsonData);
       }
@@ -111,6 +126,50 @@ function handleFileUpload(event) {
     }
   };
   reader.readAsText(file);
+}
+
+/**
+ * Sets up the graph selector dropdown with options based on the number of available graphs
+ * @param {number} graphCount - The number of available graphs
+ */
+function setupGraphSelector(graphCount) {
+  const graphSelect = document.getElementById("graphSelect");
+  const graphSelectorContainer = document.getElementById(
+    "graphSelectorContainer"
+  );
+
+  // Clear existing options
+  graphSelect.innerHTML = "";
+
+  // Add options for each graph
+  for (let i = 0; i < graphCount; i++) {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = `Graph ${i + 1}`;
+    graphSelect.appendChild(option);
+  }
+
+  // Show the selector
+  graphSelectorContainer.style.display = "block";
+
+  // Add event listener for graph selection
+  graphSelect.addEventListener("change", function () {
+    const selectedIndex = parseInt(this.value);
+    if (STATE.graph_jsons && STATE.graph_jsons.length > selectedIndex) {
+      try {
+        // Parse and load the selected graph
+        const jsonData = JSON.parse(STATE.graph_jsons[selectedIndex]);
+        loadGraphDataFromServer(jsonData);
+        window.showAlert(`Loaded graph ${selectedIndex + 1}`, "success", 2000);
+      } catch (error) {
+        console.error("Error loading selected graph:", error);
+        window.showAlert(
+          `Error loading graph ${selectedIndex + 1}: ${error.message}`,
+          "error"
+        );
+      }
+    }
+  });
 }
 
 // Add the clear highlights button event handler
