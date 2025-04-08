@@ -139,3 +139,61 @@ a:hover,
     display: flex;
     align-items: center;
 }
+
+/* Responsive toolbar styles */
+.toolbar-responsive {
+  max-height: none;
+  transition: max-height 0.3s ease;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Collapsed state for toolbar on mobile */
+.toolbar-collapsed {
+  max-height: 48px;
+  overflow: hidden;
+}
+
+/* Make scrollbar less obtrusive but still visible */
+.toolbar-responsive::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.toolbar-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.toolbar-responsive::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.toolbar-responsive::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Ensure input groups are nicely sized in the toolbar */
+.toolbar-responsive .input-group-text, .toolbar-responsive .form-select, .toolbar-responsive .form-control {
+  font-size: 0.9rem;
+}
+
+/* Add a subtle transition effect for smoother UX */
+.toolbar-responsive .btn-group,
+.toolbar-responsive .input-group {
+  transition: opacity 0.2s ease;
+}
+
+/* Make sure buttons and inputs don't get too small on small screens */
+@media (max-width: 768px) {
+  .toolbar-responsive .btn,
+  .toolbar-responsive .input-group-text,
+  .toolbar-responsive .form-select,
+  .toolbar-responsive .form-control {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}

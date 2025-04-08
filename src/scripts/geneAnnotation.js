@@ -353,10 +353,8 @@ export function annotateNode(node) {
     );
 
     // Add the first gene name as a node label if not set or if it's the same as the ID
-    if (!nodeData.name || nodeData.name === nodeData.id) {
-      const primaryGene = overlappingGenes[0];
-      node.data("name", primaryGene.geneName);
-    }
+    const primaryGene = overlappingGenes[0];
+    node.data("name", primaryGene.geneName);
   }
 
   console.log(

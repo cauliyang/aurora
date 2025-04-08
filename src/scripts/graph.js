@@ -21,6 +21,7 @@ cytoscape.use(spread);
 export const STATE = {
   cy: null,
   walks: [],
+  graph_jsons: [],
   minEdgeWeight: 1,
   minPathLength: 1,
   maxPathLength: 900,
