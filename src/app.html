@@ -94,15 +94,19 @@
 
     <div class="container-fluid h-100 p-3">
       <div class="row h-100">
-        <div class="col-12 position-relative mb-2">
+        <!-- Replace the absolute positioned toolbar with a responsive one -->
+        <div class="col-12 mb-3">
           <div
-            class="btn-toolbar"
-            style="position: absolute; top: 10px; left: 10px; z-index: 1"
+            class="btn-toolbar toolbar-responsive flex-wrap overflow-auto py-1"
             role="toolbar"
             aria-label="Toolbar with button groups"
           >
-            <!-- ... (your button and form elements remain unchanged) ... -->
-            <div class="btn-group me-2" role="group" aria-label="First group">
+            <!-- First button group remains the same -->
+            <div
+              class="btn-group me-2 mb-2"
+              role="group"
+              aria-label="First group"
+            >
               <button
                 id="toggleMaximize"
                 class="btn btn-outline-primary"
@@ -184,7 +188,7 @@
             </div>
 
             <!-- Layout Selection -->
-            <div class="btn-group me-2" role="group">
+            <div class="btn-group me-2 mb-2" role="group">
               <select id="layoutSelect" class="form-select w-auto">
                 <option value="dagre">DAG Layout</option>
                 <option value="grid">Grid Layout</option>
@@ -211,7 +215,7 @@
             <!-- Graph Selection Dropdown - Initially hidden -->
             <div
               id="graphSelectorContainer"
-              class="d-inline-flex align-items-center me-2"
+              class="d-inline-flex align-items-center me-2 mb-2"
               style="display: none"
             >
               <div class="input-group" style="height: 38px">
@@ -231,9 +235,13 @@
               </div>
             </div>
 
-            <div id="liveAlertPlaceholder"></div>
+            <div id="liveAlertPlaceholder" class="mb-2"></div>
 
-            <div class="input-group me-1">
+            <!-- Input parameters group -->
+            <div
+              class="input-group me-2 mb-2 flex-nowrap"
+              style="max-width: 100%; overflow-x: auto"
+            >
               <span class="input-group-text" id="inputGroup-sizing-default"
                 >MinEdge</span
               >
@@ -242,11 +250,8 @@
                 id="minEdgeWeight"
                 class="form-control"
                 placeholder="weight"
-                ,
                 value="1"
-                ,
                 min="1"
-                ,
                 style="width: 80px"
               />
 
@@ -258,11 +263,8 @@
                 id="MinDepth"
                 class="form-control"
                 placeholder="depth"
-                ,
                 value="2"
-                ,
                 min="2"
-                ,
                 style="width: 80px"
               />
 
@@ -274,20 +276,14 @@
                 id="MaxDepth"
                 class="form-control"
                 placeholder="depth"
-                ,
                 value="900"
-                ,
                 min="2"
-                ,
                 style="width: 80px"
               />
             </div>
 
-            <!-- <div class="input-group me-1"> -->
-            <!-- </div> -->
-
-            <!-- !-- JSON Editor and IGV Buttons -->
-            <div class="btn-group" role="group">
+            <!-- JSON Editor and IGV Buttons -->
+            <div class="btn-group mb-2" role="group">
               <button id="openJsonEditor" type="button" class="btn btn-primary">
                 <i class="bi bi-code-square"></i>
               </button>
@@ -299,7 +295,7 @@
                   style="width: 20px; height: 20px"
                 />
               </button>
-              <!-- New button for node ranking -->
+              <!-- Node ranking button -->
               <button
                 id="showNodeRanking"
                 type="button"
@@ -310,6 +306,15 @@
                 <i class="bi bi-list-ol"></i> Node Ranking
               </button>
             </div>
+
+            <!-- Toolbar collapse toggle button for very small screens -->
+            <button
+              class="btn btn-sm btn-outline-secondary d-md-none mb-2 ms-auto"
+              type="button"
+              id="collapseToolbarBtn"
+            >
+              <i class="bi bi-chevron-up"></i>
+            </button>
           </div>
         </div>
 

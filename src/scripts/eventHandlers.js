@@ -13,24 +13,28 @@ const walksPanel = document.getElementById("walks");
 const maximizeButton = document.getElementById("toggleMaximize");
 let isMaximized = false;
 
-// Add click event listener to the maximize button
-maximizeButton.addEventListener("click", () => {
-  if (isMaximized) {
-    // Restore previous layout
-    cyContainer.style.width = "";
-    cyContainer.style.height = "";
-    infoPanel.style.display = "";
-    walksPanel.style.display = "";
-    isMaximized = false;
-  } else {
-    // Maximize cy panel
-    cyContainer.style.width = "100%";
-    cyContainer.style.height = "100vh";
-    infoPanel.style.display = "none";
-    walksPanel.style.display = "none";
-    isMaximized = true;
-  }
-});
+// Add click event listener to the maximize button only if it exists
+if (maximizeButton) {
+  maximizeButton.addEventListener("click", () => {
+    if (isMaximized) {
+      // Restore previous layout
+      cyContainer.style.width = "";
+      cyContainer.style.height = "";
+      infoPanel.style.display = "";
+      walksPanel.style.display = "";
+      isMaximized = false;
+    } else {
+      // Maximize cy panel
+      cyContainer.style.width = "100%";
+      cyContainer.style.height = "100vh";
+      infoPanel.style.display = "none";
+      walksPanel.style.display = "none";
+      isMaximized = true;
+    }
+  });
+} else {
+  console.warn("Element with ID 'toggleMaximize' not found in the DOM");
+}
 
 function toggleLabels() {
   // Update labelsVisible state
@@ -51,32 +55,51 @@ function toggleLabels() {
   setLabelsVisible(!getLabelsVisible());
 }
 
-document.getElementById("hiddenLabel").addEventListener("click", toggleLabels);
+// Add a null check before attaching the event listener
+const hiddenLabelBtn = document.getElementById("hiddenLabel");
+if (hiddenLabelBtn) {
+  hiddenLabelBtn.addEventListener("click", toggleLabels);
+} else {
+  console.warn("Element with ID 'hiddenLabel' not found in the DOM");
+}
 
-document.getElementById("captureGraph").addEventListener("click", () => {
-  // Get the base64 representation of the graph
-  const base64Image = STATE.cy.png();
+const captureGraphBtn = document.getElementById("captureGraph");
+if (captureGraphBtn) {
+  captureGraphBtn.addEventListener("click", () => {
+    // Get the base64 representation of the graph
+    const base64Image = STATE.cy.png();
 
-  // Create a new anchor element to enable downloading
-  const downloadLink = document.createElement("a");
-  downloadLink.href = base64Image;
-  downloadLink.download = "graph_capture.png";
+    // Create a new anchor element to enable downloading
+    const downloadLink = document.createElement("a");
+    downloadLink.href = base64Image;
+    downloadLink.download = "graph_capture.png";
 
-  // Trigger the download
-  downloadLink.click();
-});
+    // Trigger the download
+    downloadLink.click();
+  });
+} else {
+  console.warn("Element with ID 'captureGraph' not found in the DOM");
+}
 
-document.getElementById("redirectToIgv").addEventListener("click", () => {
-  window.open("igv.html", "_blank");
-});
+const redirectToIgvBtn = document.getElementById("redirectToIgv");
+if (redirectToIgvBtn) {
+  redirectToIgvBtn.addEventListener("click", () => {
+    window.open("igv.html", "_blank");
+  });
+} else {
+  console.warn("Element with ID 'redirectToIgv' not found in the DOM");
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   resizePanels();
 });
 
-document
-  .getElementById("uploadInput")
-  .addEventListener("change", handleFileUpload);
+const uploadInput = document.getElementById("uploadInput");
+if (uploadInput) {
+  uploadInput.addEventListener("change", handleFileUpload);
+} else {
+  console.warn("Element with ID 'uploadInput' not found in the DOM");
+}
 
 function handleFileUpload(event) {
   const file = event.target.files[0];
@@ -173,14 +196,19 @@ function setupGraphSelector(graphCount) {
 }
 
 // Add the clear highlights button event handler
-document.getElementById("clearHighlights").addEventListener("click", () => {
-  clearNodeHighlights(STATE.cy);
-});
+const clearHighlightsBtn = document.getElementById("clearHighlights");
+if (clearHighlightsBtn) {
+  clearHighlightsBtn.addEventListener("click", () => {
+    clearNodeHighlights(STATE.cy);
+  });
+} else {
+  console.warn("Element with ID 'clearHighlights' not found in the DOM");
+}
 
 // Gene annotation direct action (if modal doesn't work for some reason)
-document
-  .getElementById("geneAnnotationBtn")
-  .addEventListener("click", async (e) => {
+const geneAnnotationBtn = document.getElementById("geneAnnotationBtn");
+if (geneAnnotationBtn) {
+  geneAnnotationBtn.addEventListener("click", async (e) => {
     // Direct annotation without modal
     if (e.ctrlKey || !window.bootstrap) {
       e.preventDefault();
@@ -201,6 +229,9 @@ document
       }
     }
   });
+} else {
+  console.warn("Element with ID 'geneAnnotationBtn' not found in the DOM");
+}
 
 /**
  * Handle direct gene annotation when modal is unavailable
@@ -258,3 +289,45 @@ if (
 ) {
   window.handleAuroraIdsFileUpload = handleAuroraIdsFileUpload;
 }
+
+// Add event handler for toolbar collapse toggle on mobile devices
+document.addEventListener("DOMContentLoaded", function () {
+  const collapseToolbarBtn = document.getElementById("collapseToolbarBtn");
+  const toolbar = document.querySelector(".toolbar-responsive");
+
+  if (collapseToolbarBtn && toolbar) {
+    // Default to collapsed state on small screens
+    if (window.innerWidth < 768) {
+      toolbar.classList.add("toolbar-collapsed");
+      collapseToolbarBtn.innerHTML = '<i class="bi bi-chevron-down"></i>';
+    }
+
+    collapseToolbarBtn.addEventListener("click", function () {
+      toolbar.classList.toggle("toolbar-collapsed");
+
+      // Update the icon based on collapsed state
+      if (toolbar.classList.contains("toolbar-collapsed")) {
+        collapseToolbarBtn.innerHTML = '<i class="bi bi-chevron-down"></i>';
+      } else {
+        collapseToolbarBtn.innerHTML = '<i class="bi bi-chevron-up"></i>';
+      }
+    });
+  }
+});
+
+// Also handle window resize events to maintain UI consistency
+window.addEventListener("resize", function () {
+  const toolbar = document.querySelector(".toolbar-responsive");
+  const collapseToolbarBtn = document.getElementById("collapseToolbarBtn");
+
+  if (toolbar && collapseToolbarBtn) {
+    if (window.innerWidth >= 768) {
+      // On larger screens, always expand toolbar
+      toolbar.classList.remove("toolbar-collapsed");
+    } else if (!toolbar.classList.contains("toolbar-collapsed")) {
+      // On smaller screens, collapse by default if not already collapsed
+      toolbar.classList.add("toolbar-collapsed");
+      collapseToolbarBtn.innerHTML = '<i class="bi bi-chevron-down"></i>';
+    }
+  }
+});
