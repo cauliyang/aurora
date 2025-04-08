@@ -38,8 +38,16 @@ if (maximizeButton) {
 
 function toggleLabels() {
   // Update labelsVisible state
-  const nodelabelStyle = !getLabelsVisible() ? "data(id)" : ""; // Toggles between showing the name and showing nothing
-  const edgeLabelStyle = !getLabelsVisible() ? "data(id)" : ""; // Toggles between showing the weight and showing nothing
+  const nodelabelStyle = !getLabelsVisible()
+    ? function (ele) {
+        return ele.data("name") || ele.data("id");
+      }
+    : "";
+  const edgeLabelStyle = !getLabelsVisible()
+    ? function (ele) {
+        return ele.data("name") || ele.data("id");
+      }
+    : "";
 
   STATE.cy
     .style()

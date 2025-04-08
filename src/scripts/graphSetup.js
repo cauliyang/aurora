@@ -41,8 +41,15 @@ export function initializeGraph(graphData) {
     .mode("lch")
     .colors(maxWeight);
 
-  let node_label = getLabelsVisible() ? "data(id)" : "";
-  let edge_label = getLabelsVisible() ? "data(id)" : "";
+  let node_label = function (ele) {
+    if (!getLabelsVisible()) return "";
+    return ele.data("name") ? ele.data("name") : ele.data("id");
+  };
+
+  let edge_label = function (ele) {
+    if (!getLabelsVisible()) return "";
+    return ele.data("name") ? ele.data("name") : ele.data("id");
+  };
 
   STATE.cy = cytoscape({
     container: document.getElementById("cy"),
