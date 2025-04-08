@@ -98,11 +98,10 @@ function handleFileUpload(event) {
       } else if (fileExtension === "tsg") {
         // Handle TSG file
         console.log("Loaded TSG data");
-
         // wait for the result from promise
-        const graph_jsons = await window.parse_tsgFile(content);
-        console.log(`Number of graph JSONs: ${graph_jsons.length}`);
-        const jsonData = JSON.parse(graph_jsons[0]);
+        STATE.graph_jsons = await window.parse_tsgFile(content);
+        console.log(`Number of graph JSONs: ${STATE.graph_jsons.length}`);
+        const jsonData = JSON.parse(STATE.graph_jsons[0]);
         loadGraphDataFromServer(jsonData);
       }
     } catch (error) {
