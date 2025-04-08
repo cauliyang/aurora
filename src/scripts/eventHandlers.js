@@ -85,7 +85,7 @@ function handleFileUpload(event) {
 
   const reader = new FileReader();
 
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     const content = e.target.result;
     const fileExtension = file.name.split(".").pop().toLowerCase();
 
@@ -98,10 +98,15 @@ function handleFileUpload(event) {
       } else if (fileExtension === "tsg") {
         // Handle TSG file
         console.log("Loaded TSG data");
-        let graph_jsons = window.parse_tsgFile(content);
-        console.log("Loaded TSG data:", graph_jsons[0]);
-      } else {
-        throw new Error(`Unsupported file format: ${fileExtension}`);
+
+        // wait for the result from promise
+        const graph_jsons = await window.parse_tsgFile(content);
+
+        // print the first element of graph_jsons
+        console.log(graph_jsons[0]);
+        console.log(`Number of graph JSONs: ${graph_jsons.length}`);
+        const jsonData = JSON.parse(graph_jsons[0]);
+        loadGraphDataFromServer(jsonData);
       }
     } catch (error) {
       console.error("Error processing file:", error);

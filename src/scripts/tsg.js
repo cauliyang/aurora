@@ -9,9 +9,7 @@ async function parse_tsgFile(fileContent) {
   // Parse the TSG file content
   // This is a placeholder function. You need to implement the actual parsing logic.
   console.log("Parsing TSG file content:", fileContent);
-
   await load_wasm();
-
   let summary = wasm.load_graph(fileContent);
   console.log("Parsed summary:", summary);
   return summary; // Return parsed data
