@@ -110,7 +110,7 @@ class HelpGuide {
     // Load guide progress from local storage
     this.loadProgress();
 
-    // Add help button to the navbar
+    // Add help button to the navbar - modified to place button in left navbar
     this.addHelpButton();
 
     // Show welcome message for first-time visitors
@@ -189,20 +189,42 @@ class HelpGuide {
 
   /**
    * Add a help button to the navbar for users to start the guide
+   * Now placing it after the "What's New" link
    */
   addHelpButton() {
-    const navbarRight = document.querySelector(
-      ".navbar .d-flex.align-items-center"
-    );
-    if (navbarRight) {
-      const helpButton = document.createElement("button");
-      helpButton.id = "helpGuideButton";
-      helpButton.className = "btn btn-outline-primary ms-2";
-      helpButton.title = "Start Help Guide";
-      helpButton.innerHTML = '<i class="bi bi-question-circle"></i>';
-      helpButton.addEventListener("click", () => this.startGuide());
+    // Find the "What's New" nav item
+    const whatsNewNavItem = document.getElementById("showReleaseNotesBtn");
 
-      navbarRight.prepend(helpButton);
+    if (whatsNewNavItem) {
+      // Create a new nav item for the help guide
+      const helpNavItem = document.createElement("li");
+      helpNavItem.className = "nav-item";
+
+      // Create the help button with nav-link styling to match other navbar links
+      const helpButton = document.createElement("a");
+      helpButton.id = "helpGuideButton";
+      helpButton.className = "nav-link";
+      helpButton.href = "#";
+      helpButton.title = "Start Help Guide";
+      helpButton.innerHTML = '<i class="bi bi-question-circle"></i> Help';
+      helpButton.addEventListener("click", (e) => {
+        e.preventDefault(); // Prevent default link behavior
+        this.startGuide();
+      });
+
+      // Add the button to the nav item
+      helpNavItem.appendChild(helpButton);
+
+      // Find the parent ul of whatsNewNavItem
+      const navParent = whatsNewNavItem.closest("ul");
+
+      // Get the list item containing the "What's New" link
+      const whatsNewLi = whatsNewNavItem.closest("li");
+
+      // Insert the help nav item after the "What's New" nav item
+      if (whatsNewLi && navParent) {
+        navParent.insertBefore(helpNavItem, whatsNewLi.nextSibling);
+      }
     }
   }
 
