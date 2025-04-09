@@ -173,72 +173,116 @@ class HelpGuide {
   }
 
   /**
-   * Show welcome modal for first-time visitors
+   * Show welcome message for first-time visitors
+   * Now displays in the left bottom corner of the screen
    */
   showWelcomeIfFirstVisit() {
     const hasVisitedBefore = localStorage.getItem("auroraHelpGuideWelcomeSeen");
 
     if (!hasVisitedBefore) {
-      // Create modal using Bootstrap
-      const modalHtml = `
-                <div class="modal fade"" id="welcomeHelpModal" tabindex="-1" aria-labelledby="welcomeHelpModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title" id="welcomeHelpModalLabel">
-                                    <i class="bi bi-info-circle me-2"></i> Welcome to Aurora!
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p class="mb-3">We've added an interactive help guide to help you learn how to use Aurora.</p>
-                                <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                                    <i class="bi bi-question-circle text-primary me-3" style="font-size: 2rem;"></i>
-                                    <div>
-                                        <strong>Help Guide Button</strong>
-                                        <p class="mb-0">Click this button in the top right corner anytime you need help.</p>
-                                    </div>
-                                </div>
-                                <p>The guide will walk you through all the features and functions available in Aurora.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Remind Me Later</button>
-                                <button type="button" class="btn btn-primary" id="startHelpGuideBtn">
-                                    <i class="bi bi-question-circle me-2"></i> Start Help Guide
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+      // Create a welcome toast instead of a modal
+      const toastHtml = `
+        <div class="help-guide-welcome-toast">
+          <div class="help-guide-welcome-header">
+            <i class="bi bi-question-circle text-primary me-2"></i>
+            <strong>Welcome to Aurora!</strong>
+            <button class="help-guide-welcome-close">&times;</button>
+          </div>
+          <div class="help-guide-welcome-body">
+            <p>We've added an interactive help guide to help you learn how to use Aurora.</p>
+            <p class="mb-2">Click the Help link in the navbar to start the interactive tour.</p>
+            <button class="btn btn-sm btn-primary w-100" id="startWelcomeHelpBtn">
+              <i class="bi bi-question-circle me-2"></i> Start Help Guide
+            </button>
+          </div>
+        </div>
+      `;
 
-      // Append modal to body
-      const modalContainer = document.createElement("div");
-      modalContainer.innerHTML = modalHtml;
-      document.body.appendChild(modalContainer);
+      // Add CSS for the welcome toast
+      const style = document.createElement("style");
+      style.textContent = `
+        .help-guide-welcome-toast {
+          position: fixed;
+          bottom: 20px;
+          left: 20px;
+          width: 320px;
+          background-color: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          border-radius: 6px;
+          z-index: 9999;
+          overflow: hidden;
+          animation: slideInUp 0.4s ease-out;
+        }
+        
+        .help-guide-welcome-header {
+          display: flex;
+          align-items: center;
+          padding: 12px 15px;
+          background-color: #f8f9fa;
+          border-bottom: 1px solid #dee2e6;
+        }
+        
+        .help-guide-welcome-close {
+          margin-left: auto;
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          line-height: 1;
+          cursor: pointer;
+          color: #6c757d;
+        }
+        
+        .help-guide-welcome-body {
+          padding: 15px;
+        }
+        
+        @keyframes slideInUp {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `;
+      document.head.appendChild(style);
 
-      // Show modal after a short delay to ensure it's rendered after page load
+      // Append toast to body
+      const toastContainer = document.createElement("div");
+      toastContainer.innerHTML = toastHtml;
+      document.body.appendChild(toastContainer);
+
+      // Add event listeners
+      document
+        .querySelector(".help-guide-welcome-close")
+        .addEventListener("click", () => {
+          document.querySelector(".help-guide-welcome-toast").remove();
+          localStorage.setItem("auroraHelpGuideWelcomeSeen", "true");
+        });
+
+      document
+        .getElementById("startWelcomeHelpBtn")
+        .addEventListener("click", () => {
+          document.querySelector(".help-guide-welcome-toast").remove();
+          localStorage.setItem("auroraHelpGuideWelcomeSeen", "true");
+          this.startGuide();
+        });
+
+      // Auto-hide after 30 seconds if not interacted with
       setTimeout(() => {
-        const welcomeModal = new bootstrap.Modal(
-          document.getElementById("welcomeHelpModal")
-        );
-        welcomeModal.show();
-
-        // Add event listener to the start guide button
-        document
-          .getElementById("startHelpGuideBtn")
-          .addEventListener("click", () => {
-            welcomeModal.hide();
-            this.startGuide();
-          });
-
-        // Mark as seen when modal is closed
-        document
-          .getElementById("welcomeHelpModal")
-          .addEventListener("hidden.bs.modal", () => {
-            localStorage.setItem("auroraHelpGuideWelcomeSeen", "true");
-          });
-      }, 1000);
+        const toast = document.querySelector(".help-guide-welcome-toast");
+        if (toast) {
+          toast.style.animation = "slideInUp 0.4s ease-out reverse";
+          setTimeout(() => {
+            if (toast.parentNode) {
+              toast.remove();
+              localStorage.setItem("auroraHelpGuideWelcomeSeen", "true");
+            }
+          }, 400);
+        }
+      }, 30000);
     }
   }
 
