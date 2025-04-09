@@ -6,6 +6,30 @@
 class HelpGuide {
   constructor() {
     this.helpSteps = [
+      // Panel help messages first
+      {
+        target: "#cy",
+        title: "Graph Visualization Panel",
+        content:
+          "This is the main graph visualization area. Here you can interact with your graph: zoom in/out, pan, select nodes and edges, and visualize your data structure. You can click and drag nodes to rearrange them manually.",
+        placement: "left",
+      },
+      {
+        target: "#info",
+        title: "Information Panel",
+        content:
+          "When you select a node or edge in the graph, detailed information about that element will be displayed here. This panel shows properties, metrics, and other attributes associated with the selected element.",
+        placement: "left",
+      },
+      {
+        target: "#walks",
+        title: "Graph Walks Panel",
+        content:
+          "This panel displays all walks (paths) in your graph. You can search for specific walks, highlight them in the graph visualization, and upload Aurora IDs for batch searching. Walks provide important connectivity information in your graph structure.",
+        placement: "left",
+      },
+
+      // Button help messages next
       {
         target: "#toggleMaximize",
         title: "Toggle Fullscreen",
@@ -67,6 +91,37 @@ class HelpGuide {
           "Choose different layout algorithms to organize your graph in various ways.",
         placement: "bottom",
       },
+
+      // Graph selection and filtering parameters
+      {
+        target: "#graphSelectorContainer",
+        title: "Graph Selector",
+        content:
+          "If your data contains multiple graphs, you can switch between them using this dropdown menu. Each graph represents a different dataset or view that you can analyze independently.",
+        placement: "bottom",
+      },
+      {
+        target: "#minEdgeWeight",
+        title: "Minimum Edge Weight",
+        content:
+          "Filter the graph by setting the minimum weight for edges. Edges with weights below this value will be hidden, allowing you to focus on the strongest connections in your graph.",
+        placement: "bottom",
+      },
+      {
+        target: "#MinDepth",
+        title: "Minimum Depth",
+        content:
+          "Set the minimum depth for graph traversal. This limits the graph to only show paths that have at least this many edges, helping to filter out shallow or less significant paths.",
+        placement: "bottom",
+      },
+      {
+        target: "#MaxDepth",
+        title: "Maximum Depth",
+        content:
+          "Set the maximum depth for graph traversal. This prevents the graph from showing excessively long paths, making the visualization more manageable and focused on the most relevant connections.",
+        placement: "bottom",
+      },
+
       {
         target: "#openJsonEditor",
         title: "JSON Editor",
