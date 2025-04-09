@@ -197,3 +197,97 @@ a:hover,
     padding-right: 0.5rem;
   }
 }
+
+/* Help Guide Styles */
+.help-guide-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.help-guide-tooltip {
+  position: absolute;
+  z-index: 9999;
+  background-color: white;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 16px;
+  max-width: 320px;
+  pointer-events: auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.help-guide-tooltip h5 {
+  margin-top: 0;
+  color: #007bff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.help-guide-tooltip p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.help-guide-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.target-highlight {
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5);
+  animation: pulse-highlight 1.5s infinite;
+}
+
+@keyframes pulse-highlight {
+  0% {
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(0, 123, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#helpGuideButton {
+  position: relative;
+}
+
+#helpGuideButton:hover::after {
+  content: 'Start Interactive Tour';
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 1000;
+}
