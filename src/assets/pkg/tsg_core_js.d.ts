@@ -4,6 +4,8 @@ export function start(): void;
 export function greet(): void;
 export function add(a: number, b: number): number;
 export function load_graph(raw_content: string): string[];
+export function generate_walks(raw_content: string): any;
+export function summary_graph(raw_content: string): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -13,12 +15,14 @@ export interface InitOutput {
   readonly greet: () => void;
   readonly add: (a: number, b: number) => number;
   readonly load_graph: (a: number, b: number) => [number, number, number, number];
-  readonly __wbindgen_exn_store: (a: number) => void;
-  readonly __externref_table_alloc: () => number;
-  readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly generate_walks: (a: number, b: number) => [number, number, number];
+  readonly summary_graph: (a: number, b: number) => [number, number, number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_export_4: WebAssembly.Table;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __externref_table_dealloc: (a: number) => void;
   readonly __externref_drop_slice: (a: number, b: number) => void;
   readonly __wbindgen_start: () => void;
