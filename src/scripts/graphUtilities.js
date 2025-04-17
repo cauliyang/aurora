@@ -68,7 +68,7 @@ export function displayElementInfo(element, container) {
       <h4 class="mb-3 ${type.toLowerCase()}-title">
         <i class="bi ${
           type === "Node" ? "bi-circle-fill" : "bi-arrow-right"
-        }"></i> 
+        }"></i>
         ${type} Information
       </h4>
     </div>

@@ -40,7 +40,7 @@ function toggleLabels() {
   // Update labelsVisible state
   const nodelabelStyle = !getLabelsVisible()
     ? function (ele) {
-        return ele.data("name") ? ele.data("name") : "";
+        return ele.data("gene_name") ? ele.data("gene_name") : "";
       }
     : "";
   const edgeLabelStyle = !getLabelsVisible()

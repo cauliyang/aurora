@@ -354,7 +354,7 @@ export function annotateNode(node) {
 
     // Add the first gene name as a node label if not set or if it's the same as the ID
     const primaryGene = overlappingGenes[0];
-    node.data("name", primaryGene.geneName);
+    node.data("gene_name", primaryGene.geneName);
   }
 
   console.log(
@@ -531,9 +531,9 @@ export function renderGeneAnnotations(node, container) {
                 <td>${gene.strand}</td>
                 <td>
                   <div class="progress" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" 
-                         style="width: ${gene.overlapPercentage}%;" 
-                         aria-valuenow="${gene.overlapPercentage}" 
+                    <div class="progress-bar" role="progressbar"
+                         style="width: ${gene.overlapPercentage}%;"
+                         aria-valuenow="${gene.overlapPercentage}"
                          aria-valuemin="0" aria-valuemax="100">
                     </div>
                   </div>
@@ -619,19 +619,19 @@ function addGeneAnnotationStyles() {
       z-index: 1000;
       transition: opacity 1s ease;
     }
-    
+
     #annotationStatus.fade-out {
       opacity: 0;
     }
-    
+
     #annotationStatus.error {
       background-color: rgba(220, 53, 69, 0.9);
     }
-    
+
     .gene-file-input {
       display: none;
     }
-    
+
     #uploadGeneLabel {
       cursor: pointer;
     }

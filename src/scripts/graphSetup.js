@@ -43,7 +43,7 @@ export function initializeGraph(graphData) {
 
   let node_label = function (ele) {
     if (!getLabelsVisible()) return "";
-    return ele.data("name") ? ele.data("name") : "";
+    return ele.data("gene_name") ? ele.data("gene_name") : "";
   };
 
   let edge_label = function (ele) {

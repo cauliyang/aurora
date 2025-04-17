@@ -213,7 +213,7 @@ class HelpGuide {
           overflow: hidden;
           animation: slideInUp 0.4s ease-out;
         }
-        
+
         .help-guide-welcome-header {
           display: flex;
           align-items: center;
@@ -221,7 +221,7 @@ class HelpGuide {
           background-color: #f8f9fa;
           border-bottom: 1px solid #dee2e6;
         }
-        
+
         .help-guide-welcome-close {
           margin-left: auto;
           background: none;
@@ -231,11 +231,11 @@ class HelpGuide {
           cursor: pointer;
           color: #6c757d;
         }
-        
+
         .help-guide-welcome-body {
           padding: 15px;
         }
-        
+
         @keyframes slideInUp {
           from {
             transform: translateY(100%);
@@ -366,7 +366,7 @@ class HelpGuide {
                     z-index: 9998;
                     pointer-events: none;
                 }
-                
+
                 .help-guide-tooltip {
                     position: absolute;
                     z-index: 9999;
@@ -377,21 +377,21 @@ class HelpGuide {
                     max-width: 300px;
                     pointer-events: auto;
                 }
-                
+
                 .help-guide-tooltip h5 {
                     margin-top: 0;
                     color: #007bff;
                 }
-                
+
                 .help-guide-tooltip p {
                     margin-bottom: 10px;
                 }
-                
+
                 .help-guide-buttons {
                     display: flex;
                     justify-content: space-between;
                 }
-                
+
                 .target-highlight {
                     position: relative;
                     z-index: 9999;

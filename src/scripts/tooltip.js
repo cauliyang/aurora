@@ -180,58 +180,58 @@ function addTooltipStyles() {
             pointer-events: none;
             overflow: hidden;
         }
-        
+
         #tooltip.tooltip-visible {
             opacity: 1;
             transform: translateY(0);
         }
-        
+
         .tooltip-header {
             padding: 8px 12px;
             color: white;
             font-weight: bold;
         }
-        
+
         .node-header {
             background-color: #007bff;
         }
-        
+
         .edge-header {
             background-color: #28a745;
         }
-        
+
         .tooltip-body {
             padding: 12px;
         }
-        
+
         .tooltip-section {
             display: flex;
             margin-bottom: 4px;
         }
-        
+
         .tooltip-title {
             font-weight: bold;
             width: 70px;
             color: #555;
         }
-        
+
         .tooltip-value {
             flex: 1;
             word-break: break-word;
         }
-        
+
         .weight-value {
             font-weight: bold;
             color: #28a745;
         }
-        
+
         .tooltip-metrics {
             display: flex;
             justify-content: space-between;
             margin-top: 8px;
             gap: 10px;
         }
-        
+
         .tooltip-metric {
             flex: 1;
             text-align: center;
@@ -239,7 +239,7 @@ function addTooltipStyles() {
             border-radius: 4px;
             overflow: hidden;
         }
-        
+
         .metric-label {
             display: block;
             padding: 2px 0;
@@ -247,14 +247,14 @@ function addTooltipStyles() {
             font-weight: bold;
             color: #555;
         }
-        
+
         .metric-value {
             display: block;
             padding: 4px 0;
             font-weight: bold;
             color: white;
         }
-        
+
         .tooltip-footer {
             padding: 5px 12px;
             background-color: #f5f5f5;

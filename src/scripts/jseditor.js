@@ -6,7 +6,7 @@ import JSONEditor from 'jsoneditor';
 import { loadGraphDataFromServer } from "./graph.js";
 import { STATE } from './graph';
 
-// Global variables 
+// Global variables
 let editor = null;
 let currentData = null;
 let currentEditorMode = 'code'; // Default mode

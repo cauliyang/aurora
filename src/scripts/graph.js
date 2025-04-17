@@ -317,7 +317,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
   walksContainer.innerHTML = `
         <div class="walks-header">
             <h3>
-                <i class="bi bi-diagram-3"></i> Graph Walks 
+                <i class="bi bi-diagram-3"></i> Graph Walks
                 <span class="badge bg-primary walks-count">0</span>
             </h3>
             <div class="input-group mb-3">
@@ -494,7 +494,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
         walkCard.innerHTML = `
                     <div class="card mb-2">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <button class="btn btn-link btn-sm walk-toggle-btn" type="button" data-bs-toggle="collapse" 
+                            <button class="btn btn-link btn-sm walk-toggle-btn" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#walk-${displayIndex}" aria-expanded="false" aria-controls="walk-${displayIndex}">
                                 <i class="bi bi-chevron-down chevron-icon"></i>
                                 Walk ${
@@ -788,24 +788,24 @@ function addWalksStyles() {
             border-bottom: 1px solid #e5e5e5;
             margin-bottom: 15px;
         }
-        
+
         .walks-header h3 {
             display: flex;
             align-items: center;
             font-size: 1.2rem;
             margin-bottom: 10px;
         }
-        
+
         .walks-count {
             margin-left: 10px;
             font-size: 0.8em;
         }
-        
+
         .walk-list-container {
             overflow-y: auto;
             max-height: calc(100vh - 250px);
         }
-        
+
         .loading-walks {
             display: flex;
             flex-direction: column;
@@ -814,15 +814,15 @@ function addWalksStyles() {
             padding: 30px 0;
             color: #6c757d;
         }
-        
+
         .walk-card {
             transition: all 0.2s ease-in-out;
         }
-        
+
         .walk-card:hover {
             transform: translateY(-2px);
         }
-        
+
         .walk-toggle-btn {
             color: #212529;
             text-decoration: none;
@@ -832,51 +832,51 @@ function addWalksStyles() {
             display: flex;
             align-items: center;
         }
-        
+
         .walk-toggle-btn:hover {
             color: #0d6efd;
         }
-        
+
         .chevron-icon {
             transition: transform 0.3s ease;
             margin-right: 8px;
         }
-        
+
         .chevron-icon.rotated {
             transform: rotate(180deg);
         }
-        
+
         .aurora-id-container {
             background: #f8f9fa;
             padding: 8px;
             border-radius: 4px;
             margin-bottom: 10px;
         }
-        
+
         .aurora-id {
             background: transparent;
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             color: #6610f2;
         }
-        
+
         .path-visualization {
             margin-top: 10px;
             overflow-x: auto;
         }
-        
+
         .path-nodes {
             display: flex;
             align-items: center;
             min-width: 100%;
             padding: 10px 0;
         }
-        
+
         .path-node {
             display: flex;
             align-items: center;
             flex-shrink: 0;
         }
-        
+
         .node-dot {
             width: 12px;
             height: 12px;
@@ -884,15 +884,15 @@ function addWalksStyles() {
             background-color: #6c757d;
             margin: 0 5px;
         }
-        
+
         .start-node .node-dot {
             background-color: #28a745;
         }
-        
+
         .end-node .node-dot {
             background-color: #dc3545;
         }
-        
+
         .node-label {
             font-size: 0.8rem;
             max-width: 150px;
@@ -900,12 +900,12 @@ function addWalksStyles() {
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
+
         .node-arrow {
             margin: 0 5px;
             color: #adb5bd;
         }
-        
+
         .highlight-walk-btn.active {
             background-color: #ffc107;
             border-color: #ffc107;

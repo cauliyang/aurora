@@ -84,7 +84,7 @@ function showReleaseNotes() {
                               RELEASE_NOTES.date
                             }</span>
                         </div>
-                        
+
                         <div class="mb-4">
                             <h5><i class="bi bi-stars me-2"></i>New Features</h5>
                             <ul class="list-group">
@@ -99,7 +99,7 @@ function showReleaseNotes() {
                                   .join("")}
                             </ul>
                         </div>
-                        
+
                         <div>
                             <h5><i class="bi bi-tools me-2"></i>Bug Fixes</h5>
                             <ul class="list-group">
