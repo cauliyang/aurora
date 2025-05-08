@@ -86,26 +86,27 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Add chromosome information if available
+    // Add the combined header text in one line
     if (chromosomeInfo) {
         svg.append('text')
             .attr('x', width / 2)
             .attr('y', -5)
             .attr('text-anchor', 'middle')
-            .attr('class', 'chromosome-info')
-            .text(`Chromosome ${chromosomeInfo.chrom}${chromosomeInfo.strand ? `, Strand: ${chromosomeInfo.strand}` : ''}`);
+            .attr('class', 'chromosome-info text-header')
+            .text(`Total Exons: ${exons.length} | Chromosome ${chromosomeInfo.chrom}${chromosomeInfo.strand ? `, Strand: ${chromosomeInfo.strand}` : ''}`);
+    } else {
+        // If no chromosome info, just show exon count
+        svg.append('text')
+            .attr('x', width / 2)
+            .attr('y', -5)
+            .attr('text-anchor', 'middle')
+            .attr('class', 'text-header')
+            .style('font-size', '14px')
+            .style('fill', '#666')
+            .text(`Total Exons: ${exons.length}`);
     }
 
     const defs = svg.append('defs');
-
-    // Add exon count subtitle
-    svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', chromosomeInfo ? 15 : 12)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '14px')
-        .style('fill', '#666')
-        .text(`Total Exons: ${exons.length}`);
 
     // Create a scale for genomic positions
     const xScale = d3.scaleLinear()
@@ -230,15 +231,20 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
         .domain([0, exons.length - 1])
         .interpolator(colorScheme);
 
-    // Draw exons (thick rectangles) with animation
-    const exonHeight = 40; // Taller for better visibility
-    const exonRects = svg.selectAll('.exon')
+    // Create a group for each exon to hold both rectangle and label
+    const exonGroups = svg.selectAll('.exon-group')
         .data(exons)
         .enter()
-        .append('rect')
+        .append('g')
+        .attr('class', 'exon-group')
+        .attr('transform', d => `translate(${xScale(d.start)}, ${height/2 - 20})`);
+
+    // Draw exons (thick rectangles) with animation
+    const exonHeight = 40; // Taller for better visibility
+    const exonRects = exonGroups.append('rect')
         .attr('class', 'exon')
-        .attr('x', d => xScale(d.start))
-        .attr('y', height / 2 - exonHeight / 2)
+        .attr('x', 0)
+        .attr('y', 0)
         .attr('width', 0) // Start with 0 width for animation
         .attr('height', 0) // Start with 0 height for animation
         .attr('fill', (d, i) => colorScale(i))
@@ -252,20 +258,42 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
         .duration(800)
         .delay((d, i) => i * 100)
         .attr('height', exonHeight)
-        .attr('y', height / 2 - exonHeight / 2)
         .transition()
         .duration(400)
         .attr('width', d => Math.max(6, xScale(d.end) - xScale(d.start))); // Ensure minimum width
 
+    // Add exon number labels
+    const exonLabels = exonGroups.append('text')
+        .attr('class', 'exon-label')
+        .attr('x', d => Math.max(3, (xScale(d.end) - xScale(d.start)) / 2)) // Center in the exon
+        .attr('y', exonHeight / 2 + 5) // Center vertically
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'white')
+        .attr('font-weight', 'bold')
+        .attr('font-size', '12px')
+        .attr('pointer-events', 'none') // Prevent label from interfering with mouse events
+        .style('opacity', 0) // Hidden by default
+        .text((d, i) => i + 1);
+
+    // Remove animation for labels appearing since they'll be hidden by default
+
     // Add mouse interactions for exons
-    exonRects
+    exonGroups
         .on('mouseover', function(event, d) {
-            // Highlight exon on hover (just change stroke, no movement)
-            d3.select(this)
+            const index = exons.indexOf(d);
+            
+            // Highlight exon on hover
+            d3.select(this).select('rect')
                 .transition()
                 .duration(150)
                 .attr('stroke-width', 2)
                 .attr('stroke', '#ff7f0e');
+                
+            // Show the exon label
+            d3.select(this).select('.exon-label')
+                .transition()
+                .duration(150)
+                .style('opacity', 1);
 
             // Show tooltip with exon information
             const tooltip = d3.select('#tooltip');
@@ -273,14 +301,14 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
                 console.warn('Tooltip element not found');
                 return;
             }
-
+            
             tooltip.transition()
                 .duration(200)
                 .style('opacity', 1);
 
             tooltip.html(`
                 <div class="exon-tooltip">
-                    <h6 class="mb-1">Exon ${exons.indexOf(d) + 1}</h6>
+                    <h6 class="mb-1">Exon ${index + 1}</h6>
                     <p class="mb-1"><strong>Position:</strong> ${d.start.toLocaleString()}-${d.end.toLocaleString()}</p>
                     <p class="mb-1"><strong>Length:</strong> ${d.length.toLocaleString()} bp</p>
                     <p class="mb-0"><strong>% of Transcript:</strong> ${(d.length / totalLength * 100).toFixed(2)}%</p>
@@ -290,12 +318,18 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
                 .style('top', `${event.pageY - 10}px`);
         })
         .on('mouseout', function() {
-            // Reset on mouseout (just restore stroke, no movement)
-            d3.select(this)
+            // Reset on mouseout
+            d3.select(this).select('rect')
                 .transition()
                 .duration(150)
                 .attr('stroke-width', 1)
                 .attr('stroke', '#333');
+                
+            // Hide the exon label
+            d3.select(this).select('.exon-label')
+                .transition()
+                .duration(150)
+                .style('opacity', 0);
 
             // Hide tooltip
             const tooltip = d3.select('#tooltip');
@@ -322,14 +356,22 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
 
             // Update all elements
             svg.select('.x-axis').call(xAxis.ticks(Math.min(10, newWidth / 100)));
-            svg.selectAll('.exon').attr('x', d => xScale(d.start))
+            
+            // Update exon groups and their contents
+            exonGroups.attr('transform', d => `translate(${xScale(d.start)}, ${height/2 - 20})`);
+            exonGroups.select('rect')
                 .attr('width', d => Math.max(6, xScale(d.end) - xScale(d.start)));
+            exonGroups.select('text')
+                .attr('x', d => Math.max(3, (xScale(d.end) - xScale(d.start)) / 2));
+                
+            // Update intron lines
             svg.selectAll('.intron')
                 .attr('x1', d => xScale(d.start))
                 .attr('x2', d => xScale(d.end));
-            svg.select('text:nth-child(3)').attr('x', newWidth / 2);
-            svg.select('text:nth-child(4)').attr('x', newWidth / 2);
-            svg.select('text:nth-child(7)').attr('x', newWidth / 2);
+                
+            // Update text elements
+            svg.selectAll('.text-header')
+                .attr('x', newWidth / 2);
         }
     }
 
@@ -456,6 +498,27 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                     font-size: 14px;
                     color: #555;
                     font-style: italic;
+                }
+                .text-header {
+                    font-size: 14px;
+                    margin-bottom: 5px;
+                }
+                .exon-label {
+                    dominant-baseline: middle;
+                    user-select: none;
+                    text-shadow: 0px 1px 2px rgba(0,0,0,0.7);
+                    font-size: 13px;
+                    letter-spacing: 0.5px;
+                }
+                .exon-group {
+                    cursor: pointer;
+                }
+                .exon-group:hover .exon {
+                    filter: brightness(110%);
+                }
+                .exon-group:hover .exon-label {
+                    font-weight: bolder;
+                    text-shadow: 0px 1px 3px rgba(0,0,0,0.9);
                 }
             `;
             document.head.appendChild(style);
