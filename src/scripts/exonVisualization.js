@@ -2,7 +2,7 @@
 // D3.js-based visualization of exon-intron structures
 
 // Function to create and display an exon-intron structure visualization
-export function createExonVisualization(exonsStr, containerElement) {
+export function createExonVisualization(exonsStr, containerElement, chromosomeInfo = null) {
     if (!exonsStr || typeof exonsStr !== 'string') {
         containerElement.innerHTML = '<div class="alert alert-warning">No exon information available</div>';
         return;
@@ -39,9 +39,9 @@ export function createExonVisualization(exonsStr, containerElement) {
 
         // Now that we have the proper structure, load D3
         if (!window.d3) {
-            loadD3().then(() => renderExonVisualization(exons, visualizationContainer, containerElement));
+            loadD3().then(() => renderExonVisualization(exons, visualizationContainer, containerElement, chromosomeInfo));
         } else {
-            renderExonVisualization(exons, visualizationContainer, containerElement);
+            renderExonVisualization(exons, visualizationContainer, containerElement, chromosomeInfo);
         }
     } catch (e) {
         console.error("Error parsing exons:", e);
@@ -66,14 +66,14 @@ function loadD3() {
 }
 
 // Function to render the exon-intron structure visualization using D3
-function renderExonVisualization(exons, containerElement, parentContainer) {
+function renderExonVisualization(exons, containerElement, parentContainer, chromosomeInfo = null) {
     // Calculate genomic range for scaling
     const minPos = Math.min(...exons.map(e => e.start));
     const maxPos = Math.max(...exons.map(e => e.end));
     const totalLength = maxPos - minPos + 1;
 
     // Set up dimensions - use the full width of the container
-    const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+    const margin = { top: 45, right: 30, bottom: 50, left: 60 }; // Increased top margin for chromosome info
     const width = containerElement.clientWidth - margin.left - margin.right;
     const height = 180; // Increased height for better visualization
 
@@ -103,19 +103,29 @@ function renderExonVisualization(exons, containerElement, parentContainer) {
         .attr('offset', '100%')
         .attr('stop-color', '#34A853');
 
-    svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', -10)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '18px')
-        .style('font-weight', 'bold')
-        .style('fill', 'url(#title-gradient)')
-        .text('Node Structure');
+    // svg.append('text')
+    //     .attr('x', width / 2)
+    //     .attr('y', -25)
+    //     .attr('text-anchor', 'middle')
+    //     .style('font-size', '18px')
+    //     .style('font-weight', 'bold')
+    //     .style('fill', 'url(#title-gradient)')
+    //     .text('Node Structure');
+
+    // Add chromosome information if available
+    if (chromosomeInfo) {
+        svg.append('text')
+            .attr('x', width / 2)
+            .attr('y', -5)
+            .attr('text-anchor', 'middle')
+            .attr('class', 'chromosome-info')
+            .text(`Chromosome ${chromosomeInfo.chrom}${chromosomeInfo.strand ? `, Strand: ${chromosomeInfo.strand}` : ''}`);
+    }
 
     // Add exon count subtitle
     svg.append('text')
         .attr('x', width / 2)
-        .attr('y', 12)
+        .attr('y', chromosomeInfo ? 15 : 12)
         .attr('text-anchor', 'middle')
         .style('font-size', '14px')
         .style('fill', '#666')
@@ -365,7 +375,7 @@ function renderExonVisualization(exons, containerElement, parentContainer) {
 }
 
 // Function to display exon/intron visualization in a modal
-export function showExonVisualizationModal(exonsStr, title = "Exon Structure") {
+export function showExonVisualizationModal(exonsStr, title = "Node Structure", chromosomeInfo = null) {
     // Create modal if it doesn't exist
     let modal = document.getElementById('exonVisualizationModal');
 
@@ -469,6 +479,11 @@ export function showExonVisualizationModal(exonsStr, title = "Exon Structure") {
                     font-size: 1.5rem;
                     font-weight: bold;
                 }
+                .chromosome-info {
+                    font-size: 14px;
+                    color: #555;
+                    font-style: italic;
+                }
             `;
             document.head.appendChild(style);
         }
@@ -482,43 +497,46 @@ export function showExonVisualizationModal(exonsStr, title = "Exon Structure") {
 
     // When modal is shown, render the visualization
     modal.addEventListener('shown.bs.modal', () => {
-        const container = document.getElementById('exonVisualizationContainer');
-        const statsContainer = document.getElementById('exonStatsContainer');
+                const container = document.getElementById('exonVisualizationContainer');
+                const statsContainer = document.getElementById('exonStatsContainer');
 
-        // Create the visualization
-        const result = createExonVisualization(exonsStr, container);
+                // Create the visualization
+                const result = createExonVisualization(exonsStr, container, chromosomeInfo);
 
-        // Setup fullscreen button
-        const fullscreenBtn = document.getElementById('fullscreenExonBtn');
-        if (fullscreenBtn) {
-            fullscreenBtn.addEventListener('click', () => {
-                const visualizationContainer = container.querySelector('.exon-visualization-container');
-                if (visualizationContainer) {
-                    if (visualizationContainer.requestFullscreen) {
-                        visualizationContainer.requestFullscreen();
-                    } else if (visualizationContainer.webkitRequestFullscreen) { /* Safari */
-                        visualizationContainer.webkitRequestFullscreen();
-                    } else if (visualizationContainer.msRequestFullscreen) { /* IE11 */
-                        visualizationContainer.msRequestFullscreen();
-                    }
+                // Setup fullscreen button
+                const fullscreenBtn = document.getElementById('fullscreenExonBtn');
+                if (fullscreenBtn) {
+                    fullscreenBtn.addEventListener('click', () => {
+                        const visualizationContainer = container.querySelector('.exon-visualization-container');
+                        if (visualizationContainer) {
+                            if (visualizationContainer.requestFullscreen) {
+                                visualizationContainer.requestFullscreen();
+                            } else if (visualizationContainer.webkitRequestFullscreen) { /* Safari */
+                                visualizationContainer.webkitRequestFullscreen();
+                            } else if (visualizationContainer.msRequestFullscreen) { /* IE11 */
+                                visualizationContainer.msRequestFullscreen();
+                            }
+                        }
+                    });
                 }
-            });
-        }
 
-        // Setup SVG export button
-        const exportSvgBtn = document.getElementById('exportExonSvgBtn');
-        if (exportSvgBtn) {
-            exportSvgBtn.addEventListener('click', () => {
-                exportVisualizationToSvg(container, `exon_structure_${new Date().toISOString().slice(0, 10)}`);
-            });
-        }
+                // Setup SVG export button
+                const exportSvgBtn = document.getElementById('exportExonSvgBtn');
+                if (exportSvgBtn) {
+                    exportSvgBtn.addEventListener('click', () => {
+                        const filenameBase = chromosomeInfo ?
+                            `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` :
+                            `exon_structure_${new Date().toISOString().slice(0, 10)}`;
+                        exportVisualizationToSvg(container, filenameBase);
+                    });
+                }
 
-        // If visualization was successful, show enhanced stats
-        if (result) {
-            const exonPercent = (result.exonLength / result.totalLength * 100).toFixed(1);
-            const intronPercent = (result.intronLength / result.totalLength * 100).toFixed(1);
+                // If visualization was successful, show enhanced stats
+                if (result) {
+                    const exonPercent = (result.exonLength / result.totalLength * 100).toFixed(1);
+                    const intronPercent = (result.intronLength / result.totalLength * 100).toFixed(1);
 
-            statsContainer.innerHTML = `
+                    statsContainer.innerHTML = `
         <div class="card border-0 shadow-sm">
           <div class="card-header bg-light">
             <h6 class="mb-0 fw-bold">Transcript Structure Statistics</h6>
@@ -573,6 +591,16 @@ export function showExonVisualizationModal(exonsStr, title = "Exon Structure") {
                   </div>
                 </div>
               </div>
+              ${chromosomeInfo ? `
+              <div class="col-12 mt-3">
+                <div class="alert alert-info mb-0">
+                  <i class="bi bi-info-circle me-2"></i>
+                  <strong>Chromosome Location:</strong> 
+                  Chr${chromosomeInfo.chrom}${chromosomeInfo.strand ? `, Strand: ${chromosomeInfo.strand}` : ''}
+                  (${chromosomeInfo.start?.toLocaleString() || ''}-${chromosomeInfo.end?.toLocaleString() || ''})
+                </div>
+              </div>
+              ` : ''}
             </div>
           </div>
         </div>
@@ -597,54 +625,8 @@ function exportVisualizationToSvg(container, filename) {
     }
 
     try {
-        // Clone the SVG to avoid modifying the original
-        const svgClone = svgElement.cloneNode(true);
-
-        // Set the background color for the exported SVG
-        svgClone.style.background = 'white';
-
-        // Add required namespaces
-        svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-
-        // Make sure all styles are inlined
-        const styles = document.querySelectorAll('style');
-        let stylesText = '';
-
-        // Extract styles that might be relevant for the SVG
-        styles.forEach(style => {
-            if (style.textContent.includes('.exon') ||
-                style.textContent.includes('svg') ||
-                style.textContent.includes('.intron')) {
-                stylesText += style.textContent;
-            }
-        });
-
-        // Add styles to the SVG
-        if (stylesText) {
-            const styleElement = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-            styleElement.textContent = stylesText;
-            svgClone.insertBefore(styleElement, svgClone.firstChild);
-        }
-
-        // Make sure all elements have their computed styles
-        const allElements = svgClone.querySelectorAll('*');
-        allElements.forEach(el => {
-            if (el.nodeName !== 'style') {
-                const computedStyle = window.getComputedStyle(svgElement.querySelector(`#${el.id}`)) ||
-                    window.getComputedStyle(svgElement.querySelector(`.${el.className.baseVal}`));
-
-                if (computedStyle) {
-                    el.style.fill = el.style.fill || computedStyle.fill;
-                    el.style.stroke = el.style.stroke || computedStyle.stroke;
-                    el.style.strokeWidth = el.style.strokeWidth || computedStyle.strokeWidth;
-                    el.style.opacity = el.style.opacity || computedStyle.opacity;
-                }
-            }
-        });
-
-        // Convert SVG to string
-        const svgData = new XMLSerializer().serializeToString(svgClone);
+        // Get SVG data with inline styles
+        const svgData = getSVGData(svgElement);
 
         // Create a blob from the SVG string
         const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
@@ -671,6 +653,79 @@ function exportVisualizationToSvg(container, filename) {
         console.error('Error exporting SVG:', error);
         showExportNotification('error', `Failed to export SVG: ${error.message}`);
     }
+}
+
+// Helper function to get SVG data with inline styles
+function getSVGData(svgElement) {
+    // Clone the SVG to avoid modifying the original
+    const svgClone = svgElement.cloneNode(true);
+
+    // Set the background color for the exported SVG
+    svgClone.style.background = 'white';
+
+    // Add required namespaces
+    svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+    // Create a style element to hold all the CSS rules
+    const styleElement = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    styleElement.textContent = getRelevantStyles();
+    svgClone.insertBefore(styleElement, svgClone.firstChild);
+
+    // Convert SVG to string
+    return new XMLSerializer().serializeToString(svgClone);
+}
+
+// Helper function to extract relevant CSS styles for the SVG
+function getRelevantStyles() {
+    // Get all style sheets on the page
+    const styleSheets = document.styleSheets;
+    let cssText = '';
+
+    // List of selectors relevant to the SVG
+    const relevantSelectors = [
+        '.exon', '.intron', '.exon-svg', 'svg', 'rect', 'path', 'line',
+        'text', 'g', 'circle', 'polyline', 'polygon'
+    ];
+
+    try {
+        // Loop through all style sheets
+        for (let i = 0; i < styleSheets.length; i++) {
+            const styleSheet = styleSheets[i];
+
+            try {
+                // Access the CSS rules
+                const rules = styleSheet.cssRules || styleSheet.rules;
+                if (!rules) continue;
+
+                // Loop through all CSS rules
+                for (let j = 0; j < rules.length; j++) {
+                    const rule = rules[j];
+
+                    // Check if the selector is relevant for our SVG
+                    if (rule.selectorText && relevantSelectors.some(selector =>
+                            rule.selectorText.includes(selector))) {
+                        cssText += rule.cssText + '\n';
+                    }
+                }
+            } catch (e) {
+                // Some style sheets may not be accessible due to CORS restrictions
+                console.warn('Could not access stylesheet:', e);
+            }
+        }
+    } catch (e) {
+        console.warn('Error extracting styles:', e);
+    }
+
+    // Add some default styles to ensure proper rendering
+    cssText += `
+        .exon { fill-opacity: 1; stroke-width: 2px; }
+        .intron { stroke-dasharray: 5,5; }
+        text { font-family: Arial, sans-serif; }
+        .exon:hover { stroke: #ff7f0e; stroke-width: 2px; }
+    `;
+
+    return cssText;
 }
 
 // Function to show a notification for export result

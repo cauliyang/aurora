@@ -185,8 +185,17 @@ export function displayElementInfo(element, container) {
                         btn.setAttribute('data-listener-added', 'true');
                         btn.addEventListener('click', function() {
                             const exonsData = this.getAttribute('data-exons');
+
+                            // Get chromosome info from the node data
+                            const chromosomeInfo = {
+                                chrom: data.chrom || null,
+                                strand: data.strand || null,
+                                start: data.ref_start || null,
+                                end: data.ref_end || null
+                            };
+
                             import ('./exonVisualization.js').then(module => {
-                                module.showExonVisualizationModal(exonsData);
+                                module.showExonVisualizationModal(exonsData, "Node Structure", chromosomeInfo);
                             });
                         });
                     }
