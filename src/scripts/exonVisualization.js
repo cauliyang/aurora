@@ -96,6 +96,8 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
             .text(`Chromosome ${chromosomeInfo.chrom}${chromosomeInfo.strand ? `, Strand: ${chromosomeInfo.strand}` : ''}`);
     }
 
+    const defs = svg.append('defs');
+
     // Add exon count subtitle
     svg.append('text')
         .attr('x', width / 2)
@@ -380,9 +382,6 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
               <button type="button" id="exportExonSvgBtn" class="btn btn-sm btn-outline-success me-2" title="Export as SVG">
                 <i class="bi bi-download me-1"></i> Export SVG
               </button>
-              <button type="button" id="fullscreenExonBtn" class="btn btn-sm btn-outline-primary me-2" title="Fullscreen">
-                <i class="bi bi-arrows-fullscreen"></i>
-              </button>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
           </div>
@@ -471,46 +470,29 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
 
     // When modal is shown, render the visualization
     modal.addEventListener('shown.bs.modal', () => {
-                const container = document.getElementById('exonVisualizationContainer');
-                const statsContainer = document.getElementById('exonStatsContainer');
+        const container = document.getElementById('exonVisualizationContainer');
+        const statsContainer = document.getElementById('exonStatsContainer');
 
-                // Create the visualization
-                const result = createExonVisualization(exonsStr, container, chromosomeInfo);
+        // Create the visualization
+        const result = createExonVisualization(exonsStr, container, chromosomeInfo);
 
-                // Setup fullscreen button
-                const fullscreenBtn = document.getElementById('fullscreenExonBtn');
-                if (fullscreenBtn) {
-                    fullscreenBtn.addEventListener('click', () => {
-                        const visualizationContainer = container.querySelector('.exon-visualization-container');
-                        if (visualizationContainer) {
-                            if (visualizationContainer.requestFullscreen) {
-                                visualizationContainer.requestFullscreen();
-                            } else if (visualizationContainer.webkitRequestFullscreen) { /* Safari */
-                                visualizationContainer.webkitRequestFullscreen();
-                            } else if (visualizationContainer.msRequestFullscreen) { /* IE11 */
-                                visualizationContainer.msRequestFullscreen();
-                            }
-                        }
-                    });
-                }
+        // Setup SVG export button
+        const exportSvgBtn = document.getElementById('exportExonSvgBtn');
+        if (exportSvgBtn) {
+            exportSvgBtn.addEventListener('click', () => {
+                const filenameBase = chromosomeInfo ? 
+                    `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` : 
+                    `exon_structure_${new Date().toISOString().slice(0, 10)}`;
+                exportVisualizationToSvg(container, filenameBase);
+            });
+        }
 
-                // Setup SVG export button
-                const exportSvgBtn = document.getElementById('exportExonSvgBtn');
-                if (exportSvgBtn) {
-                    exportSvgBtn.addEventListener('click', () => {
-                        const filenameBase = chromosomeInfo ?
-                            `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` :
-                            `exon_structure_${new Date().toISOString().slice(0, 10)}`;
-                        exportVisualizationToSvg(container, filenameBase);
-                    });
-                }
+        // If visualization was successful, show enhanced stats
+        if (result) {
+            const exonPercent = (result.exonLength / result.totalLength * 100).toFixed(1);
+            const intronPercent = (result.intronLength / result.totalLength * 100).toFixed(1);
 
-                // If visualization was successful, show enhanced stats
-                if (result) {
-                    const exonPercent = (result.exonLength / result.totalLength * 100).toFixed(1);
-                    const intronPercent = (result.intronLength / result.totalLength * 100).toFixed(1);
-
-                    statsContainer.innerHTML = `
+            statsContainer.innerHTML = `
         <div class="card border-0 shadow-sm">
           <div class="card-header bg-light">
             <h6 class="mb-0 fw-bold">Transcript Structure Statistics</h6>
