@@ -86,32 +86,6 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Add title with gradient
-    const defs = svg.append('defs');
-    const gradient = defs.append('linearGradient')
-        .attr('id', 'title-gradient')
-        .attr('x1', '0%')
-        .attr('y1', '0%')
-        .attr('x2', '100%')
-        .attr('y2', '0%');
-
-    gradient.append('stop')
-        .attr('offset', '0%')
-        .attr('stop-color', '#4285F4');
-
-    gradient.append('stop')
-        .attr('offset', '100%')
-        .attr('stop-color', '#34A853');
-
-    // svg.append('text')
-    //     .attr('x', width / 2)
-    //     .attr('y', -25)
-    //     .attr('text-anchor', 'middle')
-    //     .style('font-size', '18px')
-    //     .style('font-weight', 'bold')
-    //     .style('fill', 'url(#title-gradient)')
-    //     .text('Node Structure');
-
     // Add chromosome information if available
     if (chromosomeInfo) {
         svg.append('text')
