@@ -281,14 +281,14 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
     exonGroups
         .on('mouseover', function(event, d) {
             const index = exons.indexOf(d);
-            
+
             // Highlight exon on hover
             d3.select(this).select('rect')
                 .transition()
                 .duration(150)
                 .attr('stroke-width', 2)
                 .attr('stroke', '#ff7f0e');
-                
+
             // Show the exon label
             d3.select(this).select('.exon-label')
                 .transition()
@@ -301,7 +301,7 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
                 console.warn('Tooltip element not found');
                 return;
             }
-            
+
             tooltip.transition()
                 .duration(200)
                 .style('opacity', 1);
@@ -324,7 +324,7 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
                 .duration(150)
                 .attr('stroke-width', 1)
                 .attr('stroke', '#333');
-                
+
             // Hide the exon label
             d3.select(this).select('.exon-label')
                 .transition()
@@ -356,19 +356,19 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
 
             // Update all elements
             svg.select('.x-axis').call(xAxis.ticks(Math.min(10, newWidth / 100)));
-            
+
             // Update exon groups and their contents
             exonGroups.attr('transform', d => `translate(${xScale(d.start)}, ${height/2 - 20})`);
             exonGroups.select('rect')
                 .attr('width', d => Math.max(6, xScale(d.end) - xScale(d.start)));
             exonGroups.select('text')
                 .attr('x', d => Math.max(3, (xScale(d.end) - xScale(d.start)) / 2));
-                
+
             // Update intron lines
             svg.selectAll('.intron')
                 .attr('x1', d => xScale(d.start))
                 .attr('x2', d => xScale(d.end));
-                
+
             // Update text elements
             svg.selectAll('.text-header')
                 .attr('x', newWidth / 2);
@@ -543,8 +543,8 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
         const exportSvgBtn = document.getElementById('exportExonSvgBtn');
         if (exportSvgBtn) {
             exportSvgBtn.addEventListener('click', () => {
-                const filenameBase = chromosomeInfo ? 
-                    `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` : 
+                const filenameBase = chromosomeInfo ?
+                    `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` :
                     `exon_structure_${new Date().toISOString().slice(0, 10)}`;
                 exportVisualizationToSvg(container, filenameBase);
             });
@@ -614,7 +614,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
               <div class="col-12 mt-3">
                 <div class="alert alert-info mb-0">
                   <i class="bi bi-info-circle me-2"></i>
-                  <strong>Chromosome Location:</strong> 
+                  <strong>Chromosome Location:</strong>
                   Chr${chromosomeInfo.chrom}${chromosomeInfo.strand ? `, Strand: ${chromosomeInfo.strand}` : ''}
                   (${chromosomeInfo.start?.toLocaleString() || ''}-${chromosomeInfo.end?.toLocaleString() || ''})
                 </div>
