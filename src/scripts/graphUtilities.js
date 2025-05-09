@@ -5,53 +5,53 @@ import { renderGeneAnnotations } from "./geneAnnotation";
 import "jsoneditor/dist/jsoneditor.min.css";
 
 export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
-  if (!isPathValid) return;
+    if (!isPathValid) return;
 
-  currentPath.push(node);
+    currentPath.push(node);
 
-  if (sinkNodes.includes(node) && currentPath.length >= STATE.minPathLength) {
-    STATE.walks.push([...currentPath]); // Found a path
-  } else {
-    // Correctly use outgoers as a method call
-    node.outgoers("node").forEach((neighbor) => {
-      const connectingEdge = node.edgesTo(neighbor);
+    if (sinkNodes.includes(node) && currentPath.length >= STATE.minPathLength) {
+        STATE.walks.push([...currentPath]); // Found a path
+    } else {
+        // Correctly use outgoers as a method call
+        node.outgoers("node").forEach((neighbor) => {
+            const connectingEdge = node.edgesTo(neighbor);
 
-      if (connectingEdge.data("weight") >= STATE.minEdgeWeight) {
-        // if current path's leght is greater than maxdepth, don't continue
-        if (currentPath.length < STATE.maxPathLength) {
-          dfs(neighbor, currentPath, sinkNodes, true);
-        }
-      } else {
-        dfs(neighbor, currentPath, sinkNodes, false);
-      }
-    });
-  }
+            if (connectingEdge.data("weight") >= STATE.minEdgeWeight) {
+                // if current path's leght is greater than maxdepth, don't continue
+                if (currentPath.length < STATE.maxPathLength) {
+                    dfs(neighbor, currentPath, sinkNodes, true);
+                }
+            } else {
+                dfs(neighbor, currentPath, sinkNodes, false);
+            }
+        });
+    }
 
-  currentPath.pop(); // backtrack
+    currentPath.pop(); // backtrack
 }
 
 // Update or add this function to improve the info display
 export function setupClickEvent() {
-  const { cy, previousClickedElement } = STATE;
-  const infoContent = document.getElementById("infoContent");
+    const { cy, previousClickedElement } = STATE;
+    const infoContent = document.getElementById("infoContent");
 
-  cy.on("tap", "node, edge", function (evt) {
-    const element = evt.target;
+    cy.on("tap", "node, edge", function(evt) {
+        const element = evt.target;
 
-    // Reset previous styles
-    if (previousClickedElement) {
-      previousClickedElement.removeClass("selected");
-    }
+        // Reset previous styles
+        if (previousClickedElement) {
+            previousClickedElement.removeClass("selected");
+        }
 
-    // Add selected class to current element
-    element.addClass("selected");
+        // Add selected class to current element
+        element.addClass("selected");
 
-    // Store as previous element for next click
-    STATE.previousClickedElement = element;
+        // Store as previous element for next click
+        STATE.previousClickedElement = element;
 
-    // Show element information in the info panel
-    displayElementInfo(element, infoContent);
-  });
+        // Show element information in the info panel
+        displayElementInfo(element, infoContent);
+    });
 }
 
 /**
@@ -60,10 +60,10 @@ export function setupClickEvent() {
  * @param {HTMLElement} container - The HTML container to show the information
  */
 export function displayElementInfo(element, container) {
-  const type = element.isNode() ? "Node" : "Edge";
-  const data = element.data();
+    const type = element.isNode() ? "Node" : "Edge";
+    const data = element.data();
 
-  let html = `
+    let html = `
     <div class="info-header">
       <h4 class="mb-3 ${type.toLowerCase()}-title">
         <i class="bi ${
@@ -75,8 +75,8 @@ export function displayElementInfo(element, container) {
     <div class="info-body">
   `;
 
-  // ID and basic info section
-  html += `
+    // ID and basic info section
+    html += `
     <div class="card mb-3">
       <div class="card-header bg-light">
         <strong>Basic Information</strong>
@@ -85,8 +85,8 @@ export function displayElementInfo(element, container) {
         <p class="mb-1"><strong>ID:</strong> ${data.id || "Not available"}</p>
   `;
 
-  if (type === "Node") {
-    html += `
+    if (type === "Node") {
+        html += `
         <p class="mb-1"><strong>Name:</strong> ${
           data.name || data.id || "Not available"
         }</p>
@@ -98,9 +98,9 @@ export function displayElementInfo(element, container) {
     </div>
     `;
 
-    // Genomic information section (if available)
-    if (data.chrom || data.ref_start || data.ref_end) {
-      html += `
+        // Genomic information section (if available)
+        if (data.chrom || data.ref_start || data.ref_end) {
+            html += `
         <div class="card mb-3">
           <div class="card-header bg-light">
             <strong>Genomic Location</strong>
@@ -121,11 +121,11 @@ export function displayElementInfo(element, container) {
           </div>
         </div>
       `;
-    }
+        }
 
-    // PTC/PTF information section (if available)
-    if (data.ptc !== undefined || data.ptf !== undefined) {
-      html += `
+        // PTC/PTF information section (if available)
+        if (data.ptc !== undefined || data.ptf !== undefined) {
+            html += `
         <div class="card mb-3">
           <div class="card-header bg-light">
             <strong>Metrics</strong>
@@ -152,26 +152,59 @@ export function displayElementInfo(element, container) {
           </div>
         </div>
       `;
-    }
+        }
 
-    // Exons information if available
-    if (data.exons) {
-      html += `
+        // Exons information if available
+        if (data.exons) {
+            // Create the visualization button
+            const visualizeBtn = `
+              <button class="btn btn-sm btn-primary ms-2 exon-visualize-btn" data-exons="${data.exons.replace(/"/g, '&quot;')}">
+                <i class="bi bi-bar-chart-line-fill me-1"></i> Visualize
+              </button>
+            `;
+
+            html += `
         <div class="card mb-3">
-          <div class="card-header bg-light">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <strong>Exons</strong>
+            ${visualizeBtn}
           </div>
-          <div class="card-body">
+          <div class="card-body p-0">
             <div class="exon-list">
               ${formatExons(data.exons)}
             </div>
           </div>
         </div>
       `;
-    }
-  } else {
-    // Edge specific information
-    html += `
+
+            // Add event listener for the button after a small delay (to ensure DOM is ready)
+            setTimeout(() => {
+                const buttons = document.querySelectorAll('.exon-visualize-btn');
+                buttons.forEach(btn => {
+                    if (!btn.hasAttribute('data-listener-added')) {
+                        btn.setAttribute('data-listener-added', 'true');
+                        btn.addEventListener('click', function() {
+                            const exonsData = this.getAttribute('data-exons');
+
+                            // Get chromosome info from the node data
+                            const chromosomeInfo = {
+                                chrom: data.chrom || null,
+                                strand: data.strand || null,
+                                start: data.ref_start || null,
+                                end: data.ref_end || null
+                            };
+
+                            import ('./exonVisualization.js').then(module => {
+                                module.showExonVisualizationModal(exonsData, "Node Structure", chromosomeInfo);
+                            });
+                        });
+                    }
+                });
+            }, 100);
+        }
+    } else {
+        // Edge specific information
+        html += `
         <p class="mb-1"><strong>Source:</strong> ${
           data.source || "Not available"
         }</p>
@@ -184,34 +217,32 @@ export function displayElementInfo(element, container) {
       </div>
     </div>
     `;
-  }
+    }
 
-  // Additional properties section for any other data
-  const standardProps =
-    type === "Node"
-      ? [
-          "id",
-          "name",
-          "chrom",
-          "ref_start",
-          "ref_end",
-          "strand",
-          "exons",
-          "ptc",
-          "ptf",
-          "node_id",
-          "is_head",
-          "value",
-          "source-node",
-          "geneAnnotations",
-        ]
-      : ["id", "source", "target", "weight"];
-  const additionalProps = Object.keys(data).filter(
-    (key) => !standardProps.includes(key)
-  );
+    // Additional properties section for any other data
+    const standardProps =
+        type === "Node" ? [
+            "id",
+            "name",
+            "chrom",
+            "ref_start",
+            "ref_end",
+            "strand",
+            "exons",
+            "ptc",
+            "ptf",
+            "node_id",
+            "is_head",
+            "value",
+            "source-node",
+            "geneAnnotations",
+        ] : ["id", "source", "target", "weight"];
+    const additionalProps = Object.keys(data).filter(
+        (key) => !standardProps.includes(key)
+    );
 
-  if (additionalProps.length > 0) {
-    html += `
+    if (additionalProps.length > 0) {
+        html += `
       <div class="card mb-3">
         <div class="card-header bg-light">
           <strong>Additional Properties</strong>
@@ -220,30 +251,30 @@ export function displayElementInfo(element, container) {
           <dl class="row">
     `;
 
-    additionalProps.forEach((key) => {
-      html += `
+        additionalProps.forEach((key) => {
+            html += `
         <dt class="col-sm-4">${key}:</dt>
         <dd class="col-sm-8">${formatValue(data[key])}</dd>
       `;
-    });
+        });
 
-    html += `
+        html += `
           </dl>
         </div>
       </div>
     `;
-  }
+    }
 
-  html += `</div>`;
-  container.innerHTML = html;
+    html += `</div>`;
+    container.innerHTML = html;
 
-  // If this is a node, render gene annotations
-  if (type === "Node") {
-    renderGeneAnnotations(element, container);
-  }
+    // If this is a node, render gene annotations
+    if (type === "Node") {
+        renderGeneAnnotations(element, container);
+    }
 
-  // Add custom styles for the info panel
-  addInfoPanelStyles();
+    // Add custom styles for the info panel
+    addInfoPanelStyles();
 }
 
 /**
@@ -252,37 +283,38 @@ export function displayElementInfo(element, container) {
  * @returns {string} HTML representation of exons
  */
 function formatExons(exonsStr) {
-  if (!exonsStr) return "No exon information available";
+    if (!exonsStr) return "No exon information available";
 
-  // Try to parse the exons string which might be in format like "[start-end,start-end]"
-  try {
-    // Remove brackets and split by comma
-    const exonList = exonsStr.replace(/^\[|\]$/g, "").split(",");
+    // Try to parse the exons string which might be in format like "[start-end,start-end]"
+    try {
+        // Remove brackets and split by comma
+        const exonList = exonsStr.replace(/^\[|\]$/g, "").split(",");
 
-    if (exonList.length === 0) return "No exons found";
+        if (exonList.length === 0) return "No exons found";
 
-    let html = '<ul class="list-group">';
-    exonList.forEach((exon, index) => {
-      const [start, end] = exon.split("-").map(Number);
-      const length = end - start + 1;
+        let html = '<ul class="list-group list-group-flush">';
 
-      html += `
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          Exon ${index + 1}
-          <div>
-            <span class="badge bg-secondary">${start.toLocaleString()}-${end.toLocaleString()}</span>
-            <span class="badge bg-info">${length.toLocaleString()} bp</span>
-          </div>
-        </li>
-      `;
-    });
-    html += "</ul>";
+        exonList.forEach((exon, index) => {
+            const [start, end] = exon.split("-").map(Number);
+            const length = end - start + 1;
 
-    return html;
-  } catch (e) {
-    console.error("Error parsing exons:", e);
-    return `<div class="alert alert-warning">Could not parse exon information: ${exonsStr}</div>`;
-  }
+            html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Exon ${index + 1}
+              <div>
+                <span class="badge bg-secondary">${start.toLocaleString()}-${end.toLocaleString()}</span>
+                <span class="badge bg-info">${length.toLocaleString()} bp</span>
+              </div>
+            </li>
+            `;
+        });
+        html += `</ul>`;
+
+        return html;
+    } catch (e) {
+        console.error("Error parsing exons:", e);
+        return `<div class="alert alert-warning">Could not parse exon information: ${exonsStr}</div>`;
+    }
 }
 
 /**
@@ -291,32 +323,32 @@ function formatExons(exonsStr) {
  * @returns {string} Formatted value as string
  */
 function formatValue(value) {
-  if (value === undefined || value === null) return "N/A";
+    if (value === undefined || value === null) return "N/A";
 
-  if (typeof value === "boolean") {
-    return value ? "Yes" : "No";
-  }
-
-  if (typeof value === "object") {
-    try {
-      return `<pre class="code-block">${JSON.stringify(value, null, 2)}</pre>`;
-    } catch (e) {
-      return String(value);
+    if (typeof value === "boolean") {
+        return value ? "Yes" : "No";
     }
-  }
 
-  return String(value);
+    if (typeof value === "object") {
+        try {
+            return `<pre class="code-block">${JSON.stringify(value, null, 2)}</pre>`;
+        } catch (e) {
+            return String(value);
+        }
+    }
+
+    return String(value);
 }
 
 /**
  * Add custom styles to enhance the info panel
  */
 function addInfoPanelStyles() {
-  // Check if our styles are already added
-  if (!document.getElementById("info-panel-styles")) {
-    const style = document.createElement("style");
-    style.id = "info-panel-styles";
-    style.textContent = `
+    // Check if our styles are already added
+    if (!document.getElementById("info-panel-styles")) {
+        const style = document.createElement("style");
+        style.id = "info-panel-styles";
+        style.textContent = `
       #infoContent .info-header {
         border-bottom: 1px solid #e5e5e5;
         margin-bottom: 15px;
@@ -355,92 +387,92 @@ function addInfoPanelStyles() {
         overflow-y: auto;
       }
     `;
-    document.head.appendChild(style);
-  }
+        document.head.appendChild(style);
+    }
 }
 
 export function hideSingletonNodes() {
-  STATE.cy.nodes().forEach((node) => {
-    // Check if all connected edges of the node are hidden
-    if (node.connectedEdges(":visible").length === 0) {
-      node.hide();
-    }
-  });
+    STATE.cy.nodes().forEach((node) => {
+        // Check if all connected edges of the node are hidden
+        if (node.connectedEdges(":visible").length === 0) {
+            node.hide();
+        }
+    });
 }
 
 export function resizePanels() {
-  // Enable drag and resize interactions on the cy container
-  interact("#cy")
-    .resizable({
-      // Enable resize from right edge
-      edges: { right: true, bottom: true },
+    // Enable drag and resize interactions on the cy container
+    interact("#cy")
+        .resizable({
+            // Enable resize from right edge
+            edges: { right: true, bottom: true },
 
-      // Set minimum size
-      restrictSize: {
-        min: { width: 100, height: 100 },
-      },
-    })
-    .on("resizemove", (event) => {
-      const target = event.target;
-      let x = parseFloat(target.getAttribute("data-x")) || 0;
-      let y = parseFloat(target.getAttribute("data-y")) || 0;
+            // Set minimum size
+            restrictSize: {
+                min: { width: 100, height: 100 },
+            },
+        })
+        .on("resizemove", (event) => {
+            const target = event.target;
+            let x = parseFloat(target.getAttribute("data-x")) || 0;
+            let y = parseFloat(target.getAttribute("data-y")) || 0;
 
-      // Update the element's style
-      target.style.width = `${event.rect.width}px`;
-      target.style.height = `${event.rect.height}px`;
+            // Update the element's style
+            target.style.width = `${event.rect.width}px`;
+            target.style.height = `${event.rect.height}px`;
 
-      // Translate when resizing from top or left edges
-      x += event.deltaRect.left;
-      y += event.deltaRect.top;
+            // Translate when resizing from top or left edges
+            x += event.deltaRect.left;
+            y += event.deltaRect.top;
 
-      target.style.webkitTransform =
-        target.style.transform = `translate(${x}px,${y}px)`;
+            target.style.webkitTransform =
+                target.style.transform = `translate(${x}px,${y}px)`;
 
-      target.setAttribute("data-x", x);
-      target.setAttribute("data-y", y);
-    });
+            target.setAttribute("data-x", x);
+            target.setAttribute("data-y", y);
+        });
 
-  interact("#rightContainer")
-    .resizable({
-      // Enable resize from left edge
-      edges: { left: true, right: true },
+    interact("#rightContainer")
+        .resizable({
+            // Enable resize from left edge
+            edges: { left: true, right: true },
 
-      // Set minimum size
-      restrictSize: {
-        min: { width: 100 },
-      },
-    })
-    .on("resizemove", (event) => {
-      const target = event.target;
-      let x = parseFloat(target.getAttribute("data-x")) || 0;
+            // Set minimum size
+            restrictSize: {
+                min: { width: 100 },
+            },
+        })
+        .on("resizemove", (event) => {
+            const target = event.target;
+            let x = parseFloat(target.getAttribute("data-x")) || 0;
 
-      // Update the element's style
-      target.style.width = `${event.rect.width}px`;
+            // Update the element's style
+            target.style.width = `${event.rect.width}px`;
 
-      // Translate when resizing from left edge
-      x += event.deltaRect.left;
+            // Translate when resizing from left edge
+            x += event.deltaRect.left;
 
-      target.style.webkitTransform =
-        target.style.transform = `translate(${x}px)`;
+            target.style.webkitTransform =
+                target.style.transform = `translate(${x}px)`;
 
-      target.setAttribute("data-x", x);
-    });
+            target.setAttribute("data-x", x);
+        });
 
-  interact("#info, #walks")
-    .resizable({
-      edges: { right: true }, // Enable resize from the right edge
-      restrictSize: {
-        min: { width: 100 }, // Set minimum width
-      },
-    })
-    .on("resizemove", (event) => {
-      const target = event.target;
-      const newWidth = event.rect.width;
+    interact("#info, #walks")
+        .resizable({
+            edges: { right: true }, // Enable resize from the right edge
+            restrictSize: {
+                min: { width: 100 }, // Set minimum width
+            },
+        })
+        .on("resizemove", (event) => {
+            const target = event.target;
+            const newWidth = event.rect.width;
 
-      // Update the width of the element
-      target.style.width = `${newWidth}px`;
+            // Update the width of the element
+            target.style.width = `${newWidth}px`;
 
-      // Update the right position to fill the right side of the screen
-      target.style.right = "0";
-    });
+            // Update the right position to fill the right side of the screen
+            target.style.right = "0";
+        });
 }
