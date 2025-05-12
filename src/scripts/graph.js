@@ -19,215 +19,260 @@ cytoscape.use(euler);
 cytoscape.use(spread);
 
 export const STATE = {
-  cy: null,
-  walks: [],
-  graph_jsons: [],
-  minEdgeWeight: 1,
-  minPathLength: 1,
-  maxPathLength: 900,
-  previousClickedElement: null,
-  previousClickedElementStyle: null,
-  originalGraphData: null,
-  selectedNodeColor: "#8dd3c7",
-  nodeColor: "#1f77b4",
-  highlightWalkColor: "#ff5733",
-  sourceNodeColor: "#31a354",
+    cy: null,
+    walks: [],
+    graph_jsons: [],
+    minEdgeWeight: 1,
+    minPathLength: 1,
+    maxPathLength: 900,
+    previousClickedElement: null,
+    previousClickedElementStyle: null,
+    originalGraphData: null,
+    selectedNodeColor: "#8dd3c7",
+    nodeColor: "#1f77b4",
+    highlightWalkColor: "#ff5733",
+    sourceNodeColor: "#31a354",
 };
 
 window.STATE = STATE;
 
 // Get the "Change Layout" button element
 layoutSelect.addEventListener("change", () => {
-  // Get the selected layout from the select element
-  const selectedLayout = document.getElementById("layoutSelect").value;
+    // Get the selected layout from the select element
+    const selectedLayout = document.getElementById("layoutSelect").value;
 
-  if (STATE.cy === null) return;
+    if (STATE.cy === null) return;
 
-  // Apply the chosen layout
-  STATE.cy
-    .layout({
-      name: selectedLayout,
-      animate: true, // You can adjust animation settings if needed
-      fit: true,
-      padding: 10,
-      avoidOverlap: true,
-      rankDir: "LR",
-    })
-    .run();
+    // Apply the chosen layout
+    STATE.cy
+        .layout({
+            name: selectedLayout,
+            animate: true, // You can adjust animation settings if needed
+            fit: true,
+            padding: 10,
+            avoidOverlap: true,
+            rankDir: "LR",
+        })
+        .run();
 });
 
 // Function to update graph based on edge weight
 function updateGraph() {
-  // Reset graph to original data
-  console.log("updateGraph", STATE);
-  STATE.walks.length = 0;
-  STATE.cy.elements().remove();
-  STATE.cy.add(STATE.originalGraphData);
+    // Reset graph to original data
+    console.log("updateGraph", STATE);
+    STATE.walks.length = 0;
+    STATE.cy.elements().remove();
+    STATE.cy.add(STATE.originalGraphData);
 
-  const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
-  const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
+    const sourceNodes = STATE.cy.nodes().filter((node) => node.indegree() === 0);
+    const sinkNodes = STATE.cy.nodes().filter((node) => node.outdegree() === 0);
 
-  // update walks
-  sourceNodes.forEach((sourceNode) => {
-    dfs(sourceNode, [], sinkNodes);
-  });
+    // update walks
+    sourceNodes.forEach((sourceNode) => {
+        dfs(sourceNode, [], sinkNodes);
+    });
 
-  hideUninvolvedElements();
-  hideSingletonNodes();
+    hideUninvolvedElements();
+    hideSingletonNodes();
 
-  // Optionally, you can re-run layout here
-  // // change layout to dagre
-  // document.getElementById("layoutSelect").value = "dagre";
+    // Optionally, you can re-run layout here
+    // // change layout to dagre
+    // document.getElementById("layoutSelect").value = "dagre";
 
-  let currentLayout = document.getElementById("layoutSelect").value;
+    let currentLayout = document.getElementById("layoutSelect").value;
 
-  if (currentLayout === "euler") {
-    document.getElementById("layoutSelect").value = "dagre";
-    currentLayout = "dagre";
-  }
+    if (currentLayout === "euler") {
+        document.getElementById("layoutSelect").value = "dagre";
+        currentLayout = "dagre";
+    }
 
-  STATE.cy
-    .layout({
-      name: currentLayout,
-      animate: false,
-      fit: true,
-      padding: 10,
-      avoidOverlap: true,
-      rankDir: "LR",
-    })
-    .run();
+    STATE.cy
+        .layout({
+            name: currentLayout,
+            animate: false,
+            fit: true,
+            padding: 10,
+            avoidOverlap: true,
+            rankDir: "LR",
+        })
+        .run();
 
-  setupGraphInteractions();
+    setupGraphInteractions();
 }
 
 function hideUninvolvedElements() {
-  const involvedNodes = new Set();
-  const involvedEdges = new Set();
+    const involvedNodes = new Set();
+    const involvedEdges = new Set();
 
-  // Mark all nodes and edges involved in the walks
-  STATE.walks.forEach((walk) => {
-    walk.forEach((node, index) => {
-      involvedNodes.add(node.id());
-      if (index < walk.length - 1) {
-        const nextNode = walk[index + 1];
-        const connectingEdge = node.edgesTo(nextNode);
-        involvedEdges.add(connectingEdge.id());
-      }
+    // Mark all nodes and edges involved in the walks
+    STATE.walks.forEach((walk) => {
+        walk.forEach((node, index) => {
+            involvedNodes.add(node.id());
+            if (index < walk.length - 1) {
+                const nextNode = walk[index + 1];
+                const connectingEdge = node.edgesTo(nextNode);
+                involvedEdges.add(connectingEdge.id());
+            }
+        });
     });
-  });
 
-  // Hide nodes and edges not involved in any walk
-  STATE.cy.nodes().forEach((node) => {
-    if (!involvedNodes.has(node.id())) {
-      node.hide();
-    }
-  });
+    // Hide nodes and edges not involved in any walk
+    STATE.cy.nodes().forEach((node) => {
+        if (!involvedNodes.has(node.id())) {
+            node.hide();
+        }
+    });
 
-  STATE.cy.edges().forEach((edge) => {
-    if (!involvedEdges.has(edge.id())) {
-      edge.hide();
-    }
-  });
+    STATE.cy.edges().forEach((edge) => {
+        if (!involvedEdges.has(edge.id())) {
+            edge.hide();
+        }
+    });
 }
 
 document
-  .getElementById("minEdgeWeight")
-  .addEventListener("change", function () {
-    const minEdgeWeight = parseFloat(this.value) || 1;
-    if (Number.isNaN(minEdgeWeight)) return;
-    STATE.minEdgeWeight = minEdgeWeight;
+    .getElementById("minEdgeWeight")
+    .addEventListener("change", function() {
+        const minEdgeWeight = parseFloat(this.value) || 1;
+        if (Number.isNaN(minEdgeWeight)) return;
+        STATE.minEdgeWeight = minEdgeWeight;
+        updateGraph();
+    });
+
+document.getElementById("MaxDepth").addEventListener("change", function() {
+    const MaxDepth = parseFloat(this.value) || 900;
+    if (Number.isNaN(MaxDepth)) return;
+    STATE.maxPathLength = MaxDepth;
+
+    if (STATE.minPathLength > STATE.maxPathLength) {
+        // altert user
+        alert("Min Depth cannot be greater than Max Depth");
+        document.getElementById("MaxDepth").value = STATE.minPathLength;
+        return;
+    }
+
     updateGraph();
-  });
-
-document.getElementById("MaxDepth").addEventListener("change", function () {
-  const MaxDepth = parseFloat(this.value) || 900;
-  if (Number.isNaN(MaxDepth)) return;
-  STATE.maxPathLength = MaxDepth;
-
-  if (STATE.minPathLength > STATE.maxPathLength) {
-    // altert user
-    alert("Min Depth cannot be greater than Max Depth");
-    document.getElementById("MaxDepth").value = STATE.minPathLength;
-    return;
-  }
-
-  updateGraph();
 });
 
-document.getElementById("MinDepth").addEventListener("change", function () {
-  const MinDepth = parseFloat(this.value) || 2;
-  if (Number.isNaN(MinDepth)) return;
-  STATE.minPathLength = MinDepth;
+document.getElementById("MinDepth").addEventListener("change", function() {
+    const MinDepth = parseFloat(this.value) || 2;
+    if (Number.isNaN(MinDepth)) return;
+    STATE.minPathLength = MinDepth;
 
-  if (STATE.minPathLength > STATE.maxPathLength) {
-    // altert user
-    alert("Min Depth cannot be greater than Max Depth");
-    document.getElementById("MinDepth").value = STATE.maxPathLength;
-    return;
-  }
+    if (STATE.minPathLength > STATE.maxPathLength) {
+        // altert user
+        alert("Min Depth cannot be greater than Max Depth");
+        document.getElementById("MinDepth").value = STATE.maxPathLength;
+        return;
+    }
 
-  updateGraph();
+    updateGraph();
 });
 
 export function loadGraphDataFromServer(graphData) {
-  //check if graphData has elements
-  // if has elements, initialize graph using elements
-  // if not has elements, initialize graph using graphData
-  if (graphData.elements) {
-    STATE.originalGraphData = graphData.elements;
-    initializeGraph(graphData.elements);
-  } else {
-    STATE.originalGraphData = graphData;
-    initializeGraph(graphData);
-  }
-  setupGraphInteractions();
+    //check if graphData has elements
+    // if has elements, initialize graph using elements
+    // if not has elements, initialize graph using graphData
+    if (graphData.elements) {
+        STATE.originalGraphData = graphData.elements;
+        initializeGraph(graphData.elements);
+    } else {
+        STATE.originalGraphData = graphData;
+        initializeGraph(graphData);
+    }
+    setupGraphInteractions();
 }
 
 // Make loadGraphDataFromServer globally available to avoid circular dependencies
 window.loadGraphDataFromServer = loadGraphDataFromServer;
 
 document.getElementById("resetGraph").addEventListener("click", () => {
-  // Reset layout to default
-  STATE.cy.elements().removeClass("highlightWalk");
-  layoutSelect.value = "dagre";
-  STATE.cy
-    .layout({
-      name: "dagre",
-      animate: true,
-      fit: true,
-      padding: 10,
-      avoidOverlap: true,
-      rankDir: "LR",
-    })
-    .run();
+    // Reset layout to default
+    STATE.cy.elements().removeClass("highlightWalk");
+    layoutSelect.value = "dagre";
+    STATE.cy
+        .layout({
+            name: "dagre",
+            animate: true,
+            fit: true,
+            padding: 10,
+            avoidOverlap: true,
+            rankDir: "LR",
+        })
+        .run();
 
-  const cyContainer = document.getElementById("cy");
-  const infoPanel = document.getElementById("info");
-  const walksPanel = document.getElementById("walks");
+    const cyContainer = document.getElementById("cy");
+    const infoPanel = document.getElementById("info");
+    const walksPanel = document.getElementById("walks");
 
-  cyContainer.style.width = "";
-  cyContainer.style.height = "";
-  infoPanel.style.width = "";
-  walksPanel.style.width = "";
-  infoPanel.style.display = "";
-  walksPanel.style.display = "";
+    cyContainer.style.width = "";
+    cyContainer.style.height = "";
+    infoPanel.style.width = "";
+    walksPanel.style.width = "";
+    infoPanel.style.display = "";
+    walksPanel.style.display = "";
 });
 
 // Function to get color based on weight
 function setupGraphInteractions() {
-  STATE.cy.on("tap", (evt) => {
-    if (evt.target === STATE.cy) {
-      clearNodeHighlights(STATE.cy);
-    }
-  });
+    STATE.cy.on("tap", (evt) => {
+        if (evt.target === STATE.cy) {
+            clearNodeHighlights(STATE.cy);
+        }
+    });
 
-  displayWalks();
-  setupClickEvent();
-  createTooltip();
+    displayWalks();
+    setupClickEvent();
+    createTooltip();
 
-  // Initialize gene annotation functionality
-  initGeneAnnotation();
+    // Initialize gene annotation functionality
+    initGeneAnnotation();
 }
+
+/**
+ * Convert a string to a numeric identifier using SHA-256.
+ * @param {string} inputString - The string to convert
+ * @param {number|null} [length=10] - The desired length of the output identifier. If null, returns the full numeric representation
+ * @returns {Promise<string>} A string of decimal numbers derived from the SHA-256 hash
+ * @throws {TypeError} If inputString is not a string or length is not a number/null
+ * @throws {Error} If length is not positive
+ *
+ * @example
+ * const numericId = await toNumericIdentifier("Hello World!", 10);
+ * console.log(numericId); // Outputs a string of 10 decimal numbers
+ */
+async function toNumericIdentifier(inputString, length = 10) {
+    // Type checking
+    if (typeof inputString !== "string") {
+        throw new TypeError("Input must be a string");
+    }
+
+    if (
+        length !== null &&
+        (!Number.isInteger(length) || typeof length !== "number")
+    ) {
+        throw new TypeError("Length must be an integer or null");
+    }
+
+    if (length !== null && length <= 0) {
+        throw new Error("Length must be positive");
+    }
+
+    // Create SHA-256 hash
+    const encoder = new TextEncoder();
+    const data = encoder.encode(inputString);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+    // Convert buffer to decimal string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    let numericString = hashArray.map((b) => b.toString().padStart(3, "0")).join("");
+
+    // Take specified length of the numeric string if provided
+    let result = length ? numericString.slice(0, length) : numericString;
+
+    return result;
+}
+
 
 /**
  * Convert a string to a hash-based identifier using SHA-256.
@@ -242,48 +287,48 @@ function setupGraphInteractions() {
  * console.log(identifier); // Outputs something like 'a591a6d40bf420'
  */
 async function toHashIdentifier(inputString, length = 16) {
-  // Type checking
-  if (typeof inputString !== "string") {
-    throw new TypeError("Input must be a string");
-  }
+    // Type checking
+    if (typeof inputString !== "string") {
+        throw new TypeError("Input must be a string");
+    }
 
-  if (
-    length !== null &&
-    (!Number.isInteger(length) || typeof length !== "number")
-  ) {
-    throw new TypeError("Length must be an integer or null");
-  }
+    if (
+        length !== null &&
+        (!Number.isInteger(length) || typeof length !== "number")
+    ) {
+        throw new TypeError("Length must be an integer or null");
+    }
 
-  if (length !== null && length <= 0) {
-    throw new Error("Length must be positive");
-  }
+    if (length !== null && length <= 0) {
+        throw new Error("Length must be positive");
+    }
 
-  // Create SHA-256 hash
-  const encoder = new TextEncoder();
-  const data = encoder.encode(inputString);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    // Create SHA-256 hash
+    const encoder = new TextEncoder();
+    const data = encoder.encode(inputString);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-  // Convert buffer to hex string
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+    // Convert buffer to hex string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
 
-  // Take specified length of hash if provided
-  let result = length ? hashHex.slice(0, length) : hashHex;
+    // Take specified length of hash if provided
+    let result = length ? hashHex.slice(0, length) : hashHex;
 
-  // Ensure the identifier starts with a letter (prefix with 'a' if it starts with a number)
-  if (/^[0-9]/.test(result)) {
-    result = "a" + result.slice(1);
-  }
+    // Ensure the identifier starts with a letter (prefix with 'a' if it starts with a number)
+    if (/^[0-9]/.test(result)) {
+        result = "a" + result.slice(1);
+    }
 
-  return result;
+    return result;
 }
 
 /**
  * Generates a unique Aurora ID for a given walk through the graph.
  * @param {Array} walk - Array of graph nodes representing a walk
- * @returns {Promise<string>} A unique identifier for the walk generated using toHashIdentifier
+ * @returns {Promise<string>} A unique identifier for the walk generated using toNumericIdentifier
  *
  * @example
  * const walk = [node1, node2, node3];
@@ -291,30 +336,30 @@ async function toHashIdentifier(inputString, length = 16) {
  * console.log(auroraId); // Outputs something like 'a591a6d40bf420'
  */
 async function getWalkAuroraId(walk) {
-  // Create the walk info string by joining node information
-  const walkInfo = walk
-    .map((node) => {
-      const nodeId = node.data("id");
-      return nodeId;
-    })
-    .join("-");
+    // Create the walk info string by joining node information
+    const walkInfo = walk
+        .map((node) => {
+            const nodeId = node.data("id");
+            return nodeId;
+        })
+        .join("-");
 
-  // Generate hash identifier for the walk info
-  console.log(`Generating Aurora ID for walk: ${walkInfo}`);
-
-  return await toHashIdentifier(walkInfo);
+    // Generate numeric identifier for the walk info
+    console.log(`Generating Aurora ID for walk: ${walkInfo}`);
+    const auroraId = await toNumericIdentifier(walkInfo);
+    return `TSP${auroraId}`;
 }
 
 // Update the displayWalks function for a more beautiful presentation
 async function displayWalks(searchText = "", auroraIds = []) {
-  const walksContainer = document.getElementById("walks");
-  if (!walksContainer) {
-    console.error("Walks container not found");
-    return;
-  }
+    const walksContainer = document.getElementById("walks");
+    if (!walksContainer) {
+        console.error("Walks container not found");
+        return;
+    }
 
-  // Clear previous walks display and add search box with improved styling
-  walksContainer.innerHTML = `
+    // Clear previous walks display and add search box with improved styling
+    walksContainer.innerHTML = `
         <div class="walks-header">
             <h3>
                 <i class="bi bi-diagram-3"></i> Graph Walks
