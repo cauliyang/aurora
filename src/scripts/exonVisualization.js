@@ -338,8 +338,37 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
                     .duration(200)
                     .style('opacity', 0);
             }
+        })
+        .on('click', function(event, d) {
+            // Construct coordinate string
+            let coordString;
+            if (chromosomeInfo && chromosomeInfo.chrom) {
+                coordString = `${chromosomeInfo.chrom}:${d.start.toLocaleString()}-${d.end.toLocaleString()}`;
+            } else {
+                coordString = `${d.start.toLocaleString()}-${d.end.toLocaleString()}`;
+            }
+            // Copy to clipboard
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(coordString).then(() => {
+                    showExportNotification('success', `Copied: ${coordString}`);
+                }, () => {
+                    showExportNotification('error', 'Failed to copy coordinate');
+                });
+            } else {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = coordString;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showExportNotification('success', `Copied: ${coordString}`);
+                } catch (err) {
+                    showExportNotification('error', 'Failed to copy coordinate');
+                }
+                document.body.removeChild(textarea);
+            }
         });
-
     // Make responsive
     function resizeVisualization() {
         // Only adjust width if the container width changes significantly
