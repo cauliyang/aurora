@@ -732,9 +732,9 @@ function generatePathVisualization(walk) {
                 : ""
             }">
                 <div class="node-dot"></div>
-                <div class="node-label" title="${
+                <button class="node-label clickable-node-id" title="${
                   nodeData.id
-                }">${displayName}</div>
+                }" data-node-id="${nodeData.id}">${displayName}</button>
                 ${
                   index < walk.length - 1
                     ? '<div class="node-arrow"><i class="bi bi-arrow-right"></i></div>'
@@ -802,6 +802,21 @@ function addWalkCardEventListeners() {
     btn.addEventListener("click", () => {
       const chevron = btn.querySelector(".chevron-icon");
       chevron.classList.toggle("rotated");
+    });
+  });
+
+  // Add click event listeners to node ids in path visualization
+  document.querySelectorAll(".clickable-node-id").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent accordion toggle
+      const nodeId = btn.getAttribute("data-node-id");
+      if (window.highlightNode && typeof window.highlightNode === "function") {
+        window.highlightNode(STATE.cy, nodeId);
+      } else if (typeof highlightNode === "function") {
+        highlightNode(STATE.cy, nodeId);
+      } else {
+        console.error("highlightNode function not found");
+      }
     });
   });
 }
@@ -944,8 +959,33 @@ function addWalksStyles() {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            border: 1px solid #d1d5db;
+            border-radius: 999px;
+            background: #fff;
+            color: #222;
+            padding: 4px 14px;
+            margin: 0 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: border 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s, transform 0.1s;
+            outline: none;
+            font-weight: 500;
+            position: relative;
         }
-
+        .node-label:focus, .node-label:hover {
+            background: #f3f4f6;
+            border-color: #a5b4fc;
+            color: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.08);
+            transform: scale(1.04);
+            z-index: 2;
+        }
+        .node-label:active {
+            background: #e0e7ff;
+            border-color: #6366f1;
+            color: #3730a3;
+            transform: scale(0.98);
+        }
         .node-arrow {
             margin: 0 5px;
             color: #adb5bd;
