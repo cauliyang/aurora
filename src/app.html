@@ -19,10 +19,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
     />
-    <link rel="stylesheet" as="style" href="./styles/scss/styles.scss" />
-    <link rel="stylesheet" as="style" href="./styles/style.css" />
-    <link rel="stylesheet" as="style" href="./styles/app.css" />
-    <link rel="stylesheet" as="style" href="./styles/gene-annotations.css" />
+    <link rel="stylesheet" href="./styles/scss/styles.scss" />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <link rel="stylesheet" href="./styles/app.css" />
+    <link rel="stylesheet" href="./styles/gene-annotations.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -116,6 +116,7 @@
                 id="toggleMaximize"
                 class="btn btn-outline-primary"
                 title="Toggle fullscreen"
+                aria-label="Toggle fullscreen view"
               >
                 <i class="bi bi-arrows-fullscreen"></i>
               </button>
@@ -126,6 +127,7 @@
                 action="/upload"
                 class="btn btn-outline-primary"
                 title="Upload JSON/TSG file"
+                aria-label="Upload JSON or TSG file"
               >
                 <input
                   type="file"
@@ -134,13 +136,19 @@
                   class="d-none"
                   id="uploadInput"
                 />
-                <label for="uploadInput"><i class="bi bi-upload"></i></label>
+                <label
+                  for="uploadInput"
+                  title="Upload JSON/TSG file"
+                  aria-label="Upload JSON or TSG file"
+                  ><i class="bi bi-upload"></i
+                ></label>
               </form>
 
               <button
                 id="captureGraph"
                 class="btn btn-outline-primary"
                 title="Capture graph as PNG"
+                aria-label="Capture graph as PNG image"
               >
                 <i class="bi bi-camera"></i>
               </button>
@@ -149,6 +157,7 @@
                 id="hiddenLabel"
                 class="btn btn-outline-primary"
                 title="Toggle node/edge labels"
+                aria-label="Toggle node and edge labels"
                 data-tooltip-enabled="false"
                 onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))"
               >
@@ -159,6 +168,7 @@
                 id="toggleTooltip"
                 class="btn btn-outline-primary active"
                 title="Toggle tooltips"
+                aria-label="Toggle tooltips on graph elements"
                 data-tooltip-enabled="true"
                 onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))"
               >
@@ -169,24 +179,25 @@
                 id="resetGraph"
                 class="btn btn-outline-primary"
                 title="Reset graph layout"
+                aria-label="Reset graph layout"
               >
                 <i class="bi bi-arrow-repeat"></i>
               </button>
 
-              <!-- Add the clear highlights button -->
               <button
                 id="clearHighlights"
                 class="btn btn-outline-primary"
                 title="Clear node highlights"
+                aria-label="Clear node highlights"
               >
                 <i class="bi bi-eraser"></i>
               </button>
 
-              <!-- Replace the gene annotation button with this version -->
               <button
                 id="geneAnnotationBtn"
                 class="btn btn-outline-primary"
                 title="Gene Annotations"
+                aria-label="Open gene annotation settings"
               >
                 <i class="fas fa-dna"></i>
               </button>
@@ -289,10 +300,21 @@
 
             <!-- JSON Editor and IGV Buttons -->
             <div class="btn-group mb-2" role="group">
-              <button id="openJsonEditor" type="button" class="btn btn-primary">
+              <button
+                id="openJsonEditor"
+                type="button"
+                class="btn btn-primary"
+                title="Open JSON Editor"
+                aria-label="Open JSON Editor"
+              >
                 <i class="bi bi-code-square"></i>
               </button>
-              <button class="btn btn-outline-primary" id="redirectToIgv">
+              <button
+                class="btn btn-outline-primary"
+                id="redirectToIgv"
+                title="Open IGV Browser"
+                aria-label="Open IGV Browser"
+              >
                 <img
                   src="./assets/igv-logo-cooked-40x40.png"
                   alt="IGV"
@@ -307,6 +329,8 @@
                 class="btn btn-outline-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#nodeRankingModal"
+                title="Show node ranking"
+                aria-label="Show node ranking"
               >
                 <i class="bi bi-list-ol"></i> Node Ranking
               </button>
@@ -317,6 +341,8 @@
               class="btn btn-sm btn-outline-secondary d-md-none mb-2 ms-auto"
               type="button"
               id="collapseToolbarBtn"
+              title="Collapse toolbar"
+              aria-label="Collapse toolbar"
             >
               <i class="bi bi-chevron-up"></i>
             </button>
