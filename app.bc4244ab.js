@@ -59,7 +59,7 @@ class e{constructor(){this.helpSteps=[{target:"#cy",title:"Graph Visualization P
             opacity: 1;
           }
         }
-      `,document.head.appendChild(t);let o=document.createElement("div");o.innerHTML=e,document.body.appendChild(o),document.querySelector(".help-guide-welcome-close").addEventListener("click",()=>{document.querySelector(".help-guide-welcome-toast").remove(),localStorage.setItem("auroraHelpGuideWelcomeSeen","true")}),document.getElementById("startWelcomeHelpBtn").addEventListener("click",()=>{document.querySelector(".help-guide-welcome-toast").remove(),localStorage.setItem("auroraHelpGuideWelcomeSeen","true"),this.startGuide()}),setTimeout(()=>{let e=document.querySelector(".help-guide-welcome-toast");e&&(e.style.animation="slideInUp 0.4s ease-out reverse",setTimeout(()=>{e.parentNode&&(e.remove(),localStorage.setItem("auroraHelpGuideWelcomeSeen","true"))},400))},3e4)}}addHelpButton(){let e=document.getElementById("showReleaseNotesBtn");if(e){let t=document.createElement("li");t.className="nav-item";let o=document.createElement("a");o.id="helpGuideButton",o.className="nav-link",o.href="#",o.title="Start Help Guide",o.innerHTML='<i class="bi bi-question-circle"></i> Help',o.addEventListener("click",e=>{e.preventDefault(),this.startGuide()}),t.appendChild(o);let i=e.closest("ul"),n=e.closest("li");n&&i&&i.insertBefore(t,n.nextSibling)}}startGuide(){this.isGuideActive||(this.isGuideActive=!0,this.createOverlay(),this.showStep(0))}createOverlay(){if(!this.overlay){this.overlay=document.createElement("div"),this.overlay.className="help-guide-overlay",document.body.appendChild(this.overlay);let e=document.createElement("style");e.textContent=`
+      `,document.head.appendChild(t);let i=document.createElement("div");i.innerHTML=e,document.body.appendChild(i),document.querySelector(".help-guide-welcome-close").addEventListener("click",()=>{document.querySelector(".help-guide-welcome-toast").remove(),localStorage.setItem("auroraHelpGuideWelcomeSeen","true")}),document.getElementById("startWelcomeHelpBtn").addEventListener("click",()=>{document.querySelector(".help-guide-welcome-toast").remove(),localStorage.setItem("auroraHelpGuideWelcomeSeen","true"),this.startGuide()}),setTimeout(()=>{let e=document.querySelector(".help-guide-welcome-toast");e&&(e.style.animation="slideInUp 0.4s ease-out reverse",setTimeout(()=>{e.parentNode&&(e.remove(),localStorage.setItem("auroraHelpGuideWelcomeSeen","true"))},400))},3e4)}}addHelpButton(){let e=document.getElementById("showReleaseNotesBtn");if(e){let t=document.createElement("li");t.className="nav-item";let i=document.createElement("a");i.id="helpGuideButton",i.className="nav-link",i.href="#",i.title="Start Help Guide",i.innerHTML='<i class="bi bi-question-circle"></i> Help',i.addEventListener("click",e=>{e.preventDefault(),this.startGuide()}),t.appendChild(i);let o=e.closest("ul"),n=e.closest("li");n&&o&&o.insertBefore(t,n.nextSibling)}}startGuide(){this.isGuideActive||(this.isGuideActive=!0,this.createOverlay(),this.showStep(0))}createOverlay(){if(!this.overlay){this.overlay=document.createElement("div"),this.overlay.className="help-guide-overlay",document.body.appendChild(this.overlay);let e=document.createElement("style");e.textContent=`
                 .help-guide-overlay {
                     position: fixed;
                     top: 0;
@@ -94,6 +94,21 @@ class e{constructor(){this.helpSteps=[{target:"#cy",title:"Graph Visualization P
                 .help-guide-buttons {
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
+                    gap: 10px;
+                    margin-top: 10px;
+                }
+
+                .help-guide-nav-group {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .help-guide-step-indicator {
+                    min-width: 70px;
+                    text-align: center;
+                    font-weight: 500;
                 }
 
                 .target-highlight {
@@ -101,17 +116,22 @@ class e{constructor(){this.helpSteps=[{target:"#cy",title:"Graph Visualization P
                     z-index: 9999;
                     pointer-events: auto;
                 }
-            `,document.head.appendChild(e)}this.tooltip||(this.tooltip=document.createElement("div"),this.tooltip.className="help-guide-tooltip",document.body.appendChild(this.tooltip))}showStep(e){if(e<0||e>=this.helpSteps.length)return void this.endGuide();this.currentStepIndex=e;let t=this.helpSteps[e],o=document.querySelector(t.target);if(!o){console.error(`Target element ${t.target} not found`),this.nextStep();return}o.classList.add("target-highlight"),this.scrollElementIntoView(o).then(()=>{this.positionTooltip(o,t.placement),this.tooltip.innerHTML=`
+            `,document.head.appendChild(e)}this.tooltip||(this.tooltip=document.createElement("div"),this.tooltip.className="help-guide-tooltip",document.body.appendChild(this.tooltip))}showStep(e){if(e<0||e>=this.helpSteps.length)return void this.endGuide();this.currentStepIndex=e;let t=this.helpSteps[e],i=document.querySelector(t.target);if(!i){console.error(`Target element ${t.target} not found`),this.nextStep();return}i.classList.add("target-highlight"),this.scrollElementIntoView(i).then(()=>{this.positionTooltip(i,t.placement),this.tooltip.innerHTML=`
         <h5>${t.title}</h5>
         <p>${t.content}</p>
         <div class="help-guide-buttons">
-          <button id="helpGuidePrev" class="btn btn-sm btn-outline-secondary"${0===e?" disabled":""}>
-            <i class="bi bi-chevron-left"></i> Previous
-          </button>
-          <span>${e+1} of ${this.helpSteps.length}</span>
-          <button id="helpGuideNext" class="btn btn-sm btn-outline-primary">
-            ${e===this.helpSteps.length-1?'Finish <i class="bi bi-check-lg"></i>':'Next <i class="bi bi-chevron-right"></i>'}
+          <div class="help-guide-nav-group">
+            <button id="helpGuidePrev" class="btn btn-sm btn-outline-secondary"${0===e?" disabled":""}>
+              <i class="bi bi-chevron-left"></i> Previous
+            </button>
+            <span class="help-guide-step-indicator">${e+1} of ${this.helpSteps.length}</span>
+            <button id="helpGuideNext" class="btn btn-sm btn-outline-primary">
+              ${e===this.helpSteps.length-1?'Finish <i class="bi bi-check-lg"></i>':'Next <i class="bi bi-chevron-right"></i>'}
+            </button>
+          </div>
+          <button id="helpGuideClose" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-x-lg"></i> Close
           </button>
         </div>
-      `,document.getElementById("helpGuidePrev").addEventListener("click",()=>{this.previousStep()}),document.getElementById("helpGuideNext").addEventListener("click",()=>{this.nextStep()}),this.saveProgress()})}positionTooltip(e,t){this.scrollElementIntoView(e);let o=e.getBoundingClientRect();setTimeout(()=>{let e,i,n=this.tooltip.getBoundingClientRect();switch(t){case"top":e=o.top-n.height-15,i=o.left+(o.width-n.width)/2;break;case"bottom":default:e=o.bottom+15,i=o.left+(o.width-n.width)/2;break;case"left":e=o.top+(o.height-n.height)/2,i=o.left-n.width-15;break;case"right":e=o.top+(o.height-n.height)/2,i=o.right+15}let a=window.innerWidth,l=window.innerHeight;i<15&&(i=15),i+n.width>a-15&&(i=a-n.width-15),e<15&&(e="top"===t?o.bottom+15:15),e+n.height>l-15&&("bottom"===t?(e=o.top-n.height-15)<15&&(e=15):e=l-n.height-15),this.tooltip.style.top=`${e}px`,this.tooltip.style.left=`${i}px`},250)}scrollElementIntoView(e){let t=e.getBoundingClientRect(),o=window.innerHeight;return t.top>=0&&t.left>=0&&t.bottom<=o&&t.right<=window.innerWidth?Promise.resolve():(e.scrollIntoView({behavior:"smooth",block:"center",inline:"center"}),new Promise(e=>setTimeout(e,200)))}nextStep(){let e=this.helpSteps[this.currentStepIndex],t=document.querySelector(e.target);t&&t.classList.remove("target-highlight"),this.currentStepIndex===this.helpSteps.length-1?this.endGuide():this.showStep(this.currentStepIndex+1)}previousStep(){let e=this.helpSteps[this.currentStepIndex],t=document.querySelector(e.target);t&&t.classList.remove("target-highlight"),this.currentStepIndex>0&&this.showStep(this.currentStepIndex-1)}endGuide(){this.isGuideActive=!1;let e=this.helpSteps[this.currentStepIndex];if(e){let t=document.querySelector(e.target);t&&t.classList.remove("target-highlight")}this.overlay&&(document.body.removeChild(this.overlay),this.overlay=null),this.tooltip&&(document.body.removeChild(this.tooltip),this.tooltip=null),this.saveProgress()}saveProgress(){localStorage.setItem("auroraHelpGuideProgress",JSON.stringify({lastViewedStep:this.currentStepIndex,lastViewedDate:new Date().toISOString()}))}loadProgress(){try{let e=JSON.parse(localStorage.getItem("auroraHelpGuideProgress"));if(e){let t=new Date(e.lastViewedDate);(new Date-t)/864e5<=7&&(this.currentStepIndex=e.lastViewedStep)}}catch(e){console.error("Error loading help guide progress:",e),this.currentStepIndex=0}}}document.addEventListener("DOMContentLoaded",()=>{window.auroraHelpGuide=new e});
-//# sourceMappingURL=app.273b5ec6.js.map
+      `,document.getElementById("helpGuidePrev").addEventListener("click",()=>{this.previousStep()}),document.getElementById("helpGuideNext").addEventListener("click",()=>{this.nextStep()}),document.getElementById("helpGuideClose").addEventListener("click",()=>{this.endGuide()}),this.saveProgress()})}positionTooltip(e,t){this.scrollElementIntoView(e);let i=e.getBoundingClientRect();setTimeout(()=>{let e,o,n=this.tooltip.getBoundingClientRect();switch(t){case"top":e=i.top-n.height-15,o=i.left+(i.width-n.width)/2;break;case"bottom":default:e=i.bottom+15,o=i.left+(i.width-n.width)/2;break;case"left":e=i.top+(i.height-n.height)/2,o=i.left-n.width-15;break;case"right":e=i.top+(i.height-n.height)/2,o=i.right+15}let a=window.innerWidth,l=window.innerHeight;o<15&&(o=15),o+n.width>a-15&&(o=a-n.width-15),e<15&&(e="top"===t?i.bottom+15:15),e+n.height>l-15&&("bottom"===t?(e=i.top-n.height-15)<15&&(e=15):e=l-n.height-15),this.tooltip.style.top=`${e}px`,this.tooltip.style.left=`${o}px`},250)}scrollElementIntoView(e){let t=e.getBoundingClientRect(),i=window.innerHeight;return t.top>=0&&t.left>=0&&t.bottom<=i&&t.right<=window.innerWidth?Promise.resolve():(e.scrollIntoView({behavior:"smooth",block:"center",inline:"center"}),new Promise(e=>setTimeout(e,200)))}nextStep(){let e=this.helpSteps[this.currentStepIndex],t=document.querySelector(e.target);t&&t.classList.remove("target-highlight"),this.currentStepIndex===this.helpSteps.length-1?this.endGuide():this.showStep(this.currentStepIndex+1)}previousStep(){let e=this.helpSteps[this.currentStepIndex],t=document.querySelector(e.target);t&&t.classList.remove("target-highlight"),this.currentStepIndex>0&&this.showStep(this.currentStepIndex-1)}endGuide(){this.isGuideActive=!1;let e=this.helpSteps[this.currentStepIndex];if(e){let t=document.querySelector(e.target);t&&t.classList.remove("target-highlight")}this.overlay&&(document.body.removeChild(this.overlay),this.overlay=null),this.tooltip&&(document.body.removeChild(this.tooltip),this.tooltip=null),this.saveProgress()}saveProgress(){localStorage.setItem("auroraHelpGuideProgress",JSON.stringify({lastViewedStep:this.currentStepIndex,lastViewedDate:new Date().toISOString()}))}loadProgress(){try{let e=JSON.parse(localStorage.getItem("auroraHelpGuideProgress"));if(e){let t=new Date(e.lastViewedDate);(new Date-t)/864e5<=7&&(this.currentStepIndex=e.lastViewedStep)}}catch(e){console.error("Error loading help guide progress:",e),this.currentStepIndex=0}}}document.addEventListener("DOMContentLoaded",()=>{window.auroraHelpGuide=new e});
+//# sourceMappingURL=app.bc4244ab.js.map
