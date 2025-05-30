@@ -21,6 +21,9 @@ cytoscape.use(spread);
 export const STATE = {
     cy: null,
     walks: [],
+
+    possibleWalks: [],
+
     graph_jsons: [],
     minEdgeWeight: 1,
     minPathLength: 1,
@@ -57,6 +60,41 @@ layoutSelect.addEventListener("change", () => {
         })
         .run();
 });
+
+
+// Filter walks by possiblePaths
+// walks: array of walks (each walk is array of cytoscape node objects)
+// possiblePaths: object { auroraId: [elementId1, elementId2, ...] }
+function filterWalksByPossiblePaths(walks, possiblePaths) {
+    // Build a set of stringified element ID sequences for fast lookup
+    const possibleSequences = new Set(
+        Object.values(possiblePaths).map(seq => JSON.stringify(seq))
+    );
+
+
+    // Helper to get the sequence of element IDs for a walk
+    function getWalkElementIdSequence(walk) {
+        const ids = [];
+        for (let i = 0; i < walk.length; i++) {
+            ids.push(walk[i].id());
+            // If not last node, add edge ID to next node
+            if (i < walk.length - 1) {
+                const edge = walk[i].edgesTo(walk[i + 1]);
+                if (edge && edge.length > 0) {
+                    ids.push(edge[0].id());
+                }
+            }
+        }
+        return ids;
+    }
+
+    // Filter walks
+    return walks.filter(walk => {
+        const seq = getWalkElementIdSequence(walk);
+        return possibleSequences.has(JSON.stringify(seq));
+    });
+}
+
 
 // Function to update graph based on edge weight
 function updateGraph() {
@@ -187,6 +225,25 @@ export function loadGraphDataFromServer(graphData) {
         STATE.originalGraphData = graphData;
         initializeGraph(graphData);
     }
+
+    console.log("graphData", graphData.data);
+
+    // --- Filter walks using possible_paths if present in graphData.data ---
+    let possiblePaths = null;
+    if (Array.isArray(graphData.data)) {
+        const dataObj = Object.fromEntries(graphData.data);
+        possiblePaths = dataObj.possible_paths;
+    }
+
+    if (possiblePaths && typeof possiblePaths === 'object') {
+        // Save all possible walks
+        STATE.possibleWalks = possiblePaths;
+        console.log("possibleWalks", STATE.possibleWalks);
+        // Filter walks to only those matching possible_paths
+        STATE.walks = filterWalksByPossiblePaths(STATE.walks, possiblePaths);
+        console.log("filtered walks", STATE.walks);
+    }
+
     setupGraphInteractions();
 }
 
