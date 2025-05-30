@@ -32,6 +32,8 @@ export const STATE = {
     nodeColor: "#1f77b4",
     highlightWalkColor: "#ff5733",
     sourceNodeColor: "#31a354",
+    hideUninvolvedElements: false,
+    hideSingletonNodes: false,
 };
 
 window.STATE = STATE;
@@ -72,8 +74,13 @@ function updateGraph() {
         dfs(sourceNode, [], sinkNodes);
     });
 
-    hideUninvolvedElements();
-    hideSingletonNodes();
+    if (STATE.hideUninvolvedElements) {
+        hideUninvolvedElements();
+    }
+
+    if (STATE.hideSingletonNodes) {
+        hideSingletonNodes();
+    }
 
     // Optionally, you can re-run layout here
     // // change layout to dagre
