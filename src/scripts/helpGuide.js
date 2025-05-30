@@ -373,6 +373,21 @@ class HelpGuide {
                 .help-guide-buttons {
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
+                    gap: 10px;
+                    margin-top: 10px;
+                }
+
+                .help-guide-nav-group {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .help-guide-step-indicator {
+                    min-width: 70px;
+                    text-align: center;
+                    font-weight: 500;
                 }
 
                 .target-highlight {
@@ -428,18 +443,23 @@ class HelpGuide {
         <h5>${step.title}</h5>
         <p>${step.content}</p>
         <div class="help-guide-buttons">
-          <button id="helpGuidePrev" class="btn btn-sm btn-outline-secondary"${
-            index === 0 ? " disabled" : ""
-          }>
-            <i class="bi bi-chevron-left"></i> Previous
-          </button>
-          <span>${index + 1} of ${this.helpSteps.length}</span>
-          <button id="helpGuideNext" class="btn btn-sm btn-outline-primary">
-            ${
-              index === this.helpSteps.length - 1
-                ? 'Finish <i class="bi bi-check-lg"></i>'
-                : 'Next <i class="bi bi-chevron-right"></i>'
-            }
+          <div class="help-guide-nav-group">
+            <button id="helpGuidePrev" class="btn btn-sm btn-outline-secondary"${
+              index === 0 ? " disabled" : ""
+            }>
+              <i class="bi bi-chevron-left"></i> Previous
+            </button>
+            <span class="help-guide-step-indicator">${index + 1} of ${this.helpSteps.length}</span>
+            <button id="helpGuideNext" class="btn btn-sm btn-outline-primary">
+              ${
+                index === this.helpSteps.length - 1
+                  ? 'Finish <i class="bi bi-check-lg"></i>'
+                  : 'Next <i class="bi bi-chevron-right"></i>'
+              }
+            </button>
+          </div>
+          <button id="helpGuideClose" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-x-lg"></i> Close
           </button>
         </div>
       `;
@@ -451,6 +471,11 @@ class HelpGuide {
 
             document.getElementById("helpGuideNext").addEventListener("click", () => {
                 this.nextStep();
+            });
+
+            // Add event listener to close button
+            document.getElementById("helpGuideClose").addEventListener("click", () => {
+                this.endGuide();
             });
 
             // Save progress
