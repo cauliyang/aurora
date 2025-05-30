@@ -346,3 +346,20 @@ a:hover,
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
+/* walk */
+
+.walks-header {
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 15px;
+}
+
+.walks-header h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}

@@ -850,19 +850,7 @@ function addWalksStyles() {
   const style = document.createElement("style");
   style.id = "walks-styles";
   style.textContent = `
-        .walks-header {
-            padding: 10px 0;
-            border-bottom: 1px solid #e5e5e5;
-            margin-bottom: 15px;
-        }
-
-        .walks-header h3 {
-            display: flex;
-            align-items: center;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-
+        
         .walks-count {
             margin-left: 10px;
             font-size: 0.8em;
