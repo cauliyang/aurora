@@ -239,9 +239,14 @@ export function loadGraphDataFromServer(graphData) {
         // Save all possible walks
         STATE.possibleWalks = possiblePaths;
         console.log("possibleWalks", STATE.possibleWalks);
+
+        let walks_number_before_filtering = STATE.walks.length;
         // Filter walks to only those matching possible_paths
         STATE.walks = filterWalksByPossiblePaths(STATE.walks, possiblePaths);
-        console.log("filtered walks", STATE.walks);
+        let walks_number_after_filtering = STATE.walks.length;
+
+        console.log("walks_number_before_filtering", walks_number_before_filtering);
+        console.log("walks_number_after_filtering", walks_number_after_filtering);
     }
 
     setupGraphInteractions();
@@ -907,7 +912,7 @@ function addWalksStyles() {
   const style = document.createElement("style");
   style.id = "walks-styles";
   style.textContent = `
-        
+
         .walks-count {
             margin-left: 10px;
             font-size: 0.8em;
