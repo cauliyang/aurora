@@ -35,7 +35,7 @@ export const STATE = {
     nodeColor: "#1f77b4",
     highlightWalkColor: "#ff5733",
     sourceNodeColor: "#31a354",
-    hideUninvolvedElements: false,
+    hideUninvolvedElements: true, // update graph when filter changes
     hideSingletonNodes: false,
 };
 
@@ -111,6 +111,12 @@ function updateGraph() {
     sourceNodes.forEach((sourceNode) => {
         dfs(sourceNode, [], sinkNodes);
     });
+
+
+    if (STATE.possibleWalks && Object.keys(STATE.possibleWalks).length > 0) {
+        console.log("UPDATE Graph: filtering walks by possible walks");
+        STATE.walks = filterWalksByPossiblePaths(STATE.walks, STATE.possibleWalks);
+    }
 
     if (STATE.hideUninvolvedElements) {
         hideUninvolvedElements();
@@ -242,7 +248,7 @@ export function loadGraphDataFromServer(graphData) {
 
         let walks_number_before_filtering = STATE.walks.length;
         // Filter walks to only those matching possible_paths
-        STATE.walks = filterWalksByPossiblePaths(STATE.walks, possiblePaths);
+        STATE.walks = filterWalksByPossiblePaths(STATE.walks, STATE.possibleWalks);
         let walks_number_after_filtering = STATE.walks.length;
 
         console.log("walks_number_before_filtering", walks_number_before_filtering);
