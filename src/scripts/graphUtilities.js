@@ -82,42 +82,101 @@ export function displayElementInfo(element, container) {
         <strong>Basic Information</strong>
       </div>
       <div class="card-body">
-        <p class="mb-1"><strong>ID:</strong> ${data.id || "Not available"}</p>
+        <div class="info-field mb-3">
+          <i class="bi bi-hash text-primary me-2"></i>
+          <span class="field-label">ID:</span>
+          <code class="field-value text-muted">${data.id || "Not available"}</code>
+        </div>
   `;
 
     if (type === "Node") {
         html += `
-        <p class="mb-1"><strong>Name:</strong> ${
-          data.name || data.id || "Not available"
-        }</p>
-        <p class="mb-1"><strong>Connections:</strong> ${
-          element.connectedEdges().length
-        } edges</p>
-        <p class="mb-1"><strong>Degree:</strong> In: ${element.indegree()} / Out: ${element.outdegree()}</p>
+
+        <div class="row g-2 mb-2">
+          <div class="col-12">
+            <div class="info-field">
+              <i class="bi bi-tag-fill text-primary me-2"></i>
+              <span class="field-label">Name:</span>
+              <span class="field-value badge bg-light text-dark">${
+                data.name || data.id || "Not available"
+              }</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row g-2">
+          <div class="col-6">
+            <div class="stat-card text-center p-2 bg-light rounded">
+              <i class="bi bi-diagram-3 text-info mb-1"></i>
+              <div class="stat-number">${element.connectedEdges().length}</div>
+              <div class="stat-label">Connections</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="stat-card text-center p-2 bg-light rounded">
+              <i class="bi bi-arrows text-success mb-1"></i>
+              <div class="stat-number">${element.indegree()}/${element.outdegree()}</div>
+              <div class="stat-label">In/Out Degree</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     `;
 
         // Genomic information section (if available)
         if (data.chrom || data.ref_start || data.ref_end) {
+            const length = data.ref_start && data.ref_end ? data.ref_end - data.ref_start + 1 : null;
             html += `
-        <div class="card mb-3">
-          <div class="card-header bg-light">
+        <div class="card mb-3 genomic-card">
+          <div class="card-header bg-gradient-primary text-white d-flex align-items-center">
+            <i class="bi bi-geo-alt-fill me-2"></i>
             <strong>Genomic Location</strong>
           </div>
-          <div class="card-body">
-            <p class="mb-1"><strong>Chromosome:</strong> ${
-              data.chrom || "Not available"
-            }</p>
-            <p class="mb-1"><strong>Start:</strong> ${
-              data.ref_start?.toLocaleString() || "Not available"
-            }</p>
-            <p class="mb-1"><strong>End:</strong> ${
-              data.ref_end?.toLocaleString() || "Not available"
-            }</p>
-            <p class="mb-1"><strong>Strand:</strong> ${
-              data.strand || "Not available"
-            }</p>
+          <div class="card-body p-3">
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="genomic-field">
+                  <i class="bi bi-diagram-2 text-primary me-2"></i>
+                  <div class="field-content">
+                    <div class="field-label">Chromosome</div>
+                    <div class="field-value chromosome-badge">${data.chrom || "N/A"}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="genomic-field">
+                  <i class="bi bi-arrow-${data.strand === '+' ? 'right' : data.strand === '-' ? 'left' : 'left-right'} text-${data.strand === '+' ? 'success' : data.strand === '-' ? 'warning' : 'secondary'} me-2"></i>
+                  <div class="field-content">
+                    <div class="field-label">Strand</div>
+                    <div class="field-value strand-badge strand-${data.strand || 'unknown'}">${data.strand || "N/A"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="position-info mt-3 p-3 bg-light rounded">
+              <div class="row g-2 text-center">
+                <div class="col-4">
+                  <div class="position-stat">
+                    <div class="position-number">${data.ref_start?.toLocaleString() || "N/A"}</div>
+                    <div class="position-label">Start</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="position-stat">
+                    <div class="position-number">${data.ref_end?.toLocaleString() || "N/A"}</div>
+                    <div class="position-label">End</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="position-stat">
+                    <div class="position-number ${length ? 'text-info' : ''}">${length ? length.toLocaleString() : "N/A"}</div>
+                    <div class="position-label">Length${length ? ' (bp)' : ''}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -205,15 +264,27 @@ export function displayElementInfo(element, container) {
     } else {
         // Edge specific information
         html += `
-        <p class="mb-1"><strong>Source:</strong> ${
-          data.source || "Not available"
-        }</p>
-        <p class="mb-1"><strong>Target:</strong> ${
-          data.target || "Not available"
-        }</p>
-        <p class="mb-1"><strong>Weight:</strong> <span class="badge bg-info">${
-          data.weight || "Not available"
-        }</span></p>
+        <div class="edge-connection mb-3">
+          <div class="connection-flow d-flex align-items-center justify-content-center">
+            <div class="node-endpoint">
+              <i class="bi bi-circle-fill text-success"></i>
+              <div class="endpoint-label">Source</div>
+              <code class="endpoint-id">${data.source || "N/A"}</code>
+            </div>
+            
+            <div class="flow-arrow mx-3">
+              <i class="bi bi-arrow-right text-primary" style="font-size: 1.5rem;"></i>
+              ${data.weight ? `<div class="weight-badge badge bg-primary mt-1 fw-bold">${data.weight}</div>` : ''}
+              ${data.weight ? `<div class="weight-label">Weight</div>` : ''}
+            </div>
+            
+            <div class="node-endpoint">
+              <i class="bi bi-circle-fill text-danger"></i>
+              <div class="endpoint-label">Target</div>
+              <code class="endpoint-id">${data.target || "N/A"}</code>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     `;
@@ -615,6 +686,173 @@ function addInfoPanelStyles() {
         background-color: #f8f9fa;
         padding: 0.25rem 0.5rem;
         border-radius: 0.25rem;
+      }
+      
+      /* Modern info field styling */
+      #infoContent .info-field {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+      #infoContent .field-label {
+        font-weight: 600;
+        color: #495057;
+        margin-right: 0.5rem;
+      }
+      #infoContent .field-value {
+        font-weight: 500;
+      }
+      
+      /* Stat cards */
+      #infoContent .stat-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+      }
+      #infoContent .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-color: #007bff;
+      }
+      #infoContent .stat-number {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2c3e50;
+      }
+      #infoContent .stat-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-weight: 500;
+      }
+      
+      /* Genomic card styling */
+      #infoContent .genomic-card .card-header {
+        background: linear-gradient(135deg, #007bff, #0056b3) !important;
+        border: none;
+      }
+      #infoContent .genomic-field {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        transition: background-color 0.2s ease;
+      }
+      #infoContent .genomic-field:hover {
+        background-color: rgba(0,123,255,0.05);
+      }
+      #infoContent .field-content {
+        flex: 1;
+      }
+      #infoContent .field-content .field-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+      }
+      #infoContent .chromosome-badge {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      #infoContent .strand-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+      #infoContent .strand-+ {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      #infoContent .strand-- {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      #infoContent .strand-unknown {
+        background-color: #e2e3e5;
+        color: #383d41;
+        border: 1px solid #ced4da;
+      }
+      #infoContent .position-info {
+        border-left: 4px solid #007bff;
+      }
+      #infoContent .position-stat {
+        padding: 0.5rem;
+      }
+      #infoContent .position-number {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        font-family: 'Courier New', monospace;
+      }
+      #infoContent .position-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        margin-top: 0.25rem;
+      }
+      
+      /* Edge connection styling */
+      #infoContent .edge-connection {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        border: 1px solid #dee2e6;
+      }
+      #infoContent .node-endpoint {
+        text-align: center;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 120px;
+      }
+      #infoContent .endpoint-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        margin: 0.5rem 0 0.25rem 0;
+        font-weight: 600;
+      }
+      #infoContent .endpoint-id {
+        background-color: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        color: #495057;
+      }
+      #infoContent .flow-arrow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #infoContent .weight-badge {
+        font-size: 0.875rem;
+        font-weight: 700;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+      }
+      #infoContent .weight-label {
+        font-size: 0.625rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        margin-top: 0.25rem;
+        font-weight: 600;
+      }
+      #infoContent .edge-stats {
+        border-left: 4px solid #17a2b8;
+        background: linear-gradient(135deg, #e7f3ff, #f0f8ff);
+      }
+      #infoContent .stat-icon {
+        opacity: 0.8;
       }
     `;
         document.head.appendChild(style);
