@@ -329,6 +329,11 @@ function formatValue(value) {
         return value ? "Yes" : "No";
     }
 
+    // Check if value is an array (must come before generic object check)
+    if (Array.isArray(value)) {
+        return formatArrayTable(value);
+    }
+
     if (typeof value === "object") {
         try {
             return `<pre class="code-block">${JSON.stringify(value, null, 2)}</pre>`;
@@ -336,8 +341,185 @@ function formatValue(value) {
             return String(value);
         }
     }
+    
+    // Check if value is a string representation of an array (e.g., ["a", "b"] or ['a', 'b'])
+    if (typeof value === "string" && isArrayString(value)) {
+        try {
+            const parsedArray = parseArrayString(value);
+            return formatArrayTable(parsedArray);
+        } catch (e) {
+            console.warn("Failed to parse array string:", value, e);
+            return String(value);
+        }
+    }
+    
+    // Check if value is a comma-separated string (fallback for non-array format)
+    if (typeof value === "string" && value.includes(",") && value.split(",").length > 1) {
+        const items = value.split(",").map(item => item.trim()).filter(item => item.length > 0);
+        if (items.length > 1) {
+            return formatArrayTable(items);
+        }
+    }
 
     return String(value);
+}
+
+/**
+ * Check if a string represents an array (e.g., ["a"], ["a", "b"] or ['a', 'b'])
+ * @param {string} str - String to check
+ * @returns {boolean} True if string appears to be an array representation
+ */
+function isArrayString(str) {
+    const trimmed = str.trim();
+    return (trimmed.startsWith('[') && trimmed.endsWith(']'));
+}
+
+/**
+ * Parse array string into actual array
+ * @param {string} str - String representation of array
+ * @returns {Array} Parsed array
+ */
+function parseArrayString(str) {
+    const trimmed = str.trim();
+    
+    try {
+        // Try JSON.parse first for proper JSON arrays
+        return JSON.parse(trimmed);
+    } catch (e) {
+        // Fallback: manual parsing for less strict formats
+        const content = trimmed.slice(1, -1); // Remove brackets
+        if (content.trim() === '') return [];
+        
+        // Split by comma and clean up each item
+        return content.split(',').map(item => {
+            item = item.trim();
+            // Remove quotes if present
+            if ((item.startsWith('"') && item.endsWith('"')) || 
+                (item.startsWith("'") && item.endsWith("'"))) {
+                item = item.slice(1, -1);
+            }
+            return item;
+        }).filter(item => item.length > 0);
+    }
+}
+
+/**
+ * Format array as a table with copy buttons
+ * @param {Array} array - Array to format
+ * @returns {string} HTML table representation
+ */
+function formatArrayTable(array) {
+    if (!Array.isArray(array) || array.length === 0) return "No items found";
+
+    let tableId = `table-${Math.random().toString(36).substr(2, 9)}`;
+    
+    let html = `
+        <div class="comma-separated-table">
+            <table class="table table-sm table-striped" id="${tableId}">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    array.forEach((item, index) => {
+        const itemId = `item-${tableId}-${index}`;
+        const displayValue = typeof item === 'object' ? JSON.stringify(item) : String(item);
+        const copyValue = displayValue;
+        
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td class="item-value" id="${itemId}">${displayValue}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" 
+                            data-copy-text="${copyValue.replace(/"/g, '&quot;')}" 
+                            title="Copy to clipboard">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // Add event listeners for copy buttons after a delay
+    setTimeout(() => {
+        addCopyButtonListeners();
+    }, 100);
+
+    return html;
+}
+
+/**
+ * Add event listeners for copy buttons
+ */
+function addCopyButtonListeners() {
+    const copyButtons = document.querySelectorAll('.copy-btn:not([data-listener-added])');
+    
+    copyButtons.forEach(button => {
+        button.setAttribute('data-listener-added', 'true');
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const textToCopy = this.getAttribute('data-copy-text');
+            const icon = this.querySelector('i');
+            const originalClass = icon.className;
+            
+            try {
+                // Use modern clipboard API if available
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(textToCopy);
+                } else {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = textToCopy;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                }
+                
+                // Visual feedback
+                icon.className = 'bi bi-check-lg';
+                this.classList.remove('btn-outline-secondary');
+                this.classList.add('btn-success');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-outline-secondary');
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                
+                // Error feedback
+                icon.className = 'bi bi-x-lg';
+                this.classList.remove('btn-outline-secondary');
+                this.classList.add('btn-danger');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-outline-secondary');
+                }, 2000);
+            }
+        });
+    });
 }
 
 /**
@@ -385,6 +567,40 @@ function addInfoPanelStyles() {
       #infoContent .exon-list {
         max-height: 200px;
         overflow-y: auto;
+      }
+      #infoContent .comma-separated-table {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+      }
+      #infoContent .comma-separated-table .table {
+        margin-bottom: 0;
+        font-size: 0.875rem;
+      }
+      #infoContent .comma-separated-table .table th {
+        background-color: #f8f9fa;
+        border-top: none;
+        padding: 0.5rem;
+        font-weight: 600;
+      }
+      #infoContent .comma-separated-table .table td {
+        padding: 0.5rem;
+        vertical-align: middle;
+      }
+      #infoContent .copy-btn {
+        transition: all 0.2s ease;
+        border-radius: 0.25rem;
+      }
+      #infoContent .copy-btn:hover {
+        transform: scale(1.05);
+      }
+      #infoContent .item-value {
+        word-break: break-all;
+        font-family: 'Courier New', monospace;
+        background-color: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
       }
     `;
         document.head.appendChild(style);
