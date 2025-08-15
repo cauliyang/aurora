@@ -64,13 +64,18 @@ export function displayElementInfo(element, container) {
     const data = element.data();
 
     let html = `
-    <div class="info-header">
-      <h4 class="mb-3 ${type.toLowerCase()}-title">
-        <i class="bi ${
-          type === "Node" ? "bi-circle-fill" : "bi-arrow-right"
-        }"></i>
-        ${type} Information
-      </h4>
+    <div class="info-header-modern mb-4">
+      <div class="info-title-card">
+        <div class="info-icon ${type.toLowerCase()}-icon">
+          <i class="bi ${
+            type === "Node" ? "bi-circle-fill" : "bi-arrow-right-circle-fill"
+          }"></i>
+        </div>
+        <div class="info-title-content">
+          <h4 class="info-main-title">${type} Information</h4>
+          <p class="info-subtitle">Detailed ${type.toLowerCase()} properties and relationships</p>
+        </div>
+      </div>
     </div>
     <div class="info-body">
   `;
@@ -78,7 +83,8 @@ export function displayElementInfo(element, container) {
     // ID and basic info section
     html += `
     <div class="card mb-3">
-      <div class="card-header bg-light">
+      <div class="card-header bg-gradient-primary text-white d-flex align-items-center">
+        <i class="bi bi-info-circle-fill me-2"></i>
         <strong>Basic Information</strong>
       </div>
       <div class="card-body">
@@ -185,26 +191,39 @@ export function displayElementInfo(element, container) {
         // PTC/PTF information section (if available)
         if (data.ptc !== undefined || data.ptf !== undefined) {
             html += `
-        <div class="card mb-3">
-          <div class="card-header bg-light">
-            <strong>Metrics</strong>
+        <div class="card mb-3 metrics-card">
+          <div class="card-header bg-gradient-info text-white d-flex align-items-center">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            <strong>Expression Metrics</strong>
           </div>
-          <div class="card-body">
-            <div class="row">
+          <div class="card-body p-3">
+            <div class="row g-3">
               <div class="col-6">
-                <div class="metric-card text-center p-2 border rounded">
-                  <h5>PTC</h5>
-                  <span class="badge bg-primary">${
-                    data.ptc?.toFixed(4) || "0"
-                  }</span>
+                <div class="metric-stat-card">
+                  <div class="metric-icon mb-2">
+                    <i class="bi bi-pie-chart-fill text-primary"></i>
+                  </div>
+                  <div class="metric-content">
+                    <div class="metric-label">PTC</div>
+                    <div class="metric-value ptc-value">${
+                      data.ptc !== undefined ? data.ptc.toFixed(4) : "N/A"
+                    }</div>
+                    <div class="metric-description">Path Traversal Count</div>
+                  </div>
                 </div>
               </div>
               <div class="col-6">
-                <div class="metric-card text-center p-2 border rounded">
-                  <h5>PTF</h5>
-                  <span class="badge bg-secondary">${
-                    data.ptf?.toFixed(4) || "0"
-                  }</span>
+                <div class="metric-stat-card">
+                  <div class="metric-icon mb-2">
+                    <i class="bi bi-graph-up text-success"></i>
+                  </div>
+                  <div class="metric-content">
+                    <div class="metric-label">PTF</div>
+                    <div class="metric-value ptf-value">${
+                      data.ptf !== undefined ? data.ptf.toFixed(4) : "N/A"
+                    }</div>
+                    <div class="metric-description">Path Traversal Fraction</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -217,19 +236,22 @@ export function displayElementInfo(element, container) {
         if (data.exons) {
             // Create the visualization button
             const visualizeBtn = `
-              <button class="btn btn-sm btn-primary ms-2 exon-visualize-btn" data-exons="${data.exons.replace(/"/g, '&quot;')}">
+              <button class="btn btn-sm btn-light border exon-visualize-btn" data-exons="${data.exons.replace(/"/g, '&quot;')}">
                 <i class="bi bi-bar-chart-line-fill me-1"></i> Visualize
               </button>
             `;
 
             html += `
-        <div class="card mb-3">
-          <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <strong>Exons</strong>
+        <div class="card mb-3 exons-card">
+          <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-diagram-2-fill me-2"></i>
+              <strong>Exon Structure</strong>
+            </div>
             ${visualizeBtn}
           </div>
           <div class="card-body p-0">
-            <div class="exon-list">
+            <div class="exon-list-container">
               ${formatExons(data.exons)}
             </div>
           </div>
@@ -314,23 +336,31 @@ export function displayElementInfo(element, container) {
 
     if (additionalProps.length > 0) {
         html += `
-      <div class="card mb-3">
-        <div class="card-header bg-light">
+      <div class="card mb-3 additional-props-card">
+        <div class="card-header bg-gradient-secondary text-white d-flex align-items-center">
+          <i class="bi bi-list-ul me-2"></i>
           <strong>Additional Properties</strong>
+          <span class="badge bg-light text-dark ms-2">${additionalProps.length}</span>
         </div>
-        <div class="card-body">
-          <dl class="row">
+        <div class="card-body p-3">
     `;
 
-        additionalProps.forEach((key) => {
+        additionalProps.forEach((key, index) => {
+            const isLast = index === additionalProps.length - 1;
             html += `
-        <dt class="col-sm-4">${key}:</dt>
-        <dd class="col-sm-8">${formatValue(data[key], key)}</dd>
+          <div class="property-row ${!isLast ? 'border-bottom' : ''} pb-3 ${!isLast ? 'mb-3' : ''}">
+            <div class="property-header mb-2">
+              <i class="bi bi-chevron-right text-primary me-1"></i>
+              <span class="property-name">${key}</span>
+            </div>
+            <div class="property-content">
+              ${formatValue(data[key], key)}
+            </div>
+          </div>
       `;
         });
 
         html += `
-          </dl>
         </div>
       </div>
     `;
@@ -703,16 +733,6 @@ function addInfoPanelStyles() {
         const style = document.createElement("style");
         style.id = "info-panel-styles";
         style.textContent = `
-      #infoContent .info-header {
-        border-bottom: 1px solid #e5e5e5;
-        margin-bottom: 15px;
-      }
-      #infoContent .node-title {
-        color: #007bff;
-      }
-      #infoContent .edge-title {
-        color: #28a745;
-      }
       #infoContent .card {
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       }
@@ -773,6 +793,63 @@ function addInfoPanelStyles() {
         background-color: #f8f9fa;
         padding: 0.25rem 0.5rem;
         border-radius: 0.25rem;
+      }
+      
+      /* Modern header styling */
+      #infoContent .info-header-modern {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        border: 1px solid #dee2e6;
+        position: relative;
+        overflow: hidden;
+      }
+      #infoContent .info-header-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #007bff, #28a745, #17a2b8);
+      }
+      #infoContent .info-title-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      #infoContent .info-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      #infoContent .node-icon {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+      }
+      #infoContent .edge-icon {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+      }
+      #infoContent .info-title-content {
+        flex: 1;
+      }
+      #infoContent .info-main-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+        line-height: 1.2;
+      }
+      #infoContent .info-subtitle {
+        font-size: 0.95rem;
+        color: #6c757d;
+        margin-bottom: 0;
+        font-style: italic;
       }
       
       /* Modern info field styling */
@@ -965,6 +1042,122 @@ function addInfoPanelStyles() {
       }
       #infoContent .export-btn i {
         font-size: 0.875rem;
+      }
+      
+      /* Consistent card header styling */
+      #infoContent .card-header.bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3) !important;
+        border: none;
+      }
+      #infoContent .metrics-card .card-header {
+        background: linear-gradient(135deg, #17a2b8, #138496) !important;
+        border: none;
+      }
+      #infoContent .exons-card .card-header {
+        background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+        border: none;
+      }
+      #infoContent .additional-props-card .card-header {
+        background: linear-gradient(135deg, #6c757d, #545b62) !important;
+        border: none;
+      }
+      
+      /* PTC/PTF metrics styling */
+      #infoContent .metric-stat-card {
+        text-align: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+      }
+      #infoContent .metric-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-color: #007bff;
+      }
+      #infoContent .metric-icon {
+        font-size: 1.25rem;
+      }
+      #infoContent .metric-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+      #infoContent .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        margin-bottom: 0.25rem;
+      }
+      #infoContent .ptc-value {
+        color: #007bff;
+      }
+      #infoContent .ptf-value {
+        color: #28a745;
+      }
+      #infoContent .metric-description {
+        font-size: 0.625rem;
+        color: #868e96;
+        font-style: italic;
+      }
+      
+      /* Exons section styling */
+      #infoContent .exon-list-container {
+        max-height: 250px;
+        overflow-y: auto;
+      }
+      #infoContent .exons-card .exon-visualize-btn {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: #28a745;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      #infoContent .exons-card .exon-visualize-btn:hover {
+        background-color: white;
+        border-color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+      
+      /* Additional properties styling */
+      #infoContent .property-row {
+        border-color: #e9ecef !important;
+      }
+      #infoContent .property-header {
+        display: flex;
+        align-items: center;
+      }
+      #infoContent .property-name {
+        font-weight: 600;
+        color: #495057;
+        text-transform: capitalize;
+        font-size: 0.95rem;
+      }
+      #infoContent .property-content {
+        margin-left: 1rem;
+      }
+      
+      /* Consistent spacing for all cards */
+      #infoContent .card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+      #infoContent .card-header {
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        border-bottom: none;
+      }
+      #infoContent .card-body {
+        padding: 1rem;
       }
     `;
         document.head.appendChild(style);
