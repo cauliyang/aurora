@@ -415,14 +415,14 @@ function formatValue(value, propertyName = null) {
     if (isApprovedForTable) {
         // Check if value is an array (must come before generic object check)
         if (Array.isArray(value)) {
-            return formatArrayTable(value);
+            return formatArrayTable(value, propertyName);
         }
         
         // Check if value is a string representation of an array (e.g., ["a", "b"] or ['a', 'b'])
         if (typeof value === "string" && isArrayString(value)) {
             try {
                 const parsedArray = parseArrayString(value);
-                return formatArrayTable(parsedArray);
+                return formatArrayTable(parsedArray, propertyName);
             } catch (e) {
                 console.warn("Failed to parse array string:", value, e);
                 return String(value);
@@ -433,7 +433,7 @@ function formatValue(value, propertyName = null) {
         if (typeof value === "string" && value.includes(",") && value.split(",").length > 1) {
             const items = value.split(",").map(item => item.trim()).filter(item => item.length > 0);
             if (items.length > 1) {
-                return formatArrayTable(items);
+                return formatArrayTable(items, propertyName);
             }
         }
     }
@@ -491,15 +491,28 @@ function parseArrayString(str) {
 /**
  * Format array as a table with copy buttons
  * @param {Array} array - Array to format
+ * @param {string} propertyName - Name of the property for export purposes
  * @returns {string} HTML table representation
  */
-function formatArrayTable(array) {
+function formatArrayTable(array, propertyName = null) {
     if (!Array.isArray(array) || array.length === 0) return "No items found";
 
     let tableId = `table-${Math.random().toString(36).substr(2, 9)}`;
+    const isExportable = propertyName && TABLE_APPROVED_PROPERTIES.includes(propertyName);
     
     let html = `
         <div class="comma-separated-table">
+            <div class="table-header d-flex justify-content-between align-items-center mb-2">
+                <span class="table-title text-muted">${array.length} items</span>
+                ${isExportable ? `
+                <button class="btn btn-sm btn-outline-primary export-btn" 
+                        data-export-data="${JSON.stringify(array).replace(/"/g, '&quot;')}"
+                        data-export-name="${propertyName}"
+                        title="Export all items to text file">
+                    <i class="bi bi-download me-1"></i>Export TXT
+                </button>
+                ` : ''}
+            </div>
             <table class="table table-sm table-striped" id="${tableId}">
                 <thead>
                     <tr>
@@ -537,9 +550,10 @@ function formatArrayTable(array) {
         </div>
     `;
 
-    // Add event listeners for copy buttons after a delay
+    // Add event listeners for copy and export buttons after a delay
     setTimeout(() => {
         addCopyButtonListeners();
+        addExportButtonListeners();
     }, 100);
 
     return html;
@@ -602,6 +616,79 @@ function addCopyButtonListeners() {
                     this.classList.remove('btn-danger');
                     this.classList.add('btn-outline-secondary');
                 }, 2000);
+            }
+        });
+    });
+}
+
+/**
+ * Add event listeners for export buttons
+ */
+function addExportButtonListeners() {
+    const exportButtons = document.querySelectorAll('.export-btn:not([data-listener-added])');
+    
+    exportButtons.forEach(button => {
+        button.setAttribute('data-listener-added', 'true');
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const exportDataStr = this.getAttribute('data-export-data');
+            const exportName = this.getAttribute('data-export-name');
+            const icon = this.querySelector('i');
+            const originalClass = icon.className;
+            const buttonText = this.innerHTML;
+            
+            try {
+                const exportData = JSON.parse(exportDataStr);
+                
+                // Create text content with each item on a new line
+                const textContent = exportData.join('\n');
+                
+                // Create blob and download
+                const blob = new Blob([textContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                // Create temporary download link
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = `${exportName}_export_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+                
+                // Trigger download
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                // Clean up the URL
+                URL.revokeObjectURL(url);
+                
+                // Visual feedback
+                icon.className = 'bi bi-check-lg';
+                this.innerHTML = `<i class="bi bi-check-lg me-1"></i>Exported!`;
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-success');
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    this.innerHTML = buttonText;
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-outline-primary');
+                }, 3000);
+                
+            } catch (err) {
+                console.error('Failed to export data: ', err);
+                
+                // Error feedback
+                icon.className = 'bi bi-x-lg';
+                this.innerHTML = `<i class="bi bi-x-lg me-1"></i>Failed`;
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-danger');
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    this.innerHTML = buttonText;
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-outline-primary');
+                }, 3000);
             }
         });
     });
@@ -853,6 +940,31 @@ function addInfoPanelStyles() {
       }
       #infoContent .stat-icon {
         opacity: 0.8;
+      }
+      
+      /* Table header and export button styling */
+      #infoContent .table-header {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 0.75rem !important;
+      }
+      #infoContent .table-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      #infoContent .export-btn {
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border-radius: 0.375rem;
+        padding: 0.375rem 0.75rem;
+      }
+      #infoContent .export-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+      }
+      #infoContent .export-btn i {
+        font-size: 0.875rem;
       }
     `;
         document.head.appendChild(style);
