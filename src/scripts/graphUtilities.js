@@ -254,7 +254,7 @@ export function displayElementInfo(element, container) {
         additionalProps.forEach((key) => {
             html += `
         <dt class="col-sm-4">${key}:</dt>
-        <dd class="col-sm-8">${formatValue(data[key])}</dd>
+        <dd class="col-sm-8">${formatValue(data[key], key)}</dd>
       `;
         });
 
@@ -318,20 +318,53 @@ function formatExons(exonsStr) {
 }
 
 /**
+ * List of property names that should be formatted as tables when they contain arrays or lists
+ */
+const TABLE_APPROVED_PROPERTIES = [
+    "read_ids",
+    "reads"
+];
+
+/**
  * Format a data value for display
  * @param {any} value - The value to format
+ * @param {string} propertyName - Name of the property being formatted (optional)
  * @returns {string} Formatted value as string
  */
-function formatValue(value) {
+function formatValue(value, propertyName = null) {
     if (value === undefined || value === null) return "N/A";
 
     if (typeof value === "boolean") {
         return value ? "Yes" : "No";
     }
 
-    // Check if value is an array (must come before generic object check)
-    if (Array.isArray(value)) {
-        return formatArrayTable(value);
+    // Only format as tables if this property is approved for table formatting
+    const isApprovedForTable = !propertyName || TABLE_APPROVED_PROPERTIES.includes(propertyName);
+    
+    if (isApprovedForTable) {
+        // Check if value is an array (must come before generic object check)
+        if (Array.isArray(value)) {
+            return formatArrayTable(value);
+        }
+        
+        // Check if value is a string representation of an array (e.g., ["a", "b"] or ['a', 'b'])
+        if (typeof value === "string" && isArrayString(value)) {
+            try {
+                const parsedArray = parseArrayString(value);
+                return formatArrayTable(parsedArray);
+            } catch (e) {
+                console.warn("Failed to parse array string:", value, e);
+                return String(value);
+            }
+        }
+        
+        // Check if value is a comma-separated string (fallback for non-array format)
+        if (typeof value === "string" && value.includes(",") && value.split(",").length > 1) {
+            const items = value.split(",").map(item => item.trim()).filter(item => item.length > 0);
+            if (items.length > 1) {
+                return formatArrayTable(items);
+            }
+        }
     }
 
     if (typeof value === "object") {
@@ -339,25 +372,6 @@ function formatValue(value) {
             return `<pre class="code-block">${JSON.stringify(value, null, 2)}</pre>`;
         } catch (e) {
             return String(value);
-        }
-    }
-    
-    // Check if value is a string representation of an array (e.g., ["a", "b"] or ['a', 'b'])
-    if (typeof value === "string" && isArrayString(value)) {
-        try {
-            const parsedArray = parseArrayString(value);
-            return formatArrayTable(parsedArray);
-        } catch (e) {
-            console.warn("Failed to parse array string:", value, e);
-            return String(value);
-        }
-    }
-    
-    // Check if value is a comma-separated string (fallback for non-array format)
-    if (typeof value === "string" && value.includes(",") && value.split(",").length > 1) {
-        const items = value.split(",").map(item => item.trim()).filter(item => item.length > 0);
-        if (items.length > 1) {
-            return formatArrayTable(items);
         }
     }
 
