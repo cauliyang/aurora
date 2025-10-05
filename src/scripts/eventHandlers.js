@@ -74,19 +74,311 @@ if (hiddenLabelBtn) {
 const captureGraphBtn = document.getElementById("captureGraph");
 if (captureGraphBtn) {
   captureGraphBtn.addEventListener("click", () => {
-    // Get the base64 representation of the graph
-    const base64Image = STATE.cy.png();
-
-    // Create a new anchor element to enable downloading
-    const downloadLink = document.createElement("a");
-    downloadLink.href = base64Image;
-    downloadLink.download = "graph_capture.png";
-
-    // Trigger the download
-    downloadLink.click();
+    showExportDialog();
   });
 } else {
   console.warn("Element with ID 'captureGraph' not found in the DOM");
+}
+
+/**
+ * Show a modern export dialog with format options
+ */
+function showExportDialog() {
+  if (!STATE.cy) {
+    window.showAlert?.("No graph loaded to export", "error");
+    return;
+  }
+
+  // Create modal if it doesn't exist
+  let modal = document.getElementById("exportModal");
+  if (!modal) {
+    modal = createExportModal();
+    document.body.appendChild(modal);
+  }
+
+  // Show the modal
+  const bsModal = new bootstrap.Modal(modal);
+  bsModal.show();
+
+  // Set up export handlers
+  setupExportHandlers(modal, bsModal);
+}
+
+/**
+ * Create the export modal HTML
+ */
+function createExportModal() {
+  const modal = document.createElement("div");
+  modal.id = "exportModal";
+  modal.className = "modal fade";
+  modal.setAttribute("tabindex", "-1");
+  modal.innerHTML = `
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-download me-2"></i>Export Graph
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Select Export Format:</label>
+            <div class="export-format-grid">
+              <div class="export-format-option" data-format="png">
+                <i class="bi bi-file-earmark-image"></i>
+                <div class="format-name">PNG</div>
+                <div class="format-desc">Raster image, best for presentations</div>
+              </div>
+              <div class="export-format-option" data-format="jpg">
+                <i class="bi bi-file-earmark-image-fill"></i>
+                <div class="format-name">JPG</div>
+                <div class="format-desc">Compressed image, smaller file size</div>
+              </div>
+              <div class="export-format-option active" data-format="svg">
+                <i class="bi bi-file-earmark-code"></i>
+                <div class="format-name">SVG</div>
+                <div class="format-desc">Vector image, scalable and editable</div>
+              </div>
+              <div class="export-format-option" data-format="json">
+                <i class="bi bi-filetype-json"></i>
+                <div class="format-name">JSON</div>
+                <div class="format-desc">Graph data for reloading</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3" id="exportOptions">
+            <label class="form-label fw-bold">Options:</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="exportFullGraph" checked>
+              <label class="form-check-label" for="exportFullGraph">
+                Export full graph (include all elements)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="exportTransparentBg">
+              <label class="form-check-label" for="exportTransparentBg">
+                Transparent background
+              </label>
+            </div>
+          </div>
+
+          <div class="mb-3" id="scaleOptions">
+            <label for="exportScale" class="form-label fw-bold">Scale:</label>
+            <input type="range" class="form-range" id="exportScale" min="1" max="4" step="0.5" value="2">
+            <div class="d-flex justify-content-between">
+              <small>1x</small>
+              <small id="scaleValue">2x</small>
+              <small>4x</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmExport">
+            <i class="bi bi-download me-2"></i>Export
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add styles
+  if (!document.getElementById("exportModalStyles")) {
+    const style = document.createElement("style");
+    style.id = "exportModalStyles";
+    style.textContent = `
+      .export-format-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .export-format-option {
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--bg-primary, #fff);
+      }
+
+      .export-format-option:hover {
+        border-color: #007bff;
+        background: var(--bg-secondary, #f8f9fa);
+      }
+
+      .export-format-option.active {
+        border-color: #007bff;
+        background: rgba(0, 123, 255, 0.1);
+      }
+
+      .export-format-option i {
+        font-size: 2rem;
+        color: #007bff;
+        margin-bottom: 8px;
+      }
+
+      .format-name {
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: var(--text-primary, #212529);
+      }
+
+      .format-desc {
+        font-size: 0.75rem;
+        color: #6c757d;
+      }
+
+      [data-theme="dark"] .export-format-option {
+        background: var(--bg-primary, #1a1a1a);
+        border-color: #495057;
+      }
+
+      [data-theme="dark"] .export-format-option:hover {
+        background: var(--bg-secondary, #2d2d2d);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  return modal;
+}
+
+/**
+ * Set up export event handlers
+ */
+function setupExportHandlers(modal, bsModal) {
+  // Format selection
+  const formatOptions = modal.querySelectorAll(".export-format-option");
+  formatOptions.forEach((option) => {
+    option.addEventListener("click", () => {
+      formatOptions.forEach((o) => o.classList.remove("active"));
+      option.classList.add("active");
+      updateExportOptions(option.dataset.format, modal);
+    });
+  });
+
+  // Scale slider
+  const scaleSlider = modal.querySelector("#exportScale");
+  const scaleValue = modal.querySelector("#scaleValue");
+  if (scaleSlider && scaleValue) {
+    scaleSlider.addEventListener("input", (e) => {
+      scaleValue.textContent = `${e.target.value}x`;
+    });
+  }
+
+  // Export button
+  const exportBtn = modal.querySelector("#confirmExport");
+  if (exportBtn) {
+    exportBtn.replaceWith(exportBtn.cloneNode(true));
+    const newExportBtn = modal.querySelector("#confirmExport");
+    newExportBtn.addEventListener("click", async () => {
+      const activeFormat = modal.querySelector(".export-format-option.active");
+      const format = activeFormat?.dataset.format || "svg";
+      const scale = parseFloat(scaleSlider?.value || 2);
+      const fullGraph = modal.querySelector("#exportFullGraph")?.checked ?? true;
+      const transparentBg = modal.querySelector("#exportTransparentBg")?.checked ?? false;
+
+      try {
+        await exportGraph(format, { scale, fullGraph, transparentBg });
+        bsModal.hide();
+        window.showAlert?.(`Graph exported as ${format.toUpperCase()}!`, "success", 2000);
+      } catch (error) {
+        console.error("Export failed:", error);
+        window.showAlert?.(`Export failed: ${error.message}`, "error");
+      }
+    });
+  }
+}
+
+/**
+ * Update export options based on selected format
+ */
+function updateExportOptions(format, modal) {
+  const scaleOptions = modal.querySelector("#scaleOptions");
+  const exportOptions = modal.querySelector("#exportOptions");
+
+  if (format === "json") {
+    scaleOptions.style.display = "none";
+    exportOptions.style.display = "none";
+  } else {
+    scaleOptions.style.display = format === "svg" ? "none" : "block";
+    exportOptions.style.display = "block";
+  }
+}
+
+/**
+ * Export graph in the specified format
+ */
+async function exportGraph(format, options = {}) {
+  if (!STATE.cy) {
+    throw new Error("No graph loaded");
+  }
+
+  const { scale = 2, fullGraph = true, transparentBg = false } = options;
+  const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+  let data, filename, mimeType;
+
+  switch (format) {
+    case "png":
+      data = STATE.cy.png({
+        full: fullGraph,
+        scale: scale,
+        bg: transparentBg ? "transparent" : "#ffffff",
+      });
+      filename = `graph_${timestamp}.png`;
+      break;
+
+    case "jpg":
+      data = STATE.cy.jpg({
+        full: fullGraph,
+        scale: scale,
+        bg: transparentBg ? "#ffffff" : "#ffffff",
+        quality: 0.9,
+      });
+      filename = `graph_${timestamp}.jpg`;
+      break;
+
+    case "svg":
+      // Cytoscape SVG export
+      const svgContent = STATE.cy.svg({
+        full: fullGraph,
+        bg: transparentBg ? "transparent" : "#ffffff",
+      });
+      const blob = new Blob([svgContent], { type: "image/svg+xml" });
+      data = URL.createObjectURL(blob);
+      filename = `graph_${timestamp}.svg`;
+      mimeType = "image/svg+xml";
+      break;
+
+    case "json":
+      const jsonData = STATE.cy.json();
+      const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], {
+        type: "application/json",
+      });
+      data = URL.createObjectURL(jsonBlob);
+      filename = `graph_${timestamp}.json`;
+      mimeType = "application/json";
+      break;
+
+    default:
+      throw new Error(`Unsupported format: ${format}`);
+  }
+
+  // Download the file
+  const downloadLink = document.createElement("a");
+  downloadLink.href = data;
+  downloadLink.download = filename;
+  downloadLink.click();
+
+  // Clean up blob URLs
+  if (format === "svg" || format === "json") {
+    setTimeout(() => URL.revokeObjectURL(data), 100);
+  }
 }
 
 const redirectToIgvBtn = document.getElementById("redirectToIgv");
@@ -114,6 +406,14 @@ function handleFileUpload(event) {
   console.log(file);
   if (!file) return;
 
+  // Show loading indicator
+  const loadingId = `upload-${Date.now()}`;
+  window.loadingIndicator?.show(loadingId, {
+    message: `Loading ${file.name}...`,
+    type: "spinner",
+    overlay: true,
+  });
+
   const reader = new FileReader();
 
   reader.onload = async (e) => {
@@ -122,15 +422,22 @@ function handleFileUpload(event) {
 
     try {
       if (fileExtension === "json") {
+        window.loadingIndicator?.updateMessage(loadingId, "Parsing JSON data...");
         // Handle JSON file
         const jsonData = JSON.parse(content);
         console.log("Loaded JSON data:", jsonData);
+
+        window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
         loadGraphDataFromServer(jsonData);
 
         // Hide graph selector for single JSON files
         document.getElementById("graphSelectorContainer").style.display =
           "none";
+
+        window.loadingIndicator?.hide(loadingId);
+        window.showAlert?.("Graph loaded successfully!", "success", 2000);
       } else if (fileExtension === "tsg") {
+        window.loadingIndicator?.updateMessage(loadingId, "Parsing TSG file...");
         // Handle TSG file
         console.log("Loaded TSG data");
         // wait for the result from promise
@@ -139,6 +446,11 @@ function handleFileUpload(event) {
 
         // Show graph selector if multiple graphs are available
         const graphCount = STATE.graph_jsons.length;
+        window.loadingIndicator?.updateMessage(
+          loadingId,
+          `Found ${graphCount} graph${graphCount > 1 ? "s" : ""}...`
+        );
+
         if (graphCount > 1) {
           setupGraphSelector(graphCount);
         } else {
@@ -147,15 +459,29 @@ function handleFileUpload(event) {
         }
 
         // Load the first graph by default
+        window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
         const jsonData = JSON.parse(STATE.graph_jsons[0]);
         loadGraphDataFromServer(jsonData);
+
+        window.loadingIndicator?.hide(loadingId);
+        window.showAlert?.(
+          `Loaded ${graphCount} graph${graphCount > 1 ? "s" : ""} successfully!`,
+          "success",
+          2000
+        );
       }
     } catch (error) {
       console.error("Error processing file:", error);
-      window.showAlert?.("Error processing file: " + error.message, "error") ||
-        alert("Error processing file: " + error.message);
+      window.loadingIndicator?.hide(loadingId);
+      window.showAlert?.("Error processing file: " + error.message, "error");
     }
   };
+
+  reader.onerror = () => {
+    window.loadingIndicator?.hide(loadingId);
+    window.showAlert?.("Failed to read file", "error");
+  };
+
   reader.readAsText(file);
 }
 
@@ -245,33 +571,52 @@ if (geneAnnotationBtn) {
  * Handle direct gene annotation when modal is unavailable
  */
 async function handleGeneAnnotation() {
+  const loadingId = `gene-annotation-${Date.now()}`;
+
   try {
     console.log("Starting gene annotation process directly...");
 
-    // Show loading alert - use the global function instead of imported one
-    window.showAlert("Loading gene annotations...", "info");
+    // Show modern loading indicator
+    window.loadingIndicator?.show(loadingId, {
+      message: "Loading gene database...",
+      type: "bar",
+      overlay: true,
+    });
 
     // Try loading the gene data
     const loaded = await loadGeneData();
 
     if (loaded && STATE.cy) {
       console.log("Gene data loaded successfully, annotating nodes...");
+
+      // Update loading message
+      window.loadingIndicator?.updateMessage(loadingId, "Annotating nodes...");
+
       // Annotate all nodes in the graph
+      const nodeCount = STATE.cy.nodes().length;
       const annotatedCount = await annotateAllNodes(STATE.cy);
 
-      // Show success alert with auto-dismiss after 3 seconds - use global function
-      window.showAlert(
-        `Annotated ${annotatedCount} nodes with gene information!`,
-        "success",
-        3000
-      );
+      // Update progress
+      window.loadingIndicator?.updateProgress(loadingId, 100);
+
+      // Hide loading and show success
+      setTimeout(() => {
+        window.loadingIndicator?.hide(loadingId);
+        window.showAlert?.(
+          `Annotated ${annotatedCount} of ${nodeCount} nodes with gene information!`,
+          "success",
+          3000
+        );
+      }, 500);
     } else {
       console.error("Could not load gene data or graph not initialized");
-      window.showAlert("Failed to load gene annotations.", "error");
+      window.loadingIndicator?.hide(loadingId);
+      window.showAlert?.("Failed to load gene annotations.", "error");
     }
   } catch (error) {
     console.error("Error in gene annotation:", error);
-    window.showAlert("Error in gene annotation process.", "error");
+    window.loadingIndicator?.hide(loadingId);
+    window.showAlert?.("Error in gene annotation process: " + error.message, "error");
   }
 }
 

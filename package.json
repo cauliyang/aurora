@@ -36,6 +36,7 @@
         "cytoscape-euler": "^1.2.2",
         "cytoscape-klay": "^3.1.4",
         "cytoscape-spread": "^3.0.0",
+        "cytoscape-svg": "^0.4.0",
         "cytoscape-tidytree": "^0.2.0",
         "d3": "^7.9.0",
         "interactjs": "^1.10.26",

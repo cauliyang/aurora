@@ -261,32 +261,70 @@ export function loadGraphDataFromServer(graphData) {
 // Make loadGraphDataFromServer globally available to avoid circular dependencies
 window.loadGraphDataFromServer = loadGraphDataFromServer;
 
-document.getElementById("resetGraph").addEventListener("click", () => {
-    // Reset layout to default
-    STATE.cy.elements().removeClass("highlightWalk");
-    layoutSelect.value = "dagre";
-    STATE.cy
-        .layout({
-            name: "dagre",
-            animate: true,
-            fit: true,
-            padding: 10,
-            avoidOverlap: true,
-            rankDir: "LR",
-        })
-        .run();
+// Initialize reset button event listener
+function initializeResetButton() {
+    const resetButton = document.getElementById("resetGraph");
+    if (!resetButton) {
+        console.warn("Element with ID 'resetGraph' not found in the DOM");
+        return;
+    }
 
-    const cyContainer = document.getElementById("cy");
-    const infoPanel = document.getElementById("info");
-    const walksPanel = document.getElementById("walks");
+    resetButton.addEventListener("click", () => {
+        if (!STATE.cy) {
+            window.showAlert?.("No graph loaded to reset", "error");
+            return;
+        }
 
-    cyContainer.style.width = "";
-    cyContainer.style.height = "";
-    infoPanel.style.width = "";
-    walksPanel.style.width = "";
-    infoPanel.style.display = "";
-    walksPanel.style.display = "";
-});
+        try {
+            // Reset layout to default
+            STATE.cy.elements().removeClass("highlightWalk");
+            const layoutSelect = document.getElementById("layoutSelect");
+            if (layoutSelect) {
+                layoutSelect.value = "dagre";
+            }
+
+            STATE.cy
+                .layout({
+                    name: "dagre",
+                    animate: true,
+                    fit: true,
+                    padding: 10,
+                    avoidOverlap: true,
+                    rankDir: "LR",
+                })
+                .run();
+
+            const cyContainer = document.getElementById("cy");
+            const infoPanel = document.getElementById("info");
+            const walksPanel = document.getElementById("walks");
+
+            if (cyContainer) {
+                cyContainer.style.width = "";
+                cyContainer.style.height = "";
+            }
+            if (infoPanel) {
+                infoPanel.style.width = "";
+                infoPanel.style.display = "";
+            }
+            if (walksPanel) {
+                walksPanel.style.width = "";
+                walksPanel.style.display = "";
+            }
+
+            window.showAlert?.("Graph reset to default layout", "success", 2000);
+        } catch (error) {
+            console.error("Error resetting graph:", error);
+            window.showAlert?.("Failed to reset graph", "error");
+        }
+    });
+}
+
+// Initialize on DOM load
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeResetButton);
+} else {
+    initializeResetButton();
+}
 
 // Function to get color based on weight
 function setupGraphInteractions() {

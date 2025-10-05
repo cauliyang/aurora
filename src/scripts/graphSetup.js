@@ -2,7 +2,11 @@ import { dfs } from "./graphUtilities";
 import { STATE } from "./graph";
 
 import cytoscape from "cytoscape";
+import cytoscapeSvg from "cytoscape-svg";
 import chroma from "chroma-js";
+
+// Register the SVG extension
+cytoscape.use(cytoscapeSvg);
 
 function getColorForWeight(weight, minWeight, maxWeight, colorScale) {
   if (weight <= minWeight) {
