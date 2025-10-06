@@ -335,68 +335,6 @@ class HelpGuide {
             this.overlay = document.createElement("div");
             this.overlay.className = "help-guide-overlay";
             document.body.appendChild(this.overlay);
-
-            // Add CSS for overlay
-            const style = document.createElement("style");
-            style.textContent = `
-                .help-guide-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    z-index: 9998;
-                    pointer-events: none;
-                }
-
-                .help-guide-tooltip {
-                    position: absolute;
-                    z-index: 9999;
-                    background-color: white;
-                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-                    border-radius: 4px;
-                    padding: 15px;
-                    max-width: 300px;
-                    pointer-events: auto;
-                }
-
-                .help-guide-tooltip h5 {
-                    margin-top: 0;
-                    color: #007bff;
-                }
-
-                .help-guide-tooltip p {
-                    margin-bottom: 10px;
-                }
-
-                .help-guide-buttons {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 10px;
-                    margin-top: 10px;
-                }
-
-                .help-guide-nav-group {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-
-                .help-guide-step-indicator {
-                    min-width: 70px;
-                    text-align: center;
-                    font-weight: 500;
-                }
-
-                .target-highlight {
-                    position: relative;
-                    z-index: 9999;
-                    pointer-events: auto;
-                }
-            `;
-            document.head.appendChild(style);
         }
 
         // Create tooltip if it doesn't exist
@@ -405,6 +343,38 @@ class HelpGuide {
             this.tooltip.className = "help-guide-tooltip";
             document.body.appendChild(this.tooltip);
         }
+
+        // Add keyboard event listeners
+        this.addKeyboardListeners();
+    }
+
+    /**
+     * Add keyboard navigation support
+     */
+    addKeyboardListeners() {
+        if (this.keyboardHandler) return; // Already added
+
+        this.keyboardHandler = (event) => {
+            if (!this.isGuideActive) return;
+
+            switch (event.key) {
+                case "ArrowLeft":
+                    event.preventDefault();
+                    this.previousStep();
+                    break;
+                case "ArrowRight":
+                case "Enter":
+                    event.preventDefault();
+                    this.nextStep();
+                    break;
+                case "Escape":
+                    event.preventDefault();
+                    this.endGuide();
+                    break;
+            }
+        };
+
+        document.addEventListener("keydown", this.keyboardHandler);
     }
 
     /**
@@ -438,8 +408,14 @@ class HelpGuide {
             // Position tooltip near target after scrolling
             this.positionTooltip(targetElement, step.placement);
 
-            // Update tooltip content
+            // Calculate progress percentage
+            const progress = ((index + 1) / this.helpSteps.length) * 100;
+
+            // Update tooltip content with progress bar and keyboard shortcuts
             this.tooltip.innerHTML = `
+        <div class="help-guide-progress">
+          <div class="help-guide-progress-bar" style="width: ${progress}%"></div>
+        </div>
         <h5>${step.title}</h5>
         <p>${step.content}</p>
         <div class="help-guide-buttons">
@@ -450,7 +426,7 @@ class HelpGuide {
               <i class="bi bi-chevron-left"></i> Previous
             </button>
             <span class="help-guide-step-indicator">${index + 1} of ${this.helpSteps.length}</span>
-            <button id="helpGuideNext" class="btn btn-sm btn-outline-primary">
+            <button id="helpGuideNext" class="btn btn-sm btn-primary">
               ${
                 index === this.helpSteps.length - 1
                   ? 'Finish <i class="bi bi-check-lg"></i>'
@@ -462,7 +438,21 @@ class HelpGuide {
             <i class="bi bi-x-lg"></i> Close
           </button>
         </div>
+        <div class="help-guide-shortcuts">
+          <span><kbd>←</kbd> <kbd>→</kbd> Navigate</span>
+          <span><kbd>Enter</kbd> Next</span>
+          <span><kbd>Esc</kbd> Close</span>
+        </div>
       `;
+
+            // Set placement attribute for arrow positioning
+            this.tooltip.setAttribute('data-placement', step.placement);
+
+            // Add step transition animation
+            this.tooltip.classList.add('step-transition');
+            setTimeout(() => {
+                this.tooltip.classList.remove('step-transition');
+            }, 300);
 
             // Add event listeners to navigation buttons
             document.getElementById("helpGuidePrev").addEventListener("click", () => {
@@ -659,6 +649,12 @@ class HelpGuide {
         if (this.tooltip) {
             document.body.removeChild(this.tooltip);
             this.tooltip = null;
+        }
+
+        // Remove keyboard event listener
+        if (this.keyboardHandler) {
+            document.removeEventListener("keydown", this.keyboardHandler);
+            this.keyboardHandler = null;
         }
 
         // Reset current step index for next time
