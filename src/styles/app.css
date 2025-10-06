@@ -51,9 +51,10 @@ h3 {
     transform: translateY(-2px);
 }
 
+
+/* Graph canvas styles moved to components/graph-canvas.css */
+
 #cy {
-    background-color: #e9ecef;
-    border: 1px solid #ccc;
     height: 100%;
 }
 
