@@ -450,7 +450,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
           <div class="modal-header">
             <h5 class="modal-title" id="exonVisualizationModalLabel">${title}</h5>
             <div class="ms-auto">
-              <button type="button" id="exportExonSvgBtn" class="btn btn-sm btn-outline-success me-2" title="Export as SVG">
+              <button type="button" id="exportExonSvgBtn" class="btn btn-sm btn-primary export-exon-svg-btn me-2" title="Export as SVG">
                 <i class="bi bi-download me-1"></i> Export SVG
               </button>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -548,6 +548,58 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                 .exon-group:hover .exon-label {
                     font-weight: bolder;
                     text-shadow: 0px 1px 3px rgba(0,0,0,0.9);
+                }
+                
+                /* Enhanced Export SVG Button */
+                .export-exon-svg-btn {
+                    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+                    border: none !important;
+                    color: white !important;
+                    font-weight: 700 !important;
+                    padding: 0.5rem 1.25rem !important;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+                    transition: all 0.3s ease !important;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+                    letter-spacing: 0.5px;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .export-exon-svg-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+                
+                .export-exon-svg-btn:hover::before {
+                    left: 100%;
+                }
+                
+                .export-exon-svg-btn:hover {
+                    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+                    transform: translateY(-2px) scale(1.05) !important;
+                    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.6) !important;
+                }
+                
+                .export-exon-svg-btn:active {
+                    transform: translateY(0) scale(1) !important;
+                    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4) !important;
+                }
+                
+                .export-exon-svg-btn i {
+                    margin-right: 0.5rem;
+                    font-size: 1rem;
+                    animation: download-bounce 2s ease-in-out infinite;
+                }
+                
+                @keyframes download-bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-3px); }
                 }
             `;
             document.head.appendChild(style);

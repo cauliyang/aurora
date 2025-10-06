@@ -70,6 +70,17 @@ To run the Aurora Graph Visualization locally on your machine, follow these step
 
 Contributions are welcome! If you find a bug or have an enhancement in mind, please create an issue or submit a pull request. Make sure to follow the code of conduct.
 
+### Pull Request Previews
+
+All pull requests automatically get a preview deployment! 🚀
+
+- When you open a PR, a preview site is automatically built and deployed
+- The preview URL is posted as a comment on your PR
+- Test your changes live before merging
+- Preview is automatically updated when you push new commits
+
+See [PR Preview Setup Guide](docs/PR_PREVIEW_SETUP.md) for more details.
+
 ## License
 
 This project is licensed under the GPLv3 License.

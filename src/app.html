@@ -1,211 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Graph Visualization</title>
 
     <!-- PERFORMANCE -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
     <link rel="preload" as="style" href="./styles/style.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="./styles/scss/styles.scss" />
     <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/app.css" />
     <link rel="stylesheet" href="./styles/gene-annotations.css" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./styles/jsoneditor-custom.css" />
-  </head>
+    <link rel="stylesheet" href="./styles/modern-theme.css" />
+    <link rel="stylesheet" href="./styles/components/help-guide.css" />
+    <link rel="stylesheet" href="./styles/components/graph-canvas.css" />
+    <link rel="stylesheet" href="./styles/components/footer.css" />
+</head>
 
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white">
-      <!-- Container wrapper -->
-      <div class="container-fluid" style="padding-top: 15px">
-        <!-- Toggle button -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-mdb-toggle="collapse"
-          data-mdb-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <i class="fas fa-bars"></i>
+<body class="fade-in">
+    <!-- Modern Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <!-- Navbar brand with gradient -->
+            <a class="navbar-brand" href="#">
+                <span>Aurora</span>
+                <i class="bi bi-lightning-charge-fill"></i>
+            </a>
+
+            <!-- Toggle button for mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="bi bi-list"></i>
         </button>
 
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <!-- Navbar brand -->
-          <a class="navbar-brand mt-2 mt-lg-0" href="#">
-            <em>Aurora</em> <i class="bi bi-lightning-charge-fill"></i>
-          </a>
+            <!-- Navbar content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Left nav links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-folder me-1"></i>Project
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="showReleaseNotesBtn">
+                            <i class="bi bi-stars me-1"></i>What's New
+                        </a>
+                    </li>
+                </ul>
 
-          <!-- Left links -->
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Project</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" id="showReleaseNotesBtn"
-                >What's New</a
-              >
-            </li>
-          </ul>
-          <!-- Left links -->
+                <!-- Right elements -->
+                <div class="d-flex align-items-center gap-3">
+                    <a href="https://github.com/cauliyang" target="_blank" rel="noopener" aria-label="GitHub">
+                        <i class="bi bi-github"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-
-        <!-- Right elements -->
-        <div class="d-flex align-items-center">
-          <!-- Right elements -->
-          <div class="d-flex align-items-center">
-            <a href="https://github.com/cauliyang">
-              <i class="bi bi-github" style="font-size: 1.4rem"></i>
-            </a>
-          </div>
-        </div>
-
-        <!--
-            <div class="d-flex align-items-center">
-                <a href="https://yangyangli.top/">
-                    <img src="img/avatar.jpeg" alt="Avatar" class="avatar rounded" style="width: 25px; height: 25px;">
-                </a>
-            </div> -->
-      </div>
-      <!-- Container wrapper -->
     </nav>
-    <!-- Navbar -->
+    <!-- End Modern Navbar -->
 
     <hr class="hr" />
 
     <div id="tooltip" class="custom-tooltip"></div>
 
     <div class="container-fluid h-100 p-3">
-      <div class="row h-100">
-        <!-- Replace the absolute positioned toolbar with a responsive one -->
-        <div class="col-12 mb-3">
-          <div
-            class="btn-toolbar toolbar-responsive flex-wrap overflow-auto py-1"
-            role="toolbar"
-            aria-label="Toolbar with button groups"
-          >
-            <!-- First button group remains the same -->
-            <div
-              class="btn-group me-2 mb-2"
-              role="group"
-              aria-label="First group"
-            >
-              <button
-                id="toggleMaximize"
-                class="btn btn-outline-primary"
-                title="Toggle fullscreen"
-                aria-label="Toggle fullscreen view"
-              >
+        <div class="row h-100">
+            <!-- Replace the absolute positioned toolbar with a responsive one -->
+            <div class="col-12 mb-3">
+                <div class="btn-toolbar toolbar-responsive flex-wrap overflow-auto py-1" role="toolbar" aria-label="Toolbar with button groups">
+                    <!-- First button group remains the same -->
+                    <div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+                        <button id="toggleMaximize" class="btn btn-outline-primary" title="Toggle fullscreen" aria-label="Toggle fullscreen view">
                 <i class="bi bi-arrows-fullscreen"></i>
               </button>
-              <form
-                id="uploadForm"
-                enctype="multipart/form-data"
-                method="post"
-                action="/upload"
-                class="btn btn-outline-primary"
-                title="Upload JSON/TSG file"
-                aria-label="Upload JSON or TSG file"
-              >
-                <input
-                  type="file"
-                  name="file"
-                  accept=".json,.tsg"
-                  class="d-none"
-                  id="uploadInput"
-                />
-                <label
-                  for="uploadInput"
-                  title="Upload JSON/TSG file"
-                  aria-label="Upload JSON or TSG file"
-                  ><i class="bi bi-upload"></i
+                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload" class="btn btn-outline-primary" title="Upload JSON/TSG file" aria-label="Upload JSON or TSG file">
+                            <input type="file" name="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
+                            <label for="uploadInput" title="Upload JSON/TSG file" aria-label="Upload JSON or TSG file"><i class="bi bi-upload"></i
                 ></label>
-              </form>
+                        </form>
 
-              <button
-                id="captureGraph"
-                class="btn btn-outline-primary"
-                title="Capture graph as PNG"
-                aria-label="Capture graph as PNG image"
-              >
+                        <button id="captureGraph" class="btn btn-outline-primary" title="Capture graph as PNG" aria-label="Capture graph as PNG image">
                 <i class="bi bi-camera"></i>
               </button>
 
-              <button
-                id="hiddenLabel"
-                class="btn btn-outline-primary"
-                title="Toggle node/edge labels"
-                aria-label="Toggle node and edge labels"
-                data-tooltip-enabled="false"
-                onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))"
-              >
+                        <button id="hiddenLabel" class="btn btn-outline-primary" title="Toggle node/edge labels" aria-label="Toggle node and edge labels" data-tooltip-enabled="false" onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))">
                 <i class="bi bi-card-text"></i>
               </button>
 
-              <button
-                id="toggleTooltip"
-                class="btn btn-outline-primary active"
-                title="Toggle tooltips"
-                aria-label="Toggle tooltips on graph elements"
-                data-tooltip-enabled="true"
-                onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))"
-              >
+                        <button id="toggleTooltip" class="btn btn-outline-primary active" title="Toggle tooltips" aria-label="Toggle tooltips on graph elements" data-tooltip-enabled="true" onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))">
                 <i class="bi bi-info-circle"></i>
               </button>
 
-              <button
-                id="resetGraph"
-                class="btn btn-outline-primary"
-                title="Reset graph layout"
-                aria-label="Reset graph layout"
-              >
+                        <button id="resetGraph" class="btn btn-outline-primary" title="Reset graph layout" aria-label="Reset graph layout">
                 <i class="bi bi-arrow-repeat"></i>
               </button>
 
-              <button
-                id="clearHighlights"
-                class="btn btn-outline-primary"
-                title="Clear node highlights"
-                aria-label="Clear node highlights"
-              >
+                        <button id="clearHighlights" class="btn btn-outline-primary" title="Clear node highlights" aria-label="Clear node highlights">
                 <i class="bi bi-eraser"></i>
               </button>
 
-              <button
-                id="geneAnnotationBtn"
-                class="btn btn-outline-primary"
-                title="Gene Annotations"
-                aria-label="Open gene annotation settings"
-              >
+                        <button id="geneAnnotationBtn" class="btn btn-outline-primary" title="Gene Annotations" aria-label="Open gene annotation settings">
                 <i class="fas fa-dna"></i>
               </button>
-            </div>
+                    </div>
 
-            <!-- Layout Selection -->
-            <div class="btn-group me-2 mb-2" role="group">
-              <select id="layoutSelect" class="form-select w-auto">
+                    <!-- Layout Selection -->
+                    <div class="btn-group me-2 mb-2" role="group">
+                        <select id="layoutSelect" class="form-select w-auto">
                 <option value="dagre">DAG Layout</option>
                 <option value="grid">Grid Layout</option>
                 <option value="circle">Circle Layout</option>
@@ -226,19 +138,12 @@
                 <!-- https://blog.js.cytoscape.org/2020/05/11/layouts/#classes-of-layouts -->
                 <!-- Add more layout options as needed -->
               </select>
-            </div>
+                    </div>
 
-            <!-- Graph Selection Dropdown - Initially hidden -->
-            <div
-              id="graphSelectorContainer"
-              class="d-inline-flex align-items-center me-2 mb-2"
-              style="display: none"
-            >
-              <div class="input-group" style="height: 38px">
-                <span
-                  class="input-group-text"
-                  style="height: 100%; padding: 0.375rem 0.75rem"
-                  >Graph</span
+                    <!-- Graph Selection Dropdown - Initially hidden -->
+                    <div id="graphSelectorContainer" class="d-inline-flex align-items-center me-2 mb-2" style="display: none">
+                        <div class="input-group" style="height: 38px">
+                            <span class="input-group-text" style="height: 100%; padding: 0.375rem 0.75rem">Graph</span
                 >
                 <select
                   id="graphSelect"
@@ -298,7 +203,7 @@
               />
             </div>
 
-            <!-- JSON Editor and IGV Buttons -->
+            <!-- JSON Editor and Other Tools -->
             <div class="btn-group mb-2" role="group">
               <button
                 id="openJsonEditor"
@@ -308,19 +213,6 @@
                 aria-label="Open JSON Editor"
               >
                 <i class="bi bi-code-square"></i>
-              </button>
-              <button
-                class="btn btn-outline-primary"
-                id="redirectToIgv"
-                title="Open IGV Browser"
-                aria-label="Open IGV Browser"
-              >
-                <img
-                  src="./assets/igv-logo-cooked-40x40.png"
-                  alt="IGV"
-                  class="img-fluid"
-                  style="width: 20px; height: 20px"
-                />
               </button>
               <!-- Node ranking button -->
               <button
@@ -370,354 +262,232 @@
               <h3>
                 <i class="bi bi-diagram-3"></i> Graph Walks
                 <span class="badge bg-primary walks-count">0</span>
-              </h3>
-              <div class="input-group mb-3">
-                <span class="input-group-text"
-                  ><i class="bi bi-search"></i
+                            </h3>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="bi bi-search"></i
                 ></span>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="walkSearch"
-                  placeholder="Search walks or Aurora ID..."
-                  aria-label="Search walks"
-                />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="clearWalkSearch"
-                >
+                                <input type="text" class="form-control" id="walkSearch" placeholder="Search walks or Aurora ID..." aria-label="Search walks" />
+                                <button class="btn btn-outline-secondary" type="button" id="clearWalkSearch">
                   <i class="bi bi-x-lg"></i>
                 </button>
-              </div>
-              <div class="input-group mb-3">
-                <input
-                  type="file"
-                  class="form-control"
-                  id="auroraIdsFile"
-                  accept=".txt"
-                  aria-label="Upload Aurora IDs file"
-                />
-                <button
-                  class="btn btn-outline-primary"
-                  type="button"
-                  id="uploadAuroraIds"
-                >
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" id="auroraIdsFile" accept=".txt" aria-label="Upload Aurora IDs file" />
+                                <button class="btn btn-outline-primary" type="button" id="uploadAuroraIds">
                   <i class="bi bi-upload"></i> Batch Search
                 </button>
-              </div>
-            </div>
-            <div class="walk-list-container">
-              <!-- Loading placeholder -->
-              <div class="text-center p-5 text-muted">
-                <div class="spinner-border" role="status">
-                  <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="walk-list-container">
+                            <!-- Loading placeholder -->
+                            <div class="text-center p-5 text-muted">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading walks...</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="mt-2">Loading walks...</p>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Modal for JSON Editor -->
-    <div class="modal fade" id="jsonModal" tabindex="-1">
-      <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="jsonModalLabel">
-              <i class="bi bi-braces-asterisk me-2"></i> Graph Data Editor
-            </h5>
-            <div class="editor-mode-selector btn-group btn-group-sm ms-3">
-              <button
-                type="button"
-                class="btn btn-outline-secondary editor-mode-btn"
-                data-mode="tree"
-                title="Tree View"
-              >
+        <!-- Modal for JSON Editor -->
+        <div class="modal fade" id="jsonModal" tabindex="-1">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="jsonModalLabel">
+                            <i class="bi bi-braces-asterisk me-2"></i> Graph Data Editor
+                        </h5>
+                        <div class="editor-mode-selector btn-group btn-group-sm ms-3">
+                            <button type="button" class="btn btn-outline-secondary editor-mode-btn" data-mode="tree" title="Tree View">
                 <i class="bi bi-diagram-3"></i>
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary editor-mode-btn"
-                data-mode="code"
-                title="Code View"
-              >
+                            <button type="button" class="btn btn-outline-secondary editor-mode-btn" data-mode="code" title="Code View">
                 <i class="bi bi-code-slash"></i>
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary editor-mode-btn"
-                data-mode="form"
-                title="Form View"
-              >
+                            <button type="button" class="btn btn-outline-secondary editor-mode-btn" data-mode="form" title="Form View">
                 <i class="bi bi-ui-checks"></i>
               </button>
-            </div>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body p-0">
-            <div class="jsoneditor-container">
-              <div id="jsoneditor"></div>
-              <div class="editor-shortcuts">
-                Shortcuts: Ctrl+F (Search), Ctrl+Z (Undo), Ctrl+Shift+Z (Redo)
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-              id="closeEditor"
-            >
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div class="jsoneditor-container">
+                            <div id="jsoneditor"></div>
+                            <div class="editor-shortcuts">
+                                Shortcuts: Ctrl+F (Search), Ctrl+Z (Undo), Ctrl+Shift+Z (Redo)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditor">
               <i class="bi bi-x-lg me-1"></i> Cancel
             </button>
-            <button type="button" class="btn btn-primary" id="saveEditedJson">
+                        <button type="button" class="btn btn-primary" id="saveEditedJson">
               <i class="bi bi-check-lg me-1"></i> Apply Changes
             </button>
-          </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Modal for Node Ranking -->
-    <div
-      class="modal fade"
-      id="nodeRankingModal"
-      tabindex="-1"
-      aria-labelledby="nodeRankingModalLabel"
-    >
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="nodeRankingModalLabel">Node Ranking</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <ul id="nodeRankingList" class="list-group">
-              <!-- Dynamic content will be loaded here -->
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+        <!-- Modal for Node Ranking -->
+        <div class="modal fade" id="nodeRankingModal" tabindex="-1" aria-labelledby="nodeRankingModalLabel">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="nodeRankingModalLabel">Node Ranking</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="nodeRankingList" class="list-group">
+                            <!-- Dynamic content will be loaded here -->
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Close
             </button>
-          </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Modal for Gene Annotation -->
-    <div
-      class="modal fade"
-      id="geneAnnotationModal"
-      tabindex="-1"
-      aria-labelledby="geneAnnotationModalLabel"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="geneAnnotationModalLabel">
-              Gene Annotation Settings
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-4">
-              <h6>Gene Annotations</h6>
-              <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i> Using built-in gene
-                annotations for chromosomes 1 and 8, including NKX3-1, JRK, and
-                PSCA genes.
-              </div>
-              <button class="btn btn-primary w-100" id="annotateNowBtn">
+        <!-- Modal for Gene Annotation -->
+        <div class="modal fade" id="geneAnnotationModal" tabindex="-1" aria-labelledby="geneAnnotationModalLabel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="geneAnnotationModalLabel">
+                            Gene Annotation Settings
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <h6>Gene Annotations</h6>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i> Using built-in gene annotations for chromosomes 1 and 8, including NKX3-1, JRK, and PSCA genes.
+                            </div>
+                            <button class="btn btn-primary w-100" id="annotateNowBtn">
                 <i class="fas fa-dna me-2"></i> Annotate Nodes Now
               </button>
-            </div>
+                        </div>
 
-            <div class="mb-4">
-              <h6>Upload Custom Gene File</h6>
-              <div class="input-group mb-3">
-                <input
-                  type="file"
-                  class="form-control"
-                  id="geneFileInput"
-                  accept=".txt,.gz"
-                />
-                <button
-                  class="btn btn-outline-primary"
-                  type="button"
-                  id="uploadGeneBtn"
-                >
+                        <div class="mb-4">
+                            <h6>Upload Custom Gene File</h6>
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" id="geneFileInput" accept=".txt,.gz" />
+                                <button class="btn btn-outline-primary" type="button" id="uploadGeneBtn">
                   Upload & Process
                 </button>
-              </div>
-              <div class="progress mt-2 d-none" id="geneUploadProgress">
-                <div
-                  class="progress-bar progress-bar-striped progress-bar-animated"
-                  role="progressbar"
-                  style="width: 0%"
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                ></div>
-              </div>
-              <div class="form-text">
-                File should be tab-delimited with columns: gene_id, chromosome,
-                start, end, strand, gene_name
-              </div>
-            </div>
+                            </div>
+                            <div class="progress mt-2 d-none" id="geneUploadProgress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="form-text">
+                                File should be tab-delimited with columns: gene_id, chromosome, start, end, strand, gene_name
+                            </div>
+                        </div>
 
-            <div class="alert alert-info" role="alert">
-              <i class="bi bi-info-circle-fill me-2"></i> Gene annotations
-              improve node labeling and provide biological context to your
-              graph.
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle-fill me-2"></i> Gene annotations improve node labeling and provide biological context to your graph.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Close
             </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              id="annotateAllNodesBtn"
-            >
+                        <button type="button" class="btn btn-primary" id="annotateAllNodesBtn">
               Annotate All Nodes
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Status indicator for gene annotations -->
-    <div id="annotationStatus" class="d-none"></div>
-
-    <!-- Scripts - Make sure alertUtils.js is loaded first and NOT as a module -->
-
-    <!-- Add Bootstrap and Popper.js before your other scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-
-    <!-- Load UI utilities first (non-module) -->
-    <script src="./scripts/alertUtils.js"></script>
-    <script src="./scripts/ui/loadingIndicator.js"></script>
-
-    <!-- Keep other scripts as modules -->
-    <script src="./scripts/helpGuide.js" type="module"></script>
-    <script src="./scripts/graph.js" type="module"></script>
-    <script src="./scripts/jseditor.js" type="module"></script>
-    <script src="./scripts/eventHandlers.js" type="module"></script>
-    <script src="./scripts/tsg.js" type="module"></script>
-    <script src="./scripts/releaseNotes.js" type="module"></script>
-
-    <!-- Footer Start -->
-    <footer class="mt-5 py-5 bg-dark text-white">
-      <div class="container-fluid px-4 px-lg-5">
-        <div class="row gx-4 gy-5">
-          <!-- Left: About/Links -->
-          <div class="col-lg-4 col-md-6">
-            <h5 class="fw-bold border-bottom pb-3 mb-4">About Aurora</h5>
-            <p class="text-light lh-lg">
-              Aurora is a state-of-the-art graph visualization platform. Dive
-              deep into your data and extract meaningful insights with our
-              powerful interactive tools designed for bioinformatics research
-              and data exploration.
-            </p>
-          </div>
-
-          <!-- Center: Quick Links -->
-          <div class="col-lg-3 col-md-6 offset-lg-1">
-            <h5 class="fw-bold border-bottom pb-3 mb-4">Quick Links</h5>
-            <ul class="list-unstyled">
-              <li class="mb-3">
-                <a
-                  href="index.html"
-                  class="text-light text-decoration-none hover-effect d-flex align-items-center"
-                >
-                  <i class="bi bi-house-door me-3"></i>Home
-                </a>
-              </li>
-              <li class="mb-3">
-                <a
-                  href="index.html"
-                  class="text-light text-decoration-none hover-effect d-flex align-items-center"
-                >
-                  <i class="bi bi-stars me-3"></i>Features
-                </a>
-              </li>
-              <li class="mb-3">
-                <a
-                  href="#"
-                  class="text-light text-decoration-none hover-effect d-flex align-items-center"
-                >
-                  <i class="bi bi-envelope me-3"></i>Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Right: Social Media Links -->
-          <div class="col-lg-3 col-md-6">
-            <h5 class="fw-bold border-bottom pb-3 mb-4">Connect with Us</h5>
-            <div class="d-flex gap-4">
-              <a
-                href="https://yangyangli.top"
-                class="text-light fs-3"
-                title="Personal Website"
-              >
-                <i class="bi bi-person-circle"></i>
-              </a>
-              <a
-                href="https://twitter.com/yangyangliz5"
-                class="text-light fs-3"
-                title="Twitter"
-              >
-                <i class="bi bi-twitter"></i>
-              </a>
-              <a
-                href="https://github.com/cauliyang/aurora"
-                class="text-light fs-3"
-                title="GitHub Repository"
-              >
-                <i class="fab fa-github"></i>
-              </a>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
 
-        <!-- Bottom: Copyright -->
-        <div class="row mt-5 pt-4 border-top">
-          <div class="col-12 text-center">
-            <p class="mb-0">&copy; 2025 Yangyang Li. All rights reserved.</p>
-          </div>
-        </div>
-      </div>
-    </footer>
-  </body>
+        <!-- Status indicator for gene annotations -->
+        <div id="annotationStatus" class="d-none"></div>
+
+        <!-- Scripts - Make sure alertUtils.js is loaded first and NOT as a module -->
+
+        <!-- Add Bootstrap and Popper.js before your other scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+        <!-- Load UI utilities first (non-module) -->
+        <script src="./scripts/alertUtils.js"></script>
+        <script src="./scripts/ui/loadingIndicator.js"></script>
+
+        <!-- Keep other scripts as modules -->
+        <script src="./scripts/helpGuide.js" type="module"></script>
+        <script src="./scripts/graph.js" type="module"></script>
+        <script src="./scripts/jseditor.js" type="module"></script>
+        <script src="./scripts/eventHandlers.js" type="module"></script>
+        <script src="./scripts/tsg.js" type="module"></script>
+        <script src="./scripts/releaseNotes.js" type="module"></script>
+
+        <!-- Footer Start -->
+        <footer>
+            <div class="container-fluid px-4 px-lg-5">
+                <div class="row gx-4 gy-5">
+                    <!-- Left: About/Links -->
+                    <div class="col-lg-4 col-md-6">
+                        <h5 class="fw-bold border-bottom pb-3 mb-4">About Aurora</h5>
+                        <p class="text-light lh-lg">
+                            Aurora is a state-of-the-art graph visualization platform. Dive deep into your data and extract meaningful insights with our powerful interactive tools designed for bioinformatics research and data exploration.
+                        </p>
+                    </div>
+
+                    <!-- Center: Quick Links -->
+                    <div class="col-lg-3 col-md-6 offset-lg-1">
+                        <h5 class="fw-bold border-bottom pb-3 mb-4">Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <a href="index.html" class="text-light text-decoration-none hover-effect d-flex align-items-center">
+                                    <i class="bi bi-house-door me-3"></i>Home
+                                </a>
+                            </li>
+                            <li class="mb-3">
+                                <a href="index.html" class="text-light text-decoration-none hover-effect d-flex align-items-center">
+                                    <i class="bi bi-stars me-3"></i>Features
+                                </a>
+                            </li>
+                            <li class="mb-3">
+                                <a href="#" class="text-light text-decoration-none hover-effect d-flex align-items-center">
+                                    <i class="bi bi-envelope me-3"></i>Contact
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Right: Social Media Links -->
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="fw-bold border-bottom pb-3 mb-4">Connect with Us</h5>
+                        <div class="d-flex gap-4">
+                            <a href="https://yangyangli.top" class="text-light fs-3" title="Personal Website">
+                                <i class="bi bi-person-circle"></i>
+                            </a>
+                            <a href="https://twitter.com/yangyangliz5" class="text-light fs-3" title="Twitter">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                            <a href="https://github.com/cauliyang/aurora" class="text-light fs-3" title="GitHub Repository">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Copyright -->
+                <div class="row mt-5 pt-4 border-top">
+                    <div class="col-12 text-center">
+                        <p class="mb-0">&copy; 2025 Yangyang Li. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+</body>
+
 </html>
