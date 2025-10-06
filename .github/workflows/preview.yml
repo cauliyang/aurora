@@ -30,7 +30,7 @@ jobs:
       - name: Build for preview
         if: github.event.action != 'closed'
         run: |
-          # Build with PR-specific public URL
+          # Build with PR-specific public URL - MUST match your main site structure
           npm run build -- --public-url /aurora/pr-${{ github.event.pull_request.number }}/
         env:
           NODE_ENV: production
@@ -50,7 +50,7 @@ jobs:
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
-            const previewUrl = `https://yangyangli.top/pr-${prNumber}/`;
+            const previewUrl = `https://yangyangli.top/aurora/pr-${prNumber}/`;
             
             // Find existing comment
             const comments = await github.rest.issues.listComments({
@@ -95,13 +95,17 @@ jobs:
 
       - name: Cleanup Preview (on PR close)
         if: github.event.action == 'closed'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          destination_dir: pr-${{ github.event.pull_request.number }}
-          keep_files: false
-          enable_jekyll: true
+        run: |
+          # Clone gh-pages, remove PR preview directory, and push
+          git clone --depth 1 -b gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-branch
+          cd gh-pages-branch
+          rm -rf pr-${{ github.event.pull_request.number }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Clean up PR #${{ github.event.pull_request.number }} preview" && git push)
+          cd ..
+          rm -rf gh-pages-branch
 
       - name: Comment cleanup on PR
         if: github.event.action == 'closed'
