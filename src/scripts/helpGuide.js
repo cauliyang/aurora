@@ -115,12 +115,6 @@ class HelpGuide {
                 placement: "left",
             },
             {
-                target: "#redirectToIgv",
-                title: "IGV Browser",
-                content: "Launch the Integrative Genomics Viewer for detailed genomic visualization.",
-                placement: "left",
-            },
-            {
                 target: "#showNodeRanking",
                 title: "Node Ranking",
                 content: "View nodes ranked by importance based on graph metrics.",
