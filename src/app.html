@@ -28,70 +28,63 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles/jsoneditor-custom.css" />
+    <link rel="stylesheet" href="./styles/modern-theme.css" />
   </head>
 
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white">
-      <!-- Container wrapper -->
-      <div class="container-fluid" style="padding-top: 15px">
-        <!-- Toggle button -->
+  <body class="fade-in">
+    <!-- Modern Navbar -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <!-- Navbar brand with gradient -->
+        <a class="navbar-brand" href="#">
+          <span>Aurora</span>
+          <i class="bi bi-lightning-charge-fill"></i>
+        </a>
+
+        <!-- Toggle button for mobile -->
         <button
           class="navbar-toggler"
           type="button"
-          data-mdb-toggle="collapse"
-          data-mdb-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <i class="fas fa-bars"></i>
+          <i class="bi bi-list"></i>
         </button>
 
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <!-- Navbar brand -->
-          <a class="navbar-brand mt-2 mt-lg-0" href="#">
-            <em>Aurora</em> <i class="bi bi-lightning-charge-fill"></i>
-          </a>
-
-          <!-- Left links -->
+        <!-- Navbar content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <!-- Left nav links -->
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="#">Dashboard</a>
+              <a class="nav-link" href="#">
+                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+              </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Project</a>
+              <a class="nav-link" href="#">
+                <i class="bi bi-folder me-1"></i>Project
+              </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" id="showReleaseNotesBtn"
-                >What's New</a
-              >
+              <a class="nav-link" href="#" id="showReleaseNotesBtn">
+                <i class="bi bi-stars me-1"></i>What's New
+              </a>
             </li>
           </ul>
-          <!-- Left links -->
-        </div>
 
-        <!-- Right elements -->
-        <div class="d-flex align-items-center">
           <!-- Right elements -->
-          <div class="d-flex align-items-center">
-            <a href="https://github.com/cauliyang">
-              <i class="bi bi-github" style="font-size: 1.4rem"></i>
+          <div class="d-flex align-items-center gap-3">
+            <a href="https://github.com/cauliyang" target="_blank" rel="noopener" aria-label="GitHub">
+              <i class="bi bi-github"></i>
             </a>
           </div>
         </div>
-
-        <!--
-            <div class="d-flex align-items-center">
-                <a href="https://yangyangli.top/">
-                    <img src="img/avatar.jpeg" alt="Avatar" class="avatar rounded" style="width: 25px; height: 25px;">
-                </a>
-            </div> -->
       </div>
-      <!-- Container wrapper -->
     </nav>
-    <!-- Navbar -->
+    <!-- End Modern Navbar -->
 
     <hr class="hr" />
 
