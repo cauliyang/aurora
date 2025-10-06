@@ -1,0 +1,120 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        if: github.event.action != 'closed'
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        if: github.event.action != 'closed'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: github.event.action != 'closed'
+        run: npm ci
+
+      - name: Build for preview
+        if: github.event.action != 'closed'
+        run: |
+          # Build with PR-specific public URL
+          npm run build -- --public-url /aurora/pr-${{ github.event.pull_request.number }}/
+        env:
+          NODE_ENV: production
+
+      - name: Deploy Preview
+        if: github.event.action != 'closed'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: pr-${{ github.event.pull_request.number }}
+          keep_files: true
+
+      - name: Comment PR with preview URL
+        if: github.event.action != 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const previewUrl = `https://yangyangli.top/pr-${prNumber}/`;
+            
+            // Find existing comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🚀 Preview deployed')
+            );
+            
+            const body = `## 🚀 Preview deployed!
+            
+            ✨ Your changes are live at: ${previewUrl}
+            
+            - **Preview URL**: [${previewUrl}](${previewUrl})
+            - **Commit**: ${context.sha.substring(0, 7)}
+            - **Updated**: ${new Date().toLocaleString()}
+            
+            The preview will be updated automatically when you push new commits to this PR.
+            `;
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }
+
+      - name: Cleanup Preview (on PR close)
+        if: github.event.action == 'closed'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: pr-${{ github.event.pull_request.number }}
+          keep_files: false
+          enable_jekyll: true
+
+      - name: Comment cleanup on PR
+        if: github.event.action == 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `## 🧹 Preview cleaned up
+              
+              The preview deployment for this PR has been removed.`
+            });
+
