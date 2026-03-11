@@ -221,6 +221,13 @@ document.getElementById("MinDepth").addEventListener("change", function() {
 });
 
 export function loadGraphDataFromServer(graphData) {
+    // Clear empty state and show loading indicator on the graph canvas
+    clearEmptyState();
+    const cyContainer = document.getElementById("cy");
+    if (cyContainer) {
+        cyContainer.classList.add("loading");
+    }
+
     //check if graphData has elements
     // if has elements, initialize graph using elements
     // if not has elements, initialize graph using graphData
@@ -256,6 +263,11 @@ export function loadGraphDataFromServer(graphData) {
     }
 
     setupGraphInteractions();
+
+    // Clear loading state after graph is ready
+    if (cyContainer) {
+        cyContainer.classList.remove("loading");
+    }
 }
 
 // Make loadGraphDataFromServer globally available to avoid circular dependencies
@@ -319,11 +331,48 @@ function initializeResetButton() {
     });
 }
 
+// Show empty state in graph canvas before any graph is loaded
+function initializeEmptyState() {
+    const cyContainer = document.getElementById("cy");
+    if (!cyContainer) return;
+
+    cyContainer.classList.add("empty");
+    // Only add the empty state message if it doesn't already exist
+    if (!cyContainer.querySelector(".graph-empty-state")) {
+        const emptyState = document.createElement("div");
+        emptyState.className = "graph-empty-state";
+        emptyState.innerHTML = `
+            <div class="graph-empty-state-icon">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+            <h3>No Graph Loaded</h3>
+            <p>Upload a JSON or TSG file to visualize your transcript splice graph.</p>
+        `;
+        cyContainer.appendChild(emptyState);
+    }
+}
+
+// Clear empty state when a graph is about to load
+function clearEmptyState() {
+    const cyContainer = document.getElementById("cy");
+    if (!cyContainer) return;
+
+    cyContainer.classList.remove("empty");
+    const emptyState = cyContainer.querySelector(".graph-empty-state");
+    if (emptyState) {
+        emptyState.remove();
+    }
+}
+
 // Initialize on DOM load
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeResetButton);
+    document.addEventListener("DOMContentLoaded", () => {
+        initializeResetButton();
+        initializeEmptyState();
+    });
 } else {
     initializeResetButton();
+    initializeEmptyState();
 }
 
 // Function to get color based on weight

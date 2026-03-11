@@ -6,16 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Graph Visualization</title>
 
-    <!-- PERFORMANCE -->
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
-    <link rel="preload" as="style" href="./styles/style.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <!-- Bootstrap 5 + Bootstrap Icons compiled via SCSS (no CDN duplicates) -->
     <link rel="stylesheet" href="./styles/scss/styles.scss" />
-    <link rel="stylesheet" href="./styles/style.css" />
     <link rel="stylesheet" href="./styles/app.css" />
     <link rel="stylesheet" href="./styles/gene-annotations.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="./styles/jsoneditor-custom.css" />
     <link rel="stylesheet" href="./styles/modern-theme.css" />
     <link rel="stylesheet" href="./styles/components/help-guide.css" />
@@ -76,170 +73,118 @@
 
     <div class="container-fluid h-100 p-3">
         <div class="row h-100">
-            <!-- Replace the absolute positioned toolbar with a responsive one -->
+            <!-- Toolbar -->
             <div class="col-12 mb-3">
-                <div class="btn-toolbar toolbar-responsive flex-wrap overflow-auto py-1" role="toolbar" aria-label="Toolbar with button groups">
-                    <!-- First button group remains the same -->
-                    <div class="btn-group me-2 mb-2" role="group" aria-label="First group">
-                        <button id="toggleMaximize" class="btn btn-outline-primary" title="Toggle fullscreen" aria-label="Toggle fullscreen view">
-                <i class="bi bi-arrows-fullscreen"></i>
-              </button>
-                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload" class="btn btn-outline-primary" title="Upload JSON/TSG file" aria-label="Upload JSON or TSG file">
+                <div class="btn-toolbar toolbar-responsive flex-wrap overflow-auto py-1" role="toolbar"
+                    aria-label="Graph toolbar">
+
+                    <!-- File group -->
+                    <div class="btn-group me-2 mb-2" role="group" aria-label="File operations">
+                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload"
+                            class="btn btn-outline-primary" title="Upload JSON/TSG file"
+                            aria-label="Upload JSON or TSG file">
                             <input type="file" name="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
-                            <label for="uploadInput" title="Upload JSON/TSG file" aria-label="Upload JSON or TSG file"><i class="bi bi-upload"></i
-                ></label>
+                            <label for="uploadInput" title="Upload JSON/TSG file"
+                                aria-label="Upload JSON or TSG file"><i class="bi bi-upload"></i></label>
                         </form>
-
-                        <button id="captureGraph" class="btn btn-outline-primary" title="Capture graph as PNG" aria-label="Capture graph as PNG image">
-                <i class="bi bi-camera"></i>
-              </button>
-
-                        <button id="hiddenLabel" class="btn btn-outline-primary" title="Toggle node/edge labels" aria-label="Toggle node and edge labels" data-tooltip-enabled="false" onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))">
-                <i class="bi bi-card-text"></i>
-              </button>
-
-                        <button id="toggleTooltip" class="btn btn-outline-primary active" title="Toggle tooltips" aria-label="Toggle tooltips on graph elements" data-tooltip-enabled="true" onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))">
-                <i class="bi bi-info-circle"></i>
-              </button>
-
-                        <button id="resetGraph" class="btn btn-outline-primary" title="Reset graph layout" aria-label="Reset graph layout">
-                <i class="bi bi-arrow-repeat"></i>
-              </button>
-
-                        <button id="clearHighlights" class="btn btn-outline-primary" title="Clear node highlights" aria-label="Clear node highlights">
-                <i class="bi bi-eraser"></i>
-              </button>
-
-                        <button id="geneAnnotationBtn" class="btn btn-outline-primary" title="Gene Annotations" aria-label="Open gene annotation settings">
-                <i class="fas fa-dna"></i>
-              </button>
+                        <button id="captureGraph" class="btn btn-outline-primary" title="Export graph"
+                            aria-label="Export graph">
+                            <i class="bi bi-camera"></i>
+                        </button>
                     </div>
 
-                    <!-- Layout Selection -->
-                    <div class="btn-group me-2 mb-2" role="group">
-                        <select id="layoutSelect" class="form-select w-auto">
-                <option value="dagre">DAG Layout</option>
-                <option value="grid">Grid Layout</option>
-                <option value="circle">Circle Layout</option>
-                <option value="cose">COSE Layout</option>
-                <option value="breadthfirst">Breadthfirst Layout</option>
-                <option value="concentric">Concentric Layout</option>
-                <!-- <option value="preset">Preset Layout</option> -->
-                <option value="random">Radom Layout</option>
-                <option value="tidytree">Tidytree Layout</option>
-                <!-- <option value="elk">Elk Layout</option> -->
-                <!-- <option value="cola">Cola Layout</option> -->
-                <!-- <option value="cise">Cise Layout</option> -->
-                <option value="klay">Klay Layout</option>
-                <!-- <option value="avsdf">Avsdf Layout</option> -->
-                <option value="euler">Euler Layout</option>
-                <option value="spread">Spread Layout</option>
-
-                <!-- https://blog.js.cytoscape.org/2020/05/11/layouts/#classes-of-layouts -->
-                <!-- Add more layout options as needed -->
-              </select>
+                    <!-- View group -->
+                    <div class="btn-group me-2 mb-2" role="group" aria-label="View controls">
+                        <button id="toggleMaximize" class="btn btn-outline-primary" title="Toggle fullscreen"
+                            aria-label="Toggle fullscreen view">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
+                        <button id="hiddenLabel" class="btn btn-outline-primary" title="Toggle labels"
+                            aria-label="Toggle node and edge labels" data-tooltip-enabled="false"
+                            onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))">
+                            <i class="bi bi-card-text"></i>
+                        </button>
+                        <button id="toggleTooltip" class="btn btn-outline-primary active" title="Toggle tooltips"
+                            aria-label="Toggle tooltips" data-tooltip-enabled="true"
+                            onclick="this.classList.toggle('active'); this.setAttribute('data-tooltip-enabled', this.classList.contains('active'))">
+                            <i class="bi bi-info-circle"></i>
+                        </button>
+                        <button id="resetGraph" class="btn btn-outline-primary" title="Reset layout"
+                            aria-label="Reset graph layout">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                        <button id="clearHighlights" class="btn btn-outline-primary" title="Clear highlights"
+                            aria-label="Clear node highlights">
+                            <i class="bi bi-eraser"></i>
+                        </button>
                     </div>
 
-                    <!-- Graph Selection Dropdown - Initially hidden -->
-                    <div id="graphSelectorContainer" class="d-inline-flex align-items-center me-2 mb-2" style="display: none">
-                        <div class="input-group" style="height: 38px">
-                            <span class="input-group-text" style="height: 100%; padding: 0.375rem 0.75rem">Graph</span
-                >
-                <select
-                  id="graphSelect"
-                  class="form-select"
-                  style="height: 100%; width: auto; min-width: 100px"
-                >
-                  <option value="0">Graph 1</option>
-                  <!-- Additional options will be added dynamically -->
-                </select>
-              </div>
+                    <!-- Layout group -->
+                    <div class="btn-group me-2 mb-2" role="group" aria-label="Layout selection">
+                        <select id="layoutSelect" class="form-select toolbar-select">
+                            <option value="dagre">DAG Layout</option>
+                            <option value="grid">Grid Layout</option>
+                            <option value="circle">Circle Layout</option>
+                            <option value="cose">COSE Layout</option>
+                            <option value="breadthfirst">Breadthfirst Layout</option>
+                            <option value="concentric">Concentric Layout</option>
+                            <option value="random">Random Layout</option>
+                            <option value="tidytree">Tidytree Layout</option>
+                            <option value="klay">Klay Layout</option>
+                            <option value="euler">Euler Layout</option>
+                            <option value="spread">Spread Layout</option>
+                        </select>
+                    </div>
+
+                    <!-- Graph selector (hidden by default, shown for multi-graph TSG files) -->
+                    <div id="graphSelectorContainer" class="d-none me-2 mb-2">
+                        <div class="input-group toolbar-input-group">
+                            <span class="input-group-text">Graph</span>
+                            <select id="graphSelect" class="form-select toolbar-select">
+                                <option value="0">Graph 1</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="liveAlertPlaceholder" class="mb-2"></div>
+
+                    <!-- Filter group -->
+                    <div class="input-group me-2 mb-2 flex-nowrap toolbar-filter-group">
+                        <span class="input-group-text">MinEdge</span>
+                        <input type="number" id="minEdgeWeight" class="form-control toolbar-number-input"
+                            placeholder="weight" value="1" min="1" />
+                        <span class="input-group-text">MinDepth</span>
+                        <input type="number" id="MinDepth" class="form-control toolbar-number-input"
+                            placeholder="depth" value="2" min="2" />
+                        <span class="input-group-text">MaxDepth</span>
+                        <input type="number" id="MaxDepth" class="form-control toolbar-number-input"
+                            placeholder="depth" value="900" min="2" />
+                    </div>
+
+                    <!-- Tools group -->
+                    <div class="btn-group me-2 mb-2" role="group" aria-label="Tools">
+                        <button id="geneAnnotationBtn" class="btn btn-outline-primary" title="Gene Annotations"
+                            aria-label="Open gene annotation settings">
+                            <i class="fas fa-dna"></i>
+                        </button>
+                        <button id="openJsonEditor" type="button" class="btn btn-primary" title="JSON Editor"
+                            aria-label="Open JSON Editor">
+                            <i class="bi bi-code-square"></i>
+                        </button>
+                        <button id="showNodeRanking" type="button" class="btn btn-outline-primary"
+                            data-bs-toggle="modal" data-bs-target="#nodeRankingModal" title="Node Ranking"
+                            aria-label="Show node ranking">
+                            <i class="bi bi-list-ol"></i>
+                        </button>
+                    </div>
+
+                    <!-- Toolbar collapse toggle for small screens -->
+                    <button class="btn btn-sm btn-outline-secondary d-md-none mb-2 ms-auto" type="button"
+                        id="collapseToolbarBtn" title="Collapse toolbar" aria-label="Collapse toolbar">
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                </div>
             </div>
-
-            <div id="liveAlertPlaceholder" class="mb-2"></div>
-
-            <!-- Input parameters group -->
-            <div
-              class="input-group me-2 mb-2 flex-nowrap"
-              style="max-width: 100%; overflow-x: auto"
-            >
-              <span class="input-group-text" id="inputGroup-sizing-default"
-                >MinEdge</span
-              >
-              <input
-                type="number"
-                id="minEdgeWeight"
-                class="form-control"
-                placeholder="weight"
-                value="1"
-                min="1"
-                style="width: 80px"
-              />
-
-              <span class="input-group-text" id="inputGroup-sizing-default"
-                >MinDepth</span
-              >
-              <input
-                type="number"
-                id="MinDepth"
-                class="form-control"
-                placeholder="depth"
-                value="2"
-                min="2"
-                style="width: 80px"
-              />
-
-              <span class="input-group-text" id="inputGroup-sizing-default"
-                >MaxDepth</span
-              >
-              <input
-                type="number"
-                id="MaxDepth"
-                class="form-control"
-                placeholder="depth"
-                value="900"
-                min="2"
-                style="width: 80px"
-              />
-            </div>
-
-            <!-- JSON Editor and Other Tools -->
-            <div class="btn-group mb-2" role="group">
-              <button
-                id="openJsonEditor"
-                type="button"
-                class="btn btn-primary"
-                title="Open JSON Editor"
-                aria-label="Open JSON Editor"
-              >
-                <i class="bi bi-code-square"></i>
-              </button>
-              <!-- Node ranking button -->
-              <button
-                id="showNodeRanking"
-                type="button"
-                class="btn btn-outline-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#nodeRankingModal"
-                title="Show node ranking"
-                aria-label="Show node ranking"
-              >
-                <i class="bi bi-list-ol"></i> Node Ranking
-              </button>
-            </div>
-
-            <!-- Toolbar collapse toggle button for very small screens -->
-            <button
-              class="btn btn-sm btn-outline-secondary d-md-none mb-2 ms-auto"
-              type="button"
-              id="collapseToolbarBtn"
-              title="Collapse toolbar"
-              aria-label="Collapse toolbar"
-            >
-              <i class="bi bi-chevron-up"></i>
-            </button>
-          </div>
-        </div>
 
         <div class="col-lg-8 col-md-12 h-100" id="cy"></div>
 

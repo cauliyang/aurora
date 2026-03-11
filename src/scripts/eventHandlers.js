@@ -426,8 +426,7 @@ function handleFileUpload(event) {
                 loadGraphDataFromServer(jsonData);
 
                 // Hide graph selector for single JSON files
-                document.getElementById("graphSelectorContainer").style.display =
-                    "none";
+                document.getElementById("graphSelectorContainer").classList.add("d-none");
 
                 window.loadingIndicator ? .hide(loadingId);
                 window.showAlert ? .("Graph loaded successfully!", "success", 2000);
@@ -449,8 +448,7 @@ function handleFileUpload(event) {
                 if (graphCount > 1) {
                     setupGraphSelector(graphCount);
                 } else {
-                    document.getElementById("graphSelectorContainer").style.display =
-                        "none";
+                    document.getElementById("graphSelectorContainer").classList.add("d-none");
                 }
 
                 // Load the first graph by default
@@ -502,7 +500,7 @@ function setupGraphSelector(graphCount) {
     }
 
     // Show the selector
-    graphSelectorContainer.style.display = "block";
+    graphSelectorContainer.classList.remove("d-none");
 
     // Add event listener for graph selection
     graphSelect.addEventListener("change", function() {
