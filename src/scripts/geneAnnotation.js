@@ -16,6 +16,11 @@ let assetLoadingAttempted = false;
 // Map<string, Gene[]> where each Gene[] is sorted by gene.start ascending.
 let geneIndex = new Map();
 
+// Prefix-max-end arrays for each chromosome, enabling O(log N) lower-bound
+// search in findOverlappingGenes(). prefixMaxEnd[i] = max(genes[0].end, ..., genes[i].end).
+// Since genes are sorted by start, prefixMaxEnd is monotonically non-decreasing.
+let genePrefixMaxEnd = new Map();
+
 /**
  * Normalize chromosome name to always have "chr" prefix.
  * @param {string} chrom - Chromosome name (e.g., "1", "chr1")
@@ -27,12 +32,19 @@ function normalizeChrom(chrom) {
 
 /**
  * Build the chromosome-indexed gene lookup from the gene database.
- * Groups genes by normalized chromosome and sorts each group by start position.
- * Called once after gene data is parsed.
+ * Groups genes by normalized chromosome, sorts each group by start position,
+ * and precomputes a prefixMaxEnd array for efficient lower-bound queries.
+ *
+ * prefixMaxEnd[i] = max(genes[0].end, ..., genes[i].end)
+ * This is monotonically non-decreasing and allows binary search to find
+ * the first gene index where any gene at or before that index could overlap
+ * a query region [start, end].
+ *
  * @param {Array<Gene>} genes - Array of Gene objects
  */
 function buildGeneIndex(genes) {
   geneIndex.clear();
+  genePrefixMaxEnd.clear();
   for (const gene of genes) {
     const chrom = normalizeChrom(gene.chromosome);
     if (!geneIndex.has(chrom)) {
@@ -40,9 +52,18 @@ function buildGeneIndex(genes) {
     }
     geneIndex.get(chrom).push(gene);
   }
-  // Sort each chromosome's genes by start position for binary search
-  for (const chromGenes of geneIndex.values()) {
+  // Sort each chromosome's genes by start position, then build prefixMaxEnd
+  for (const [chrom, chromGenes] of geneIndex.entries()) {
     chromGenes.sort((a, b) => a.start - b.start);
+
+    // Build prefix-max-end array: prefixMaxEnd[i] = max(genes[0..i].end)
+    const pme = new Array(chromGenes.length);
+    let maxEnd = 0;
+    for (let i = 0; i < chromGenes.length; i++) {
+      maxEnd = Math.max(maxEnd, chromGenes[i].end);
+      pme[i] = maxEnd;
+    }
+    genePrefixMaxEnd.set(chrom, pme);
   }
   console.log(
     `Built gene index: ${geneIndex.size} chromosomes, ${genes.length} genes`
@@ -422,10 +443,16 @@ function getFallbackGeneData() {
 
 /**
  * Find genes whose span overlaps the given genomic coordinates.
- * Uses the chromosome-indexed lookup with early termination for efficiency.
+ * Uses two binary searches on the chromosome-indexed gene array:
+ *   1. Upper bound: first gene where gene.start > end (genes sorted by start)
+ *   2. Lower bound: first gene where prefixMaxEnd[i] >= start
+ *      (prefixMaxEnd is monotonically non-decreasing, so binary search works)
  *
- * Complexity: O(log G_chr) binary search to find upper bound, then linear
- * scan within the candidate range. Typically examines only a handful of genes.
+ * This narrows the scan to only the genes in [lower, upper), which is
+ * typically a very small range (the actual overlapping genes plus a few
+ * neighbors), even for queries near the chromosome end.
+ *
+ * Complexity: O(log G_chr + k) where k is the size of [lower, upper).
  *
  * @param {string} chrom - Chromosome (e.g., "chr1")
  * @param {number} start - Start position
@@ -443,8 +470,10 @@ export function findOverlappingGenes(chrom, start, end, strand = null) {
   const genes = geneIndex.get(chromNorm);
   if (!genes || genes.length === 0) return [];
 
-  // Binary search: find the first index where gene.start > end.
-  // All genes at index >= upper can't overlap (they start after the query end).
+  const pme = genePrefixMaxEnd.get(chromNorm);
+
+  // Binary search upper bound: first index where gene.start > end.
+  // All genes at index >= upper start after the query end — can't overlap.
   let lo = 0;
   let hi = genes.length;
   while (lo < hi) {
@@ -455,11 +484,29 @@ export function findOverlappingGenes(chrom, start, end, strand = null) {
       lo = mid + 1;
     }
   }
-  const upper = lo; // genes[upper..] all start after 'end'
+  const upper = lo;
 
-  // Scan genes[0..upper-1] and collect those where gene.end >= start
+  // Binary search lower bound using prefixMaxEnd: first index where
+  // prefixMaxEnd[i] >= start. All genes before this index have end < start
+  // (and so do all genes before them), so they can't overlap.
+  let lower = 0;
+  if (pme) {
+    lo = 0;
+    hi = upper; // only search within [0, upper)
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (pme[mid] < start) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    lower = lo;
+  }
+
+  // Scan only genes[lower..upper-1] and collect those where gene.end >= start
   const results = [];
-  for (let i = 0; i < upper; i++) {
+  for (let i = lower; i < upper; i++) {
     const gene = genes[i];
     if (gene.end >= start) {
       if (!strand || gene.strand === strand) {
@@ -551,9 +598,12 @@ export function annotateNode(node) {
       })
     );
 
-    // Add the first gene name as a node label
+    // Add the first gene name as a node label, but avoid overwriting an existing label
     const primaryGene = overlappingGenes[0];
-    node.data("gene_name", primaryGene.geneName);
+    const existingGeneName = nodeData.gene_name;
+    if (existingGeneName == null || existingGeneName === node.id()) {
+      node.data("gene_name", primaryGene.geneName);
+    }
   }
 
   return node;
@@ -702,7 +752,7 @@ export function renderGeneAnnotations(node, container) {
               <th>Location</th>
               <th>Strand</th>
               <th>Exons</th>
-              <th>Exon Overlap</th>
+              <th>Overlap</th>
             </tr>
           </thead>
           <tbody>

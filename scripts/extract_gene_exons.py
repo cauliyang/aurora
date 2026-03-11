@@ -24,7 +24,6 @@ import gzip
 import re
 import sys
 import os
-from collections import defaultdict
 
 
 def parse_gtf_attributes(attr_string):
