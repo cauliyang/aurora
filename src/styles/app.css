@@ -1,9 +1,15 @@
-body,
-html {
-    background-color: #f5f5f520;
+/* ===========================
+   App Layout & Structural Styles
+   (Visual theming is in modern-theme.css)
+   =========================== */
+
+
+/* Base layout — required for percentage-height chain */
+
+html,
+body {
     height: 100%;
     margin: 0;
-    font-family: "Roboto", sans-serif;
 }
 
 .container {
@@ -22,73 +28,36 @@ h3 {
     border-bottom: 1px solid #e4e4e4;
     padding-bottom: 2px;
     font-size: 14px;
-    /* reduced font size */
     margin-bottom: 5px;
-    /* added margin-bottom for spacing */
-}
-
-.btn {
-    transition: all 0.3s ease;
-}
-
-.btn:hover {
-    transform: scale(1.05);
-}
-
-.btn-upload {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.btn-upload:hover {
-    background-color: #0056b3;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
 }
 
 
-/* Graph canvas styles moved to components/graph-canvas.css */
+/* Graph canvas height (supplements graph-canvas.css) */
 
 #cy {
     height: 100%;
 }
 
-#info,
-#walks {
-    border: 1px solid #ccc;
-    overflow-y: auto;
-    flex: 1 1 auto;
-    height: 100%;
-}
+
+/* Side panels layout */
 
 #right-container {
     height: 100%;
     display: flex;
-    /* Add this line to enable flex layout */
     flex-direction: column;
-    /* Add this line to stack the panels vertically */
 }
 
 #jsoneditor {
     width: 100%;
     height: 400px;
-    /* You can adjust this value as needed */
 }
 
 pre.expanded {
     max-height: 500px;
-    /* or whatever value you feel appropriate */
 }
 
-header {
-    background-color: #333;
-    color: white;
-}
+
+/* Utility styles */
 
 a:hover,
 .clickable:hover {
@@ -96,143 +65,12 @@ a:hover,
     cursor: pointer;
 }
 
-.element:hover {
-    animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
 .file-upload-container {
     justify-content: flex-start;
 }
 
-.igv-container {
-    border: 1px solid #d6d6d6;
-    height: 100vh;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
-}
-
 #selectedFileName {
     color: #555;
-}
-
-.navbar {
-    height: 25px;
-    font-size: 0.9rem;
-}
-
-.navbar-brand {
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    padding-left: 1rem;
-    display: flex;
-    align-items: center;
-}
-
-
-/* Responsive toolbar styles */
-
-.toolbar-responsive {
-    max-height: none;
-    transition: max-height 0.3s ease;
-    padding: 4px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-
-/* Collapsed state for toolbar on mobile */
-
-.toolbar-collapsed {
-    max-height: 48px;
-    overflow: hidden;
-}
-
-
-/* Make scrollbar less obtrusive but still visible */
-
-.toolbar-responsive::-webkit-scrollbar {
-    height: 6px;
-    width: 6px;
-}
-
-.toolbar-responsive::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.toolbar-responsive::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 3px;
-}
-
-.toolbar-responsive::-webkit-scrollbar-thumb:hover {
-    background: #999;
-}
-
-
-/* Ensure input groups are nicely sized in the toolbar */
-
-.toolbar-responsive .input-group-text,
-.toolbar-responsive .form-select,
-.toolbar-responsive .form-control {
-    font-size: 0.9rem;
-}
-
-
-/* Add a subtle transition effect for smoother UX */
-
-.toolbar-responsive .btn-group,
-.toolbar-responsive .input-group {
-    transition: opacity 0.2s ease;
-}
-
-
-/* Make sure buttons and inputs don't get too small on small screens */
-
-@media (max-width: 768px) {
-    .toolbar-responsive .btn,
-    .toolbar-responsive .input-group-text,
-    .toolbar-responsive .form-select,
-    .toolbar-responsive .form-control {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
-}
-
-
-/* Help Guide Styles - See styles/components/help-guide.css for full implementation */
-
-#helpGuideButton {
-    position: relative;
-}
-
-#helpGuideButton:hover::after {
-    content: 'Start Interactive Tour';
-    position: absolute;
-    bottom: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    z-index: 1000;
 }
 
 
@@ -275,18 +113,29 @@ a:hover,
 }
 
 
-/* walk */
+/* Toolbar structural classes (replaces inline styles) */
 
-.walks-header {
-    padding: 10px 0;
-    border-bottom: 1px solid #e5e5e5;
-    margin-bottom: 15px;
+.toolbar-select {
+    width: auto;
+    min-width: 100px;
 }
 
-.walks-header h3 {
-    display: flex;
-    align-items: center;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    font-weight: 500;
+.toolbar-input-group {
+    height: 38px;
+}
+
+.toolbar-number-input {
+    width: 80px;
+}
+
+.toolbar-filter-group {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Collapsed state for toolbar on mobile */
+
+.toolbar-collapsed {
+    max-height: 48px;
+    overflow: hidden;
 }
