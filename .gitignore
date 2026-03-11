@@ -21,3 +21,5 @@ public
 # Make sure WebAssembly files are included in git
 !./src/assets/pkg/
 CLAUDE.md
+.claude/
+data/

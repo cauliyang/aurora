@@ -12,28 +12,190 @@ let isGeneDataLoaded = false;
 let isLoading = false;
 let assetLoadingAttempted = false;
 
+// Chromosome-indexed gene lookup for efficient queries.
+// Map<string, Gene[]> where each Gene[] is sorted by gene.start ascending.
+let geneIndex = new Map();
+
+// Prefix-max-end arrays for each chromosome, enabling O(log N) lower-bound
+// search in findOverlappingGenes(). prefixMaxEnd[i] = max(genes[0].end, ..., genes[i].end).
+// Since genes are sorted by start, prefixMaxEnd is monotonically non-decreasing.
+let genePrefixMaxEnd = new Map();
+
+/**
+ * Normalize chromosome name to always have "chr" prefix.
+ * @param {string} chrom - Chromosome name (e.g., "1", "chr1")
+ * @returns {string} - Normalized chromosome name (e.g., "chr1")
+ */
+function normalizeChrom(chrom) {
+  return chrom.startsWith("chr") ? chrom : `chr${chrom}`;
+}
+
+/**
+ * Build the chromosome-indexed gene lookup from the gene database.
+ * Groups genes by normalized chromosome, sorts each group by start position,
+ * and precomputes a prefixMaxEnd array for efficient lower-bound queries.
+ *
+ * prefixMaxEnd[i] = max(genes[0].end, ..., genes[i].end)
+ * This is monotonically non-decreasing and allows binary search to find
+ * the first gene index where any gene at or before that index could overlap
+ * a query region [start, end].
+ *
+ * @param {Array<Gene>} genes - Array of Gene objects
+ */
+function buildGeneIndex(genes) {
+  geneIndex.clear();
+  genePrefixMaxEnd.clear();
+  for (const gene of genes) {
+    const chrom = normalizeChrom(gene.chromosome);
+    if (!geneIndex.has(chrom)) {
+      geneIndex.set(chrom, []);
+    }
+    geneIndex.get(chrom).push(gene);
+  }
+  // Sort each chromosome's genes by start position, then build prefixMaxEnd
+  for (const [chrom, chromGenes] of geneIndex.entries()) {
+    chromGenes.sort((a, b) => a.start - b.start);
+
+    // Build prefix-max-end array: prefixMaxEnd[i] = max(genes[0..i].end)
+    const pme = new Array(chromGenes.length);
+    let maxEnd = 0;
+    for (let i = 0; i < chromGenes.length; i++) {
+      maxEnd = Math.max(maxEnd, chromGenes[i].end);
+      pme[i] = maxEnd;
+    }
+    genePrefixMaxEnd.set(chrom, pme);
+  }
+  console.log(
+    `Built gene index: ${geneIndex.size} chromosomes, ${genes.length} genes`
+  );
+}
+
+/**
+ * Parse an exon string into a sorted array of {start, end} intervals.
+ * Handles formats: "[start-end,start-end,...]" or "start-end,start-end,..."
+ * @param {string} exonsStr - Exon intervals string
+ * @returns {Array<{start: number, end: number}>} - Sorted array of exon intervals
+ */
+function parseExonString(exonsStr) {
+  if (!exonsStr || typeof exonsStr !== "string") return [];
+  const cleaned = exonsStr.replace(/^\[|\]$/g, "").trim();
+  if (!cleaned) return [];
+  const parts = cleaned.split(",");
+  const exons = [];
+  for (const part of parts) {
+    const [startStr, endStr] = part.split("-");
+    const start = parseInt(startStr);
+    const end = parseInt(endStr);
+    if (!isNaN(start) && !isNaN(end)) {
+      exons.push({ start, end });
+    }
+  }
+  exons.sort((a, b) => a.start - b.start);
+  return exons;
+}
+
 /**
  * Gene class to represent a gene annotation
  */
 class Gene {
-  constructor(geneId, chromosome, start, end, strand, geneName) {
+  /**
+   * @param {string} geneId - Gene identifier (e.g., "ENSG00000186092")
+   * @param {string} chromosome - Chromosome (e.g., "chr1")
+   * @param {number|string} start - Gene start position
+   * @param {number|string} end - Gene end position
+   * @param {string} strand - Strand ("+" or "-")
+   * @param {string} geneName - Gene symbol (e.g., "OR4F5")
+   * @param {Array<{start: number, end: number}>|null} exons - Merged exon intervals,
+   *   sorted by start. If null, defaults to the gene span as a single interval.
+   */
+  constructor(geneId, chromosome, start, end, strand, geneName, exons = null) {
     this.geneId = geneId;
     this.chromosome = chromosome;
     this.start = parseInt(start);
     this.end = parseInt(end);
     this.strand = strand;
     this.geneName = geneName;
+    // If exon data provided, use it; otherwise fall back to gene span as single interval
+    this.exons = exons && exons.length > 0
+      ? exons
+      : [{ start: this.start, end: this.end }];
   }
 
   /**
-   * Check if this gene overlaps with given genomic coordinates
+   * Check if this gene's span overlaps with given genomic coordinates.
+   * Used as a fast pre-filter before exon-level checks.
    */
   overlaps(chrom, start, end) {
     return this.chromosome === chrom && this.start <= end && this.end >= start;
   }
 
   /**
-   * Calculate the overlap percentage with given genomic coordinates
+   * Check if any of this gene's exons overlap with any of the given node exon intervals.
+   * Uses a two-pointer merge scan — O(E_g + E_n) where both arrays are sorted by start.
+   * @param {Array<{start: number, end: number}>} nodeExons - Sorted node exon intervals
+   * @returns {boolean} - True if at least one gene exon overlaps a node exon
+   */
+  overlapsExons(nodeExons) {
+    if (!nodeExons || nodeExons.length === 0) return false;
+    let gi = 0;
+    let ni = 0;
+    while (gi < this.exons.length && ni < nodeExons.length) {
+      const ge = this.exons[gi];
+      const ne = nodeExons[ni];
+      if (ge.start <= ne.end && ge.end >= ne.start) {
+        return true; // Found overlap, early exit
+      }
+      // Advance the pointer with the smaller end position
+      if (ge.end < ne.end) {
+        gi++;
+      } else {
+        ni++;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Calculate the exon-level overlap percentage: total bases of node exons
+   * overlapping gene exons, divided by total node exon bases.
+   * Uses a two-pointer merge scan — O(E_g + E_n).
+   * @param {Array<{start: number, end: number}>} nodeExons - Sorted node exon intervals
+   * @returns {number} - Overlap percentage (0-100)
+   */
+  calculateExonOverlapPercentage(nodeExons) {
+    if (!nodeExons || nodeExons.length === 0) return 0;
+
+    let totalNodeBases = 0;
+    for (const ne of nodeExons) {
+      totalNodeBases += ne.end - ne.start + 1;
+    }
+    if (totalNodeBases === 0) return 0;
+
+    let overlapBases = 0;
+    let gi = 0;
+    let ni = 0;
+    while (gi < this.exons.length && ni < nodeExons.length) {
+      const ge = this.exons[gi];
+      const ne = nodeExons[ni];
+      if (ge.start <= ne.end && ge.end >= ne.start) {
+        overlapBases +=
+          Math.min(ge.end, ne.end) - Math.max(ge.start, ne.start) + 1;
+      }
+      // Advance the pointer with the smaller end position
+      if (ge.end < ne.end) {
+        gi++;
+      } else {
+        ni++;
+      }
+    }
+    return (overlapBases / totalNodeBases) * 100;
+  }
+
+  /**
+   * Calculate the span-level overlap percentage with given genomic coordinates.
+   * Kept for backward compatibility with files lacking exon data.
+   * @param {number} start - Region start
+   * @param {number} end - Region end
    * @returns {number} Overlap percentage (0-100)
    */
   calculateOverlapPercentage(start, end) {
@@ -48,7 +210,7 @@ class Gene {
    * Return a human-readable representation of this gene
    */
   toString() {
-    return `${this.geneName} (${this.geneId}): ${this.chromosome}:${this.start}-${this.end} ${this.strand}`;
+    return `${this.geneName} (${this.geneId}): ${this.chromosome}:${this.start}-${this.end} ${this.strand} [${this.exons.length} exons]`;
   }
 }
 
@@ -58,7 +220,7 @@ class Gene {
  * @returns {Array<Gene>} - Array of parsed genes
  */
 function parseGeneData(text) {
-  console.log(`Parsing gene data... ${text}`);
+  console.log(`Parsing gene data (${text.length} characters)...`);
   const genes = [];
 
   try {
@@ -99,9 +261,12 @@ function parseGeneData(text) {
 
       // If we're here, we have a data line
       // Determine field positions
-      let geneId, chromosome, start, end, strand, geneName;
+      let geneId, chromosome, start, end, strand, geneName, exonsField;
 
-      if (fields.length >= 6) {
+      if (fields.length >= 7) {
+        // New format with exons: gene_id chromosome start end strand gene_name exons
+        [geneId, chromosome, start, end, strand, geneName, exonsField] = fields;
+      } else if (fields.length >= 6) {
         // Standard format: gene_id chromosome start end strand gene_name
         [geneId, chromosome, start, end, strand, geneName] = fields;
       } else if (fields.length === 5) {
@@ -135,9 +300,12 @@ function parseGeneData(text) {
         continue;
       }
 
+      // Parse exon intervals if present (7th column)
+      const exons = exonsField ? parseExonString(exonsField) : null;
+
       // Create and add gene
       genes.push(
-        new Gene(geneId, chromosome, startNum, endNum, strand, geneName)
+        new Gene(geneId, chromosome, startNum, endNum, strand, geneName, exons)
       );
 
       if (genes.length % 1000 === 0) {
@@ -146,6 +314,11 @@ function parseGeneData(text) {
     }
 
     console.log(`Successfully parsed ${genes.length} genes`);
+
+    // Build the chromosome index for efficient lookups
+    if (genes.length > 0) {
+      buildGeneIndex(genes);
+    }
   } catch (error) {
     console.error("Error parsing gene data:", error);
   }
@@ -245,32 +418,47 @@ export async function loadGeneData() {
   }
 }
 
-// Fallback data in case loading from file fails
+// Fallback data in case loading from file fails (protein-coding genes with exons)
 function getFallbackGeneData() {
   const fallbackData = [
-    // Format: geneId, chromosome, start, end, strand, geneName
-    ["ENSG00000223972", "chr1", 11869, 14409, "+", "DDX11L1"],
-    ["ENSG00000227232", "chr1", 14404, 29570, "-", "WASH7P"],
-    ["ENSG00000243485", "chr1", 29554, 31109, "+", "MIR1302-2HG"],
-    ["ENSG00000237613", "chr1", 34554, 36081, "-", "FAM138A"],
-    ["ENSG00000188157", "chr8", 62278276, 62282882, "+", "NKX3-1"],
-    ["ENSG00000214093", "chr8", 62286313, 62296461, "+", "JRK"],
-    ["ENSG00000188648", "chr8", 62296421, 62344273, "+", "PSCA"],
+    // Format: [geneId, chromosome, start, end, strand, geneName, exonsString]
+    ["ENSG00000186092", "chr1", 65419, 71585, "+", "OR4F5", "65419-65433,65520-65573,69037-71585"],
+    ["ENSG00000187634", "chr1", 923923, 944574, "+", "SAMD11", "923923-924948,925731-925800,925922-926013,930155-930336,931039-931089,935772-935896,939040-939129,939272-939460,941144-941306,942136-942251,942410-942488,942559-943058,943253-943377,943698-943808,943893-944574"],
+    ["ENSG00000188976", "chr1", 943527, 960714, "-", "NOC2L", "943527-944800,945042-945146,945518-945653,946173-946286,946402-946545,946757-946972,948059-948232,948490-948603,951127-951238,952000-952139,952412-952600,952877-952945,953169-953288,953782-953934,954004-954184,954464-954523,955412-955477,955638-955706,955923-956028,956095-956215,956894-957043,957099-957273,958929-959081,959215-960714"],
+    ["ENSG00000187961", "chr1", 960576, 965719, "+", "KLHL17", "960576-960800,961293-961552,961629-961750,961826-962047,962286-962471,962704-962917,963032-963253,963337-963504,963857-964008,964107-964180,964349-964530,964963-965719"],
+    ["ENSG00000167034", "chr8", 23678697, 23682938, "-", "NKX3-1", "23678697-23681639,23682604-23682938"],
+    ["ENSG00000167653", "chr8", 142674358, 142682725, "+", "PSCA", "142674358-142676236,142680395-142680563,142681327-142681770,142681921-142682725"],
   ];
 
-  return fallbackData.map(
-    ([geneId, chromosome, start, end, strand, geneName]) =>
-      new Gene(geneId, chromosome, start, end, strand, geneName)
+  const genes = fallbackData.map(
+    ([geneId, chromosome, start, end, strand, geneName, exonsStr]) =>
+      new Gene(geneId, chromosome, start, end, strand, geneName, parseExonString(exonsStr))
   );
+
+  // Build the index for the fallback data too
+  buildGeneIndex(genes);
+
+  return genes;
 }
 
 /**
- * Find genes that overlap with given genomic coordinates
+ * Find genes whose span overlaps the given genomic coordinates.
+ * Uses two binary searches on the chromosome-indexed gene array:
+ *   1. Upper bound: first gene where gene.start > end (genes sorted by start)
+ *   2. Lower bound: first gene where prefixMaxEnd[i] >= start
+ *      (prefixMaxEnd is monotonically non-decreasing, so binary search works)
+ *
+ * This narrows the scan to only the genes in [lower, upper), which is
+ * typically a very small range (the actual overlapping genes plus a few
+ * neighbors), even for queries near the chromosome end.
+ *
+ * Complexity: O(log G_chr + k) where k is the size of [lower, upper).
+ *
  * @param {string} chrom - Chromosome (e.g., "chr1")
  * @param {number} start - Start position
  * @param {number} end - End position
  * @param {string} strand - Strand ("+" or "-"), optional
- * @returns {Array<Gene>} - Array of overlapping genes
+ * @returns {Array<Gene>} - Array of genes whose span overlaps [start, end]
  */
 export function findOverlappingGenes(chrom, start, end, strand = null) {
   if (!isGeneDataLoaded) {
@@ -278,33 +466,68 @@ export function findOverlappingGenes(chrom, start, end, strand = null) {
     return [];
   }
 
-  // Try with and without "chr" prefix to handle different formats
-  const chromWithoutPrefix = chrom.replace(/^chr/, "");
-  const chromWithPrefix = chrom.startsWith("chr") ? chrom : `chr${chrom}`;
+  const chromNorm = normalizeChrom(chrom);
+  const genes = geneIndex.get(chromNorm);
+  if (!genes || genes.length === 0) return [];
 
-  console.log(
-    `geneDatabase length: ${geneDatabase.length}, considering strand: ${strand}`
-  );
+  const pme = genePrefixMaxEnd.get(chromNorm);
 
-  // Find all overlapping genes
-  const allOverlappingGenes = geneDatabase.filter(
-    (gene) =>
-      gene.overlaps(chrom, start, end) ||
-      gene.overlaps(chromWithoutPrefix, start, end) ||
-      gene.overlaps(chromWithPrefix, start, end)
-  );
+  // Binary search upper bound: first index where gene.start > end.
+  // All genes at index >= upper start after the query end — can't overlap.
+  let lo = 0;
+  let hi = genes.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (genes[mid].start > end) {
+      hi = mid;
+    } else {
+      lo = mid + 1;
+    }
+  }
+  const upper = lo;
 
-  // If no strand is provided, return all overlapping genes
-  if (!strand) {
-    return allOverlappingGenes;
+  // Binary search lower bound using prefixMaxEnd: first index where
+  // prefixMaxEnd[i] >= start. All genes before this index have end < start
+  // (and so do all genes before them), so they can't overlap.
+  let lower = 0;
+  if (pme) {
+    lo = 0;
+    hi = upper; // only search within [0, upper)
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (pme[mid] < start) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+    lower = lo;
   }
 
-  // If strand is provided, only return genes on the matching strand
-  return allOverlappingGenes.filter((gene) => gene.strand === strand);
+  // Scan only genes[lower..upper-1] and collect those where gene.end >= start
+  const results = [];
+  for (let i = lower; i < upper; i++) {
+    const gene = genes[i];
+    if (gene.end >= start) {
+      if (!strand || gene.strand === strand) {
+        results.push(gene);
+      }
+    }
+  }
+  return results;
 }
 
 /**
- * Annotate a node with gene information
+ * Annotate a node with gene information using exon-level overlap matching.
+ *
+ * Algorithm:
+ *   1. Parse node's exon intervals from the "exons" data field
+ *   2. Find span-level candidate genes via chromosome-indexed binary search (fast pre-filter)
+ *   3. Filter candidates to those with actual exon-to-exon overlap (two-pointer scan)
+ *   4. Sort by exon overlap percentage and attach annotations to the node
+ *
+ * For nodes without exon data, falls back to span-level matching.
+ *
  * @param {Object} node - Cytoscape node
  * @returns {Object} - The node with annotations added
  */
@@ -322,45 +545,66 @@ export function annotateNode(node) {
     return node;
   }
 
-  console.log(
-    `Annotating node ${nodeData.id} with coordinates ${chrom}:${start}-${end}`
-  );
+  // Parse node's exon intervals (if available)
+  const nodeExons = parseExonString(nodeData.exons);
+  const hasExonData = nodeExons.length > 0;
 
-  // Find overlapping genes
-  const overlappingGenes = findOverlappingGenes(chrom, start, end, strand);
+  // Step 1: Find span-level candidate genes (fast, uses chromosome index + binary search)
+  const candidateGenes = findOverlappingGenes(chrom, start, end, strand);
 
-  // sort by overlap percentage
-  overlappingGenes.sort(
-    (a, b) =>
-      b.calculateOverlapPercentage(start, end) -
-      a.calculateOverlapPercentage(start, end)
-  );
+  // Step 2: Filter to genes with actual exon-level overlap
+  let overlappingGenes;
+  if (hasExonData) {
+    overlappingGenes = candidateGenes.filter((gene) =>
+      gene.overlapsExons(nodeExons)
+    );
+  } else {
+    // No node exon data — use all span-level candidates (backward compat)
+    overlappingGenes = candidateGenes;
+  }
+
+  // Step 3: Sort by exon overlap percentage (or span overlap as fallback)
+  if (hasExonData) {
+    overlappingGenes.sort(
+      (a, b) =>
+        b.calculateExonOverlapPercentage(nodeExons) -
+        a.calculateExonOverlapPercentage(nodeExons)
+    );
+  } else {
+    overlappingGenes.sort(
+      (a, b) =>
+        b.calculateOverlapPercentage(start, end) -
+        a.calculateOverlapPercentage(start, end)
+    );
+  }
 
   if (overlappingGenes.length > 0) {
     // Add the gene annotations to the node data
     node.data(
       "geneAnnotations",
-      overlappingGenes.map((gene) => ({
-        geneId: gene.geneId,
-        geneName: gene.geneName,
-        strand: gene.strand,
-        start: gene.start,
-        end: gene.end,
-        overlapPercentage: gene
-          .calculateOverlapPercentage(start, end)
-          .toFixed(1),
-      }))
+      overlappingGenes.map((gene) => {
+        const overlapPct = hasExonData
+          ? gene.calculateExonOverlapPercentage(nodeExons)
+          : gene.calculateOverlapPercentage(start, end);
+        return {
+          geneId: gene.geneId,
+          geneName: gene.geneName,
+          strand: gene.strand,
+          start: gene.start,
+          end: gene.end,
+          exonCount: gene.exons.length,
+          overlapPercentage: overlapPct.toFixed(1),
+        };
+      })
     );
 
-    // Add the first gene name as a node label if not set or if it's the same as the ID
+    // Add the first gene name as a node label, but avoid overwriting an existing label
     const primaryGene = overlappingGenes[0];
-    node.data("gene_name", primaryGene.geneName);
+    const existingGeneName = nodeData.gene_name;
+    if (existingGeneName == null || existingGeneName === node.id()) {
+      node.data("gene_name", primaryGene.geneName);
+    }
   }
-
-  console.log(
-    `Node ${nodeData.id} annotated with ${overlappingGenes.length} genes GeneAnnotations:`,
-    node.data("geneAnnotations")
-  );
 
   return node;
 }
@@ -507,6 +751,7 @@ export function renderGeneAnnotations(node, container) {
               <th>Gene</th>
               <th>Location</th>
               <th>Strand</th>
+              <th>Exons</th>
               <th>Overlap</th>
             </tr>
           </thead>
@@ -529,6 +774,7 @@ export function renderGeneAnnotations(node, container) {
                   ${gene.start?.toLocaleString()}-${gene.end?.toLocaleString()}
                 </td>
                 <td>${gene.strand}</td>
+                <td class="text-center">${gene.exonCount || "-"}</td>
                 <td>
                   <div class="progress" style="height: 5px;">
                     <div class="progress-bar" role="progressbar"
