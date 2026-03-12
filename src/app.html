@@ -69,12 +69,11 @@
 
                     <!-- File group -->
                     <div class="btn-group me-2 mb-2" role="group" aria-label="File operations">
-                        <div class="btn btn-outline-primary" title="Upload JSON/TSG file"
-                            aria-label="Upload JSON or TSG file" role="button" tabindex="0">
-                            <input type="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
-                            <label for="uploadInput" title="Upload JSON/TSG file"
-                                aria-label="Upload JSON or TSG file" style="cursor:pointer;margin:0"><i class="bi bi-upload"></i></label>
-                        </div>
+                        <button id="uploadBtn" class="btn btn-outline-primary" type="button" title="Upload JSON/TSG file"
+                            aria-label="Upload JSON or TSG file">
+                            <i class="bi bi-upload"></i>
+                        </button>
+                        <input type="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
                         <button id="captureGraph" class="btn btn-outline-primary" title="Export graph"
                             aria-label="Export graph">
                             <i class="bi bi-camera"></i>

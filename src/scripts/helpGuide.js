@@ -34,7 +34,7 @@ class HelpGuide {
                 placement: "bottom",
             },
             {
-                target: "#uploadForm",
+                target: "#uploadBtn",
                 title: "Upload Files",
                 content: "Upload your JSON or TSG files here to visualize your graph data.",
                 placement: "bottom",

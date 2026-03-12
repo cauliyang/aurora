@@ -390,10 +390,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const uploadInput = document.getElementById("uploadInput");
+const uploadBtn = document.getElementById("uploadBtn");
 if (uploadInput) {
     uploadInput.addEventListener("change", handleFileUpload);
 } else {
     console.warn("Element with ID 'uploadInput' not found in the DOM");
+}
+if (uploadBtn && uploadInput) {
+    uploadBtn.addEventListener("click", () => uploadInput.click());
+} else {
+    console.warn("Upload button or input not found in the DOM");
 }
 
 function handleFileUpload(event) {
