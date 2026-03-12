@@ -8,7 +8,7 @@
    MAIN FOOTER CONTAINER
    =========================== */
 
-footer {
+footer:not(.footer-minimal) {
     background: linear-gradient(135deg, #1a1d2e 0%, #2d1b3d 50%, #1e2438 100%);
     position: relative;
     overflow: hidden;
@@ -20,7 +20,7 @@ footer {
 
 /* Animated aurora background effect */
 
-footer::before {
+footer:not(.footer-minimal)::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -51,7 +51,7 @@ footer::before {
 
 /* Subtle grid pattern overlay */
 
-footer::after {
+footer:not(.footer-minimal)::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -354,11 +354,11 @@ footer a:focus-visible {
 
 /* Add decorative corner accents */
 
-footer {
+footer:not(.footer-minimal) {
     position: relative;
 }
 
-footer::after {
+footer:not(.footer-minimal)::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -372,7 +372,7 @@ footer::after {
 
 /* Top right accent */
 
-footer .container-fluid::before {
+footer:not(.footer-minimal) .container-fluid::before {
     content: '';
     position: absolute;
     top: 0;
@@ -403,13 +403,14 @@ footer .container-fluid::before {
    =========================== */
 
 .footer-minimal {
-    background: var(--bg-secondary, #f8fafc);
-    border-top: 1px solid var(--border-color, #e2e8f0);
-    padding: var(--space-xs, 4px) 0;
+    background: linear-gradient(135deg, #1a1d2e 0%, #24183a 50%, #1e2438 100%);
+    border-top: 1px solid rgba(99, 102, 241, 0.25);
+    padding: var(--space-sm, 8px) 0;
     font-size: 0.8rem;
-    color: var(--text-tertiary, #94a3b8);
+    color: rgba(255, 255, 255, 0.6);
     position: relative;
     z-index: 10;
+    margin-top: 0 !important;
 }
 
 .footer-minimal .container-fluid {
@@ -417,19 +418,21 @@ footer .container-fluid::before {
 }
 
 .footer-minimal .footer-sep {
-    opacity: 0.35;
+    opacity: 0.3;
     font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
 }
 
 .footer-minimal a {
-    color: var(--text-tertiary, #94a3b8);
+    color: rgba(255, 255, 255, 0.5);
     text-decoration: none;
     font-size: 0.95rem;
     transition: color var(--transition-fast, 150ms ease);
 }
 
 .footer-minimal a:hover {
-    color: var(--aurora-primary, #6366f1);
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
 }
 
 
