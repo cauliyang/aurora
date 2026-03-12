@@ -336,7 +336,7 @@ function initializeEmptyState() {
                 <i class="bi bi-diagram-3"></i>
             </div>
             <h3>No Graph Loaded</h3>
-            <p>Upload a JSON or TSG file to visualize your transcript splice graph.</p>
+            <p>Upload a JSON or TSG file to visualize your transcript segment graph.</p>
         `;
         cyContainer.appendChild(emptyState);
     }
