@@ -6,130 +6,125 @@
 class HelpGuide {
     constructor() {
         this.helpSteps = [
-            // Panel help messages first
+            // Panels overview
             {
                 target: "#cy",
-                title: "Graph Visualization Panel",
-                content: "This is the main graph visualization area. Here you can interact with your graph: zoom in/out, pan, select nodes and edges, and visualize your data structure. You can click and drag nodes to rearrange them manually.",
+                title: "Graph Canvas",
+                content: "Your main workspace. Zoom, pan, click nodes and edges, or drag them to rearrange. Upload a JSON or TSG file to get started.",
                 placement: "left",
             },
             {
                 target: "#info",
-                title: "Information Panel",
-                content: "When you select a node or edge in the graph, detailed information about that element will be displayed here. This panel shows properties, metrics, and other attributes associated with the selected element.",
+                title: "Details Panel",
+                content: "Click any node or edge to see its properties here — coordinates, weight, gene annotations, and more.",
                 placement: "left",
             },
             {
                 target: "#walks",
-                title: "Graph Walks Panel",
-                content: "This panel displays all walks (paths) in your graph. You can search for specific walks, highlight them in the graph visualization, and upload Aurora IDs for batch searching. Walks provide important connectivity information in your graph structure.",
+                title: "Walks Panel",
+                content: "Lists all discovered paths through your graph. Search, highlight, or batch-filter walks by Aurora ID.",
                 placement: "left",
             },
 
-            // Button help messages next
-            {
-                target: "#toggleMaximize",
-                title: "Toggle Fullscreen",
-                content: "Click this button to enter or exit fullscreen mode, giving you more space to work with your graph.",
-                placement: "bottom",
-            },
+            // Toolbar — file operations
             {
                 target: "#uploadBtn",
-                title: "Upload Files",
-                content: "Upload your JSON or TSG files here to visualize your graph data.",
+                title: "Upload File",
+                content: "Load a JSON or TSG file to visualize a transcript segment graph.",
                 placement: "bottom",
             },
             {
                 target: "#captureGraph",
-                title: "Capture Graph",
-                content: "Save your current graph view as a PNG image to use in presentations or documentation.",
+                title: "Export Image",
+                content: "Save the current graph view as a PNG image.",
+                placement: "bottom",
+            },
+
+            // Toolbar — view controls
+            {
+                target: "#toggleMaximize",
+                title: "Fullscreen",
+                content: "Expand the graph canvas to fill the entire screen.",
                 placement: "bottom",
             },
             {
                 target: "#hiddenLabel",
                 title: "Toggle Labels",
-                content: "Show or hide node and edge labels to customize your graph visualization.",
+                content: "Show or hide node names and edge weights on the graph.",
                 placement: "bottom",
             },
             {
                 target: "#toggleTooltip",
                 title: "Toggle Tooltips",
-                content: "Enable or disable tooltips that show information when hovering over graph elements.",
+                content: "Turn hover tooltips on or off for graph elements.",
                 placement: "bottom",
             },
             {
                 target: "#resetGraph",
-                title: "Reset Graph",
-                content: "Reset the graph layout to its original state.",
+                title: "Reset Layout",
+                content: "Re-run the layout algorithm to reposition all nodes.",
                 placement: "bottom",
             },
             {
                 target: "#clearHighlights",
                 title: "Clear Highlights",
-                content: "Remove all highlights from nodes in the graph.",
-                placement: "bottom",
-            },
-            {
-                target: "#geneAnnotationBtn",
-                title: "Gene Annotations",
-                content: "Add biological context to your graph by annotating nodes with gene information.",
-                placement: "bottom",
-            },
-            {
-                target: "#layoutSelect",
-                title: "Layout Selection",
-                content: "Choose different layout algorithms to organize your graph in various ways.",
+                content: "Remove all active node and walk highlights.",
                 placement: "bottom",
             },
 
-            // Graph selection and filtering parameters
+            // Toolbar — layout & graph selection
+            {
+                target: "#layoutSelect",
+                title: "Layout Algorithm",
+                content: "Switch between layout algorithms — dagre, klay, tidytree, and more — to arrange the graph differently.",
+                placement: "bottom",
+            },
             {
                 target: "#graphSelectorContainer",
                 title: "Graph Selector",
-                content: "If your data contains multiple graphs, you can switch between them using this dropdown menu. Each graph represents a different dataset or view that you can analyze independently.",
-                placement: "bottom",
-            },
-            {
-                target: "#minEdgeWeight",
-                title: "Minimum Edge Weight",
-                content: "Filter the graph by setting the minimum weight for edges. Edges with weights below this value will be hidden, allowing you to focus on the strongest connections in your graph.",
-                placement: "bottom",
-            },
-            {
-                target: "#MinDepth",
-                title: "Minimum Depth",
-                content: "Set the minimum depth for graph traversal. This limits the graph to only show paths that have at least this many edges, helping to filter out shallow or less significant paths.",
-                placement: "bottom",
-            },
-            {
-                target: "#MaxDepth",
-                title: "Maximum Depth",
-                content: "Set the maximum depth for graph traversal. This prevents the graph from showing excessively long paths, making the visualization more manageable and focused on the most relevant connections.",
+                content: "When a TSG file contains multiple graphs, use this dropdown to switch between them.",
                 placement: "bottom",
             },
 
+            // Toolbar — filters (consolidated)
+            {
+                target: ".toolbar-filter-group",
+                title: "Graph Filters",
+                content: "Control walk discovery: set a minimum edge weight, and minimum/maximum path depth to focus on the most relevant walks.",
+                placement: "bottom",
+            },
+
+            // Toolbar — tools
+            {
+                target: "#geneAnnotationBtn",
+                title: "Gene Annotations",
+                content: "Annotate graph nodes with gene names and exon data from GENCODE.",
+                placement: "bottom",
+            },
             {
                 target: "#openJsonEditor",
                 title: "JSON Editor",
-                content: "Open the JSON editor to view or modify the underlying graph data structure.",
+                content: "View or edit the raw graph JSON data in a tree, code, or form view.",
                 placement: "left",
             },
             {
                 target: "#showNodeRanking",
                 title: "Node Ranking",
-                content: "View nodes ranked by importance based on graph metrics.",
+                content: "Rank nodes by degree, centrality, or other graph metrics.",
                 placement: "left",
             },
+
+            // Walks panel — search
             {
                 target: "#walkSearch",
                 title: "Search Walks",
-                content: "Search for specific walks or Aurora IDs in the graph.",
+                content: "Type to filter walks by node IDs or Aurora IDs.",
                 placement: "top",
             },
             {
                 target: "#uploadAuroraIds",
                 title: "Batch Search",
-                content: "Upload a list of Aurora IDs for batch searching across your graph.",
+                content: "Upload a .txt file of Aurora IDs to filter walks in bulk.",
                 placement: "top",
             },
         ];
@@ -166,10 +161,10 @@ class HelpGuide {
             <button class="help-guide-welcome-close">&times;</button>
           </div>
           <div class="help-guide-welcome-body">
-            <p>We've added an interactive help guide to help you learn how to use Aurora.</p>
-            <p class="mb-2">Click the Help link in the navbar to start the interactive tour.</p>
+            <p>New here? Take a quick interactive tour to learn the interface.</p>
+            <p class="mb-2 small text-muted">Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate, <kbd>Esc</kbd> to close.</p>
             <button class="btn btn-sm btn-primary w-100" id="startWelcomeHelpBtn">
-              <i class="bi bi-question-circle me-2"></i> Start Help Guide
+              <i class="bi bi-rocket-takeoff me-2"></i> Start Tour
             </button>
           </div>
         </div>
@@ -195,8 +190,8 @@ class HelpGuide {
           display: flex;
           align-items: center;
           padding: 12px 15px;
-          background-color: #f8f9fa;
-          border-bottom: 1px solid #dee2e6;
+          background-color: var(--bg-secondary, #f8f9fa);
+          border-bottom: 1px solid var(--border-color, #dee2e6);
         }
 
         .help-guide-welcome-close {
@@ -375,7 +370,7 @@ class HelpGuide {
      * Show a specific step in the guide
      * @param {number} index - The index of the step to show
      */
-    showStep(index) {
+    showStep(index, direction = 1) {
         // Ensure index is valid
         if (index < 0 || index >= this.helpSteps.length) {
             this.endGuide();
@@ -388,9 +383,19 @@ class HelpGuide {
         const step = this.helpSteps[index];
         const targetElement = document.querySelector(step.target);
 
-        if (!targetElement) {
-            console.error(`Target element ${step.target} not found`);
-            this.nextStep();
+        // Skip missing or hidden elements (e.g., graphSelectorContainer with d-none)
+        const shouldSkip = !targetElement || (
+            targetElement.offsetParent === null &&
+            !targetElement.matches('#cy') &&
+            (targetElement.classList.contains('d-none') || getComputedStyle(targetElement).display === 'none')
+        );
+        if (shouldSkip) {
+            const nextIndex = index + direction;
+            if (nextIndex >= 0 && nextIndex < this.helpSteps.length) {
+                this.showStep(nextIndex, direction);
+            } else {
+                this.endGuide();
+            }
             return;
         }
 
@@ -615,7 +620,7 @@ class HelpGuide {
 
         // Move to previous step if not at first step
         if (this.currentStepIndex > 0) {
-            this.showStep(this.currentStepIndex - 1);
+            this.showStep(this.currentStepIndex - 1, -1);
         }
     }
 
