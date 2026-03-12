@@ -44,7 +44,7 @@ function createTooltipContent(elementData, element) {
       if (elementData.ptc !== undefined) {
         content += `<div class="tooltip-metric">
                     <span class="metric-label">PTC</span>
-                    <span class="metric-value" style="background-color: #007bff;">${elementData.ptc.toFixed(
+                    <span class="metric-value" style="background-color: var(--aurora-primary, #6366f1);">${elementData.ptc.toFixed(
                       4
                     )}</span>
                 </div>`;
@@ -53,7 +53,7 @@ function createTooltipContent(elementData, element) {
       if (elementData.ptf !== undefined) {
         content += `<div class="tooltip-metric">
                     <span class="metric-label">PTF</span>
-                    <span class="metric-value" style="background-color: #6c757d;">${elementData.ptf.toFixed(
+                    <span class="metric-value" style="background-color: var(--text-secondary, #475569);">${elementData.ptf.toFixed(
                       4
                     )}</span>
                 </div>`;
@@ -193,11 +193,11 @@ function addTooltipStyles() {
         }
 
         .node-header {
-            background-color: #007bff;
+            background-color: var(--aurora-primary, #6366f1);
         }
 
         .edge-header {
-            background-color: #28a745;
+            background-color: var(--success, #10b981);
         }
 
         .tooltip-body {
@@ -222,7 +222,7 @@ function addTooltipStyles() {
 
         .weight-value {
             font-weight: bold;
-            color: #28a745;
+            color: var(--success, #10b981);
         }
 
         .tooltip-metrics {

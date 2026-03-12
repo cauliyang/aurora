@@ -1020,7 +1020,7 @@ function addWalksStyles() {
             align-items: center;
             justify-content: center;
             padding: 30px 0;
-            color: #6c757d;
+            color: var(--text-secondary, #475569);
         }
 
         .walk-card {
@@ -1032,7 +1032,7 @@ function addWalksStyles() {
         }
 
         .walk-toggle-btn {
-            color: #212529;
+            color: var(--text-primary, #0f172a);
             text-decoration: none;
             width: 100%;
             text-align: left;
@@ -1042,7 +1042,7 @@ function addWalksStyles() {
         }
 
         .walk-toggle-btn:hover {
-            color: #0d6efd;
+            color: var(--aurora-primary, #6366f1);
         }
 
         .chevron-icon {
@@ -1055,16 +1055,16 @@ function addWalksStyles() {
         }
 
         .aurora-id-container {
-            background: #f8f9fa;
+            background: var(--bg-secondary, #f8fafc);
             padding: 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm, 6px);
             margin-bottom: 10px;
         }
 
         .aurora-id {
             background: transparent;
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            color: #6610f2;
+            color: var(--aurora-secondary, #8b5cf6);
         }
 
         .path-visualization {
@@ -1089,16 +1089,16 @@ function addWalksStyles() {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: #6c757d;
+            background-color: var(--text-secondary, #475569);
             margin: 0 5px;
         }
 
         .start-node .node-dot {
-            background-color: #28a745;
+            background-color: var(--success, #10b981);
         }
 
         .end-node .node-dot {
-            background-color: #dc3545;
+            background-color: var(--error, #ef4444);
         }
 
         .node-label {
@@ -1107,13 +1107,13 @@ function addWalksStyles() {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            border: 1px solid #d1d5db;
-            border-radius: 999px;
-            background: #fff;
-            color: #222;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: var(--radius-full, 9999px);
+            background: var(--bg-primary, #ffffff);
+            color: var(--text-primary, #0f172a);
             padding: 4px 14px;
             margin: 0 2px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
             cursor: pointer;
             transition: border 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s, transform 0.1s;
             outline: none;
@@ -1121,27 +1121,27 @@ function addWalksStyles() {
             position: relative;
         }
         .node-label:focus, .node-label:hover {
-            background: #f3f4f6;
-            border-color: #a5b4fc;
-            color: #1d4ed8;
-            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.08);
+            background: var(--bg-tertiary, #f1f5f9);
+            border-color: var(--aurora-primary-light, #818cf8);
+            color: var(--aurora-primary-dark, #4f46e5);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
             transform: scale(1.04);
             z-index: 2;
         }
         .node-label:active {
-            background: #e0e7ff;
-            border-color: #6366f1;
-            color: #3730a3;
+            background: var(--info-light, #dbeafe);
+            border-color: var(--aurora-primary, #6366f1);
+            color: var(--aurora-primary-dark, #4f46e5);
             transform: scale(0.98);
         }
         .node-arrow {
             margin: 0 5px;
-            color: #adb5bd;
+            color: var(--text-tertiary, #94a3b8);
         }
 
         .highlight-walk-btn.active {
-            background-color: #ffc107;
-            border-color: #ffc107;
+            background-color: var(--warning, #f59e0b);
+            border-color: var(--warning, #f59e0b);
         }
     `;
 

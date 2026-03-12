@@ -488,12 +488,12 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                     position: relative;
                     height: 350px;
                     width: 100%;
-                    background: #f9f9f9;
+                    background: var(--bg-secondary);
                 }
                 .exon-visualization-container {
                     height: 100%;
                     width: 100%;
-                    background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+                    background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
                 }
                 .exon-tooltip {
                     background-color: rgba(255, 255, 255, 0.95);
@@ -504,14 +504,14 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                     z-index: 1000;
                 }
                 .exon-tooltip h6 {
-                    border-bottom: 1px solid #eee;
+                    border-bottom: 1px solid var(--border-color-light);
                     padding-bottom: 5px;
                     margin-bottom: 5px;
-                    color: #333;
+                    color: var(--text-primary);
                     font-size: 16px;
                 }
                 .exon-svg {
-                    background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+                    background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
                 }
                 .stat-card {
                     border-radius: 8px;
@@ -528,7 +528,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                 }
                 .chromosome-info {
                     font-size: 14px;
-                    color: #555;
+                    color: var(--text-secondary);
                     font-style: italic;
                 }
                 .text-header {
@@ -555,7 +555,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                 
                 /* Enhanced Export SVG Button */
                 .export-exon-svg-btn {
-                    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+                    background: linear-gradient(135deg, var(--aurora-primary) 0%, var(--aurora-secondary) 100%) !important;
                     border: none !important;
                     color: white !important;
                     font-weight: 700 !important;
@@ -584,7 +584,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                 }
                 
                 .export-exon-svg-btn:hover {
-                    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+                    background: linear-gradient(135deg, var(--aurora-primary-dark) 0%, var(--aurora-secondary-dark) 100%) !important;
                     transform: translateY(-2px) scale(1.05) !important;
                     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.6) !important;
                 }
@@ -878,10 +878,10 @@ function showExportNotification(type, message) {
                 animation: fadeInOut 3s forwards;
             }
             .export-notification.success {
-                background-color: #28a745;
+                background-color: var(--success);
             }
             .export-notification.error {
-                background-color: #dc3545;
+                background-color: var(--error);
             }
             @keyframes fadeInOut {
                 0% { opacity: 0; transform: translateY(20px); }

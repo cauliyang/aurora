@@ -209,18 +209,18 @@ function createExportModal() {
       }
 
       .export-format-option:hover {
-        border-color: #007bff;
+        border-color: var(--aurora-primary, #6366f1);
         background: var(--bg-secondary, #f8f9fa);
       }
 
       .export-format-option.active {
-        border-color: #007bff;
+        border-color: var(--aurora-primary, #6366f1);
         background: rgba(0, 123, 255, 0.1);
       }
 
       .export-format-option i {
         font-size: 2rem;
-        color: #007bff;
+        color: var(--aurora-primary, #6366f1);
         margin-bottom: 8px;
       }
 
@@ -232,7 +232,7 @@ function createExportModal() {
 
       .format-desc {
         font-size: 0.75rem;
-        color: #6c757d;
+        color: var(--text-secondary, #475569);
       }
 
       [data-theme="dark"] .export-format-option {

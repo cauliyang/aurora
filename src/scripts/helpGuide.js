@@ -206,7 +206,7 @@ class HelpGuide {
           font-size: 1.5rem;
           line-height: 1;
           cursor: pointer;
-          color: #6c757d;
+          color: var(--text-secondary, #475569);
         }
 
         .help-guide-welcome-body {
