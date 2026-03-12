@@ -124,7 +124,7 @@ export function displayElementInfo(element, container) {
             html += `
         <div class="info-section">
           <div class="card exons-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header card-header-accent d-flex justify-content-between align-items-center">
               <span><i class="bi bi-diagram-2-fill me-1"></i> Exon Structure</span>
               <button class="btn btn-sm exon-visualize-btn" data-exons="${data.exons.replace(/"/g, '&quot;')}">
                 <i class="bi bi-bar-chart-line-fill me-1"></i> Visualize

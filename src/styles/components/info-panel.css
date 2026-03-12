@@ -77,7 +77,7 @@
 
 #infoContent .info-section {
     padding: var(--space-md) 0;
-    border-bottom: 1px solid var(--border-color-light);
+    border-bottom: 1px solid var(--border-color);
 }
 
 #infoContent .info-section:last-child {
@@ -377,7 +377,7 @@
     gap: var(--space-sm);
     padding: 5px 0;
     font-size: 0.85rem;
-    border-bottom: 1px solid var(--border-color-light);
+    border-bottom: 1px solid var(--border-color);
 }
 
 #infoContent .prop-row:last-child {
@@ -416,18 +416,19 @@
     font-weight: 600;
     font-size: 0.85rem;
     padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+#infoContent .card-header-accent {
+    background: var(--aurora-gradient-accent) !important;
+    color: white !important;
     border-bottom: none;
-    background: var(--aurora-gradient-accent);
-    color: white;
 }
 
 #infoContent .card-body {
     padding: var(--space-md);
-}
-
-#infoContent .card-header.bg-light {
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary);
 }
 
 

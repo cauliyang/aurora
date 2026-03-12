@@ -41,13 +41,8 @@
    GENE ANNOTATION CARD
    =========================== */
 
-/* Card header within info panel */
-.card-header.bg-light {
-    background: var(--bg-secondary, #f8fafc) !important;
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
-    font-size: 0.85rem;
-    padding: var(--space-sm, 8px) var(--space-md, 16px);
-}
+/* Card header — neutral default is now handled by info-panel.css.
+   Gene annotation cards use the default card-header style (no .bg-light needed). */
 
 
 /* ===========================
