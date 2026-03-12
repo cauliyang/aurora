@@ -13,17 +13,14 @@ body {
     padding-bottom: 36px;
 }
 
-.container {
-    padding: 20px;
-}
-
 h1,
 h2,
 h3 {
     margin-top: 0;
 }
 
-h3 {
+#info h3,
+#walks h3 {
     margin-top: 0;
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-color);
