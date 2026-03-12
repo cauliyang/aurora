@@ -185,8 +185,6 @@ const exampleJson = {
  * @returns {Promise<void>} Promise that resolves when editor is ready
  */
 export async function initializeJsonEditor() {
-    console.log("Initializing JSON editor...");
-
     // Only create editor when modal is shown, to avoid unnecessary processing
     document.getElementById("jsonModal").addEventListener("shown.bs.modal", () => {
         setupEditor();
@@ -214,7 +212,6 @@ function setupEditor() {
     if (!editor) {
         try {
             editor = new JSONEditor(container, editorOptions);
-            console.log("JSON editor initialized successfully");
 
             // Add keyboard shortcuts
             addKeyboardShortcuts();

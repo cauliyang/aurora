@@ -398,7 +398,6 @@ if (uploadInput) {
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
-    console.log(file);
     if (!file) return;
 
     // Show loading indicator
@@ -420,7 +419,6 @@ function handleFileUpload(event) {
                 window.loadingIndicator?.updateMessage(loadingId, "Parsing JSON data...");
                 // Handle JSON file
                 const jsonData = JSON.parse(content);
-                console.log("Loaded JSON data:", jsonData);
 
                 window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
                 loadGraphDataFromServer(jsonData);
@@ -433,10 +431,8 @@ function handleFileUpload(event) {
             } else if (fileExtension === "tsg") {
                 window.loadingIndicator?.updateMessage(loadingId, "Parsing TSG file...");
                 // Handle TSG file
-                console.log("Loaded TSG data");
                 // wait for the result from promise
                 STATE.graph_jsons = await window.parse_tsgFile(content);
-                console.log(`Number of graph JSONs: ${STATE.graph_jsons.length}`);
 
                 // Show graph selector if multiple graphs are available
                 const graphCount = STATE.graph_jsons.length;
@@ -572,8 +568,6 @@ async function handleGeneAnnotation() {
     const loadingId = `gene-annotation-${Date.now()}`;
 
     try {
-        console.log("Starting gene annotation process directly...");
-
         // Show modern loading indicator
         window.loadingIndicator?.show(loadingId, {
             message: "Loading gene database...",
@@ -585,8 +579,6 @@ async function handleGeneAnnotation() {
         const loaded = await loadGeneData();
 
         if (loaded && STATE.cy) {
-            console.log("Gene data loaded successfully, annotating nodes...");
-
             // Update loading message
             window.loadingIndicator?.updateMessage(loadingId, "Annotating nodes...");
 
@@ -631,15 +623,6 @@ document.addEventListener("click", (event) => {
         }
     }
 });
-
-// Make the Aurora ID file upload handler globally available
-if (
-    typeof window !== "undefined" &&
-    typeof window.handleAuroraIdsFileUpload === "undefined" &&
-    typeof handleAuroraIdsFileUpload === "function"
-) {
-    window.handleAuroraIdsFileUpload = handleAuroraIdsFileUpload;
-}
 
 // Add event handler for toolbar collapse toggle on mobile devices
 document.addEventListener("DOMContentLoaded", function() {

@@ -393,22 +393,6 @@ input[type="text"]:focus {
    MODERN PANELS & CARDS
    =========================== */
 
-.glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-lg);
-    padding: var(--space-lg);
-    transition: all var(--transition-base);
-}
-
-.glass-panel:hover {
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-2px);
-}
-
-
 /* Info Panel */
 
 #info.card {
@@ -543,65 +527,6 @@ input[type="text"]:focus {
 /* Graph Container - Enhanced styles in components/graph-canvas.css */
 
 
-/* Graph Stats Overlay */
-
-.graph-stats {
-    position: absolute;
-    top: var(--space-md);
-    left: var(--space-md);
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-md);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--glass-border);
-    display: flex;
-    gap: var(--space-md);
-    font-size: 0.875rem;
-    z-index: 100;
-}
-
-.graph-stats-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    color: var(--text-secondary);
-}
-
-.graph-stats-item i {
-    color: var(--aurora-primary);
-}
-
-.graph-stats-item strong {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-
-/* Walk Item Cards */
-
-.walk-item {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: var(--space-md);
-    margin-bottom: var(--space-sm);
-    transition: all var(--transition-base);
-    cursor: pointer;
-}
-
-.walk-item:hover {
-    border-color: var(--aurora-primary);
-    box-shadow: var(--shadow-md);
-    transform: translateX(4px);
-}
-
-.walk-item.active {
-    border-color: var(--aurora-primary);
-    background: rgba(99, 102, 241, 0.05);
-}
-
-
 /* Input Groups */
 
 .input-group {
@@ -673,15 +598,6 @@ input[type="text"]:focus {
 /* ===========================
    DIVIDER
    =========================== */
-
-.hr {
-    border: none;
-    height: 1px;
-    background: linear-gradient( 90deg, transparent, var(--aurora-primary), transparent);
-    margin: var(--space-lg) 0;
-    opacity: 0.3;
-}
-
 
 /* ===========================
    ANIMATIONS

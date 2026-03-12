@@ -49,19 +49,6 @@ footer:not(.footer-minimal)::before {
 }
 
 
-/* Subtle grid pattern overlay */
-
-footer:not(.footer-minimal)::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-    opacity: 0.5;
-}
-
-
 /* ===========================
    FOOTER CONTENT
    =========================== */

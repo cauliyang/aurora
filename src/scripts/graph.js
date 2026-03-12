@@ -99,7 +99,6 @@ function filterWalksByPossiblePaths(walks, possiblePaths) {
 // Function to update graph based on edge weight
 function updateGraph() {
     // Reset graph to original data
-    console.log("updateGraph", STATE);
     STATE.walks.length = 0;
     STATE.cy.elements().remove();
     STATE.cy.add(STATE.originalGraphData);
@@ -114,7 +113,6 @@ function updateGraph() {
 
 
     if (STATE.possibleWalks && Object.keys(STATE.possibleWalks).length > 0) {
-        console.log("UPDATE Graph: filtering walks by possible walks");
         STATE.walks = filterWalksByPossiblePaths(STATE.walks, STATE.possibleWalks);
     }
 
@@ -237,8 +235,6 @@ export function loadGraphDataFromServer(graphData) {
         initializeGraph(graphData);
     }
 
-    console.log("graphData", graphData.data);
-
     // --- Filter walks using possible_paths if present in graphData.data ---
     let possiblePaths = null;
     if (Array.isArray(graphData.data)) {
@@ -249,15 +245,11 @@ export function loadGraphDataFromServer(graphData) {
     if (possiblePaths && typeof possiblePaths === 'object') {
         // Save all possible walks
         STATE.possibleWalks = possiblePaths;
-        console.log("possibleWalks", STATE.possibleWalks);
-
         let walks_number_before_filtering = STATE.walks.length;
         // Filter walks to only those matching possible_paths
         STATE.walks = filterWalksByPossiblePaths(STATE.walks, STATE.possibleWalks);
         let walks_number_after_filtering = STATE.walks.length;
 
-        console.log("walks_number_before_filtering", walks_number_before_filtering);
-        console.log("walks_number_after_filtering", walks_number_after_filtering);
     }
 
     setupGraphInteractions();
@@ -435,57 +427,6 @@ async function toNumericIdentifier(inputString, length = 10) {
 
 
 /**
- * Convert a string to a hash-based identifier using SHA-256.
- * @param {string} inputString - The string to convert
- * @param {number|null} [length=16] - The desired length of the output identifier. If null, returns the full hash
- * @returns {Promise<string>} A valid identifier string derived from the SHA-256 hash
- * @throws {TypeError} If inputString is not a string or length is not a number/null
- * @throws {ValueError} If length is not positive
- *
- * @example
- * const identifier = await toHashIdentifier("Hello World!");
- * console.log(identifier); // Outputs something like 'a591a6d40bf420'
- */
-async function toHashIdentifier(inputString, length = 16) {
-    // Type checking
-    if (typeof inputString !== "string") {
-        throw new TypeError("Input must be a string");
-    }
-
-    if (
-        length !== null &&
-        (!Number.isInteger(length) || typeof length !== "number")
-    ) {
-        throw new TypeError("Length must be an integer or null");
-    }
-
-    if (length !== null && length <= 0) {
-        throw new Error("Length must be positive");
-    }
-
-    // Create SHA-256 hash
-    const encoder = new TextEncoder();
-    const data = encoder.encode(inputString);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    // Convert buffer to hex string
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-    // Take specified length of hash if provided
-    let result = length ? hashHex.slice(0, length) : hashHex;
-
-    // Ensure the identifier starts with a letter (prefix with 'a' if it starts with a number)
-    if (/^[0-9]/.test(result)) {
-        result = "a" + result.slice(1);
-    }
-
-    return result;
-}
-
-/**
  * Generates a unique Aurora ID for a given walk through the graph.
  * @param {Array} walk - Array of graph nodes representing a walk
  * @returns {Promise<string>} A unique identifier for the walk generated using toNumericIdentifier
@@ -505,7 +446,6 @@ async function getWalkAuroraId(walk) {
         .join("-");
 
     // Generate numeric identifier for the walk info
-    console.log(`Generating Aurora ID for walk: ${walkInfo}`);
     const auroraId = await toNumericIdentifier(walkInfo);
     return `TSP${auroraId}`;
 }
@@ -849,24 +789,12 @@ function filterWalkCards(searchValue, auroraIds = []) {
       shouldShow = false;
     }
 
-    // Debug information
-    if (shouldShow && searchValue) {
-      console.log(
-        `Match found: "${searchValue}" in walk ${walkIndex} (${walkText.substring(
-          0,
-          50
-        )}...)`
-      );
-    }
-
     card.style.display = shouldShow ? "" : "none";
 
     if (shouldShow) {
       visibleCardCount++;
     }
   });
-
-  console.log(`Filter results: ${visibleCardCount} walks match the criteria`);
 
   // Update the count of visible walks
   updateVisibleWalksCount();
@@ -924,7 +852,6 @@ function addWalkCardEventListeners() {
       const walkCard = btn.closest(".walk-card");
       const walkIndex = parseInt(walkCard.getAttribute("data-walk-index"), 10);
 
-      console.log(`Highlighting walk at index: ${walkIndex}`);
       if (walkIndex >= 0 && walkIndex < STATE.walks.length) {
         highlightWalk(STATE.walks[walkIndex]);
         // Add visual feedback
@@ -1292,11 +1219,9 @@ function highlightNode(cy, nodeId) {
     const isAlreadyHighlighted = node.hasClass("highlighted");
 
     if (isAlreadyHighlighted) {
-      console.log("Node is already highlighted, clearing highlights");
       // If the node is already highlighted, clear all highlights
       clearNodeHighlights(cy);
     } else {
-      console.log("Highlighting node:", nodeId);
       // Clear any existing highlights first
       clearNodeHighlights(cy);
 
@@ -1328,9 +1253,7 @@ function highlightNode(cy, nodeId) {
 
 // Function to clear all highlighting
 export function clearNodeHighlights(cy) {
-  console.log("Clearing all highlights");
-
-  // Check if cy exists before accessing its elements
+    // Check if cy exists before accessing its elements
   if (!cy) {
     console.warn("Cannot clear highlights: graph object is null");
     return;

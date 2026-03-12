@@ -138,7 +138,6 @@ export function createTooltip() {
 
 export function toggleTooltip() {
   tooltipDisabled = !tooltipDisabled;
-  console.log("Tooltip disabled:", tooltipDisabled);
 
   const tooltip = document.getElementById("tooltip");
   if (tooltipDisabled) {
