@@ -399,6 +399,41 @@ footer .container-fluid::before {
 
 
 /* ===========================
+   MINIMAL FOOTER (App page)
+   =========================== */
+
+.footer-minimal {
+    background: var(--bg-secondary, #f8fafc);
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    padding: var(--space-xs, 4px) 0;
+    font-size: 0.8rem;
+    color: var(--text-tertiary, #94a3b8);
+    position: relative;
+    z-index: 10;
+}
+
+.footer-minimal .container-fluid {
+    gap: var(--space-sm, 8px);
+}
+
+.footer-minimal .footer-sep {
+    opacity: 0.35;
+    font-size: 0.7rem;
+}
+
+.footer-minimal a {
+    color: var(--text-tertiary, #94a3b8);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color var(--transition-fast, 150ms ease);
+}
+
+.footer-minimal a:hover {
+    color: var(--aurora-primary, #6366f1);
+}
+
+
+/* ===========================
    PRINT STYLES
    =========================== */
 

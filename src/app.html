@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="./styles/modern-theme.css" />
     <link rel="stylesheet" href="./styles/components/help-guide.css" />
     <link rel="stylesheet" href="./styles/components/graph-canvas.css" />
+    <link rel="stylesheet" href="./styles/components/info-panel.css" />
     <link rel="stylesheet" href="./styles/components/footer.css" />
 </head>
 
@@ -66,8 +67,6 @@
         </div>
     </nav>
     <!-- End Modern Navbar -->
-
-    <hr class="hr" />
 
     <div id="tooltip" class="custom-tooltip"></div>
 
@@ -195,7 +194,10 @@
           <div id="info" class="card">
             <div class="card-header">Node/Edge Information</div>
             <div class="card-body" id="infoContent">
-              <!-- Dynamic content will be loaded here -->
+              <div class="info-empty-state">
+                <i class="bi bi-cursor-fill"></i>
+                <p>Click a node or edge to view details</p>
+              </div>
             </div>
           </div>
 
@@ -374,63 +376,14 @@
         <script src="./scripts/tsg.js" type="module"></script>
         <script src="./scripts/releaseNotes.js" type="module"></script>
 
-        <!-- Footer Start -->
-        <footer>
-            <div class="container-fluid px-4 px-lg-5">
-                <div class="row gx-4 gy-5">
-                    <!-- Left: About/Links -->
-                    <div class="col-lg-4 col-md-6">
-                        <h5 class="fw-bold border-bottom pb-3 mb-4">About Aurora</h5>
-                        <p class="text-light lh-lg">
-                            Aurora is a state-of-the-art graph visualization platform. Dive deep into your data and extract meaningful insights with our powerful interactive tools designed for bioinformatics research and data exploration.
-                        </p>
-                    </div>
-
-                    <!-- Center: Quick Links -->
-                    <div class="col-lg-3 col-md-6 offset-lg-1">
-                        <h5 class="fw-bold border-bottom pb-3 mb-4">Quick Links</h5>
-                        <ul class="list-unstyled">
-                            <li class="mb-3">
-                                <a href="index.html" class="text-light text-decoration-none hover-effect d-flex align-items-center">
-                                    <i class="bi bi-house-door me-3"></i>Home
-                                </a>
-                            </li>
-                            <li class="mb-3">
-                                <a href="index.html" class="text-light text-decoration-none hover-effect d-flex align-items-center">
-                                    <i class="bi bi-stars me-3"></i>Features
-                                </a>
-                            </li>
-                            <li class="mb-3">
-                                <a href="#" class="text-light text-decoration-none hover-effect d-flex align-items-center">
-                                    <i class="bi bi-envelope me-3"></i>Contact
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Right: Social Media Links -->
-                    <div class="col-lg-3 col-md-6">
-                        <h5 class="fw-bold border-bottom pb-3 mb-4">Connect with Us</h5>
-                        <div class="d-flex gap-4">
-                            <a href="https://yangyangli.top" class="text-light fs-3" title="Personal Website">
-                                <i class="bi bi-person-circle"></i>
-                            </a>
-                            <a href="https://twitter.com/yangyangliz5" class="text-light fs-3" title="Twitter">
-                                <i class="bi bi-twitter"></i>
-                            </a>
-                            <a href="https://github.com/cauliyang/aurora" class="text-light fs-3" title="GitHub Repository">
-                                <i class="fab fa-github"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bottom: Copyright -->
-                <div class="row mt-5 pt-4 border-top">
-                    <div class="col-12 text-center">
-                        <p class="mb-0">&copy; 2025 Yangyang Li. All rights reserved.</p>
-                    </div>
-                </div>
+        <!-- Minimal App Footer -->
+        <footer class="footer-minimal">
+            <div class="container-fluid d-flex align-items-center justify-content-center gap-3">
+                <span>&copy; 2025 Yangyang Li</span>
+                <span class="footer-sep">|</span>
+                <a href="https://github.com/cauliyang/aurora" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://yangyangli.top" target="_blank" rel="noopener" title="Website"><i class="bi bi-person-circle"></i></a>
+                <a href="https://twitter.com/yangyangliz5" target="_blank" rel="noopener" title="Twitter"><i class="bi bi-twitter"></i></a>
             </div>
         </footer>
 </body>

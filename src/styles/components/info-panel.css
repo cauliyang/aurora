@@ -1,0 +1,482 @@
+/**
+ * Info Panel Styles — Aurora Theme
+ * Replaces runtime-injected addInfoPanelStyles() from graphUtilities.js
+ */
+
+
+/* ===========================
+   EMPTY STATE
+   =========================== */
+
+.info-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-md);
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+.info-empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-sm);
+    opacity: 0.4;
+    background: var(--aurora-gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.info-empty-state p {
+    font-size: 0.875rem;
+    margin: 0;
+    color: var(--text-tertiary);
+}
+
+
+/* ===========================
+   COMPACT HEADER
+   =========================== */
+
+#infoContent .info-header-compact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    margin-bottom: var(--space-sm);
+    border-bottom: 2px solid;
+    border-image: var(--aurora-gradient-accent) 1;
+}
+
+#infoContent .info-header-compact i {
+    font-size: 1rem;
+    color: var(--aurora-primary);
+}
+
+#infoContent .info-header-compact h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+#infoContent .info-header-compact .info-id {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    margin-left: auto;
+}
+
+
+/* ===========================
+   SECTION LAYOUT
+   =========================== */
+
+#infoContent .info-section {
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+#infoContent .info-section:last-child {
+    border-bottom: none;
+}
+
+#infoContent .info-section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+#infoContent .info-section-title i {
+    font-size: 0.75rem;
+    color: var(--aurora-primary);
+}
+
+
+/* ===========================
+   KEY-VALUE ROWS
+   =========================== */
+
+#infoContent .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 0.8125rem;
+}
+
+#infoContent .info-row .info-key {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+#infoContent .info-row .info-val {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+}
+
+#infoContent .info-row .info-val.badge {
+    font-family: inherit;
+    font-size: 0.75rem;
+}
+
+
+/* ===========================
+   INLINE STAT BADGES
+   =========================== */
+
+#infoContent .info-stats {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+#infoContent .info-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+#infoContent .info-stat strong {
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+}
+
+
+/* ===========================
+   GENOMIC POSITION BAR
+   =========================== */
+
+#infoContent .genomic-bar {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    padding: var(--space-xs) 0;
+}
+
+#infoContent .genomic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+#infoContent .genomic-badge.chrom {
+    background: linear-gradient(135deg, var(--success), #20c997);
+    color: white;
+}
+
+#infoContent .genomic-badge.strand-plus {
+    background: var(--success-light);
+    color: #155724;
+}
+
+#infoContent .genomic-badge.strand-minus {
+    background: var(--warning-light);
+    color: #856404;
+}
+
+#infoContent .genomic-badge.strand-na {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+#infoContent .position-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-xs);
+    text-align: center;
+    padding: var(--space-xs);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--aurora-primary);
+}
+
+#infoContent .position-grid .pos-val {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+#infoContent .position-grid .pos-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+}
+
+
+/* ===========================
+   METRICS (PTC/PTF)
+   =========================== */
+
+#infoContent .metrics-row {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+#infoContent .metric-chip {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+#infoContent .metric-chip .metric-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+}
+
+#infoContent .metric-chip .metric-value {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+#infoContent .metric-chip .metric-value.ptc {
+    color: var(--aurora-primary);
+}
+
+#infoContent .metric-chip .metric-value.ptf {
+    color: var(--success);
+}
+
+
+/* ===========================
+   EDGE FLOW DISPLAY
+   =========================== */
+
+#infoContent .edge-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+}
+
+#infoContent .edge-endpoint {
+    text-align: center;
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    min-width: 80px;
+}
+
+#infoContent .edge-endpoint .ep-label {
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+}
+
+#infoContent .edge-endpoint code {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    margin-top: 2px;
+}
+
+#infoContent .edge-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--aurora-primary);
+}
+
+#infoContent .edge-arrow i {
+    font-size: 1.25rem;
+}
+
+#infoContent .edge-arrow .weight-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--aurora-gradient-accent);
+    color: white;
+    padding: 1px 6px;
+    border-radius: var(--radius-full);
+    margin-top: 2px;
+}
+
+
+/* ===========================
+   EXON LIST
+   =========================== */
+
+#infoContent .exon-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#infoContent .exon-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#infoContent .exon-list-container .list-group-item {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+}
+
+#infoContent .exons-card .exon-visualize-btn {
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--success);
+}
+
+#infoContent .exons-card .exon-visualize-btn:hover {
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* ===========================
+   ADDITIONAL PROPERTIES
+   =========================== */
+
+#infoContent .prop-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    padding: 3px 0;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+#infoContent .prop-row:last-child {
+    border-bottom: none;
+}
+
+#infoContent .prop-key {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+#infoContent .prop-val {
+    color: var(--text-primary);
+    word-break: break-all;
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+}
+
+
+/* ===========================
+   INNER CARDS (exons, annotations)
+   =========================== */
+
+#infoContent .card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+#infoContent .card-header {
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: none;
+    background: var(--aurora-gradient-accent);
+    color: white;
+}
+
+#infoContent .card-body {
+    padding: var(--space-sm);
+}
+
+#infoContent .card-header.bg-light {
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary);
+}
+
+
+/* ===========================
+   COMMA-SEPARATED TABLE
+   =========================== */
+
+#infoContent .comma-separated-table {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}
+
+#infoContent .comma-separated-table .table {
+    margin-bottom: 0;
+    font-size: 0.8rem;
+}
+
+#infoContent .comma-separated-table .table th {
+    background: var(--bg-secondary);
+    border-top: none;
+    padding: 4px 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+#infoContent .comma-separated-table .table td {
+    padding: 4px 8px;
+    vertical-align: middle;
+}
+
+
+/* ===========================
+   CODE BLOCKS
+   =========================== */
+
+#infoContent .code-block {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-xs);
+    font-size: 0.8rem;
+    max-height: 100px;
+    overflow-y: auto;
+    margin-bottom: 0;
+}
+
+#infoContent .item-value {
+    word-break: break-all;
+    font-family: 'Courier New', monospace;
+    background: var(--bg-secondary);
+    padding: 2px 4px;
+    border-radius: 3px;
+}

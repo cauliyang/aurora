@@ -98,12 +98,12 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    padding: var(--space-md) 0;
+    padding: var(--space-xs) 0;
     transition: all var(--transition-base);
 }
 
 .navbar-brand {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     background: var(--aurora-gradient-primary);
     -webkit-background-clip: text;
@@ -175,14 +175,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: var(--radius-full);
     transition: all var(--transition-base);
 }
 
 .navbar a[href*="github"] i {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--text-primary);
     transition: all var(--transition-base);
 }
@@ -205,25 +205,43 @@
 .toolbar-responsive {
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
-    border-radius: var(--radius-lg);
-    padding: var(--space-md);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-md);
+    padding: var(--space-xs) var(--space-sm);
+    box-shadow: var(--shadow-sm);
     border: 1px solid var(--glass-border);
-    gap: var(--space-md);
+    gap: var(--space-sm);
     transition: all var(--transition-base);
 }
 
 .toolbar-responsive .btn-group {
-    gap: var(--space-xs);
+    gap: 2px;
+}
+
+.toolbar-responsive .btn {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+    border-radius: var(--radius-sm);
+}
+
+.toolbar-responsive .form-select,
+.toolbar-responsive .form-control,
+.toolbar-responsive .input-group-text {
+    padding: 4px 8px;
+    font-size: 0.8125rem;
+}
+
+/* Disable hover lift in toolbar to prevent jitter */
+.toolbar-responsive .btn:hover {
+    transform: none;
 }
 
 
 /* Modern Button Styles */
 
 .btn {
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     font-weight: 500;
-    padding: 10px 20px;
+    padding: 6px 14px;
     transition: all var(--transition-base);
     border: 1px solid transparent;
     position: relative;
