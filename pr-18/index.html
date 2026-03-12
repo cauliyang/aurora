@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang=en><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=author content="Yangyang Li"><meta name=description content="Aurora - Interactive Transcript Splice Graph visualization for bioinformatics research"><meta name=referrer content=unsafe-url><meta name=robots content="index, follow"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"><link rel=stylesheet href=/aurora/pr-18/aurora.04e64bff.css><link rel=stylesheet href=/aurora/pr-18/aurora.01cd5384.css><link rel=stylesheet href=/aurora/pr-18/aurora.ee7d1fe0.css><link rel=stylesheet href=/aurora/pr-18/aurora.893fbe8c.css><title>Aurora: Visualize TSGraph</title><body>
+<!DOCTYPE html><html lang=en><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=author content="Yangyang Li"><meta name=description content="Aurora - Interactive Transcript Segment Graph visualization for bioinformatics research"><meta name=referrer content=unsafe-url><meta name=robots content="index, follow"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"><link rel=stylesheet href=/aurora/pr-18/aurora.04e64bff.css><link rel=stylesheet href=/aurora/pr-18/aurora.01cd5384.css><link rel=stylesheet href=/aurora/pr-18/aurora.ee7d1fe0.css><link rel=stylesheet href=/aurora/pr-18/aurora.893fbe8c.css><title>Aurora: Visualize TSGraph</title><body>
     
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class=container>
@@ -9,14 +9,14 @@
                 <span class=navbar-toggler-icon></span>
             </button>
             <div class="collapse justify-content-end navbar-collapse" id=navbarNav>
-                <ul class="gap-2 navbar-nav">
+                <ul class="align-items-center gap-2 navbar-nav">
                     <li class=nav-item>
                         <a class=nav-link href=#features>Features</a>
                     </li>
                     <li class=nav-item>
                         <a class=nav-link href=https://github.com/cauliyang/Aurora target=_blank rel="noopener noreferrer">GitHub</a>
                     </li>
-                    <li class=nav-item>
+                    <li class="ms-2 nav-item">
                         <a class="btn btn-primary btn-sm nav-link px-3 text-white" href=/aurora/pr-18/app.html>Launch App</a>
                     </li>
                 </ul>
@@ -33,10 +33,10 @@
                     <div class=col-lg-6>
                         <h1 class=landing-hero-title>
                             Visualize Transcript<br>
-                            <span class=landing-gradient-text>Splice Graphs</span>
+                            <span class=landing-gradient-text>Segment Graphs</span>
                         </h1>
                         <p class=landing-hero-subtitle>
-                            Aurora is an interactive web application for visualizing Transcript Splice Graphs (TSG).
+                            Aurora is an interactive web application for visualizing Transcript Segment Graphs (TSG).
                             Upload your data and explore graph structures with powerful layout algorithms,
                             gene annotation, and walk path analysis.
                         </p>
@@ -132,7 +132,7 @@
                 <div class="landing-cta-card mx-auto">
                     <h2>Ready to explore your data?</h2>
                     <p class=mb-4>
-                        Upload a JSON or TSG file and start visualizing transcript splice graphs in seconds.
+                        Upload a JSON or TSG file and start visualizing transcript segment graphs in seconds.
                     </p>
                     <a href=/aurora/pr-18/app.html class="btn btn-lg btn-primary landing-btn-glow">
                         <i class="bi bi-rocket-takeoff me-2"></i>Launch Aurora
@@ -144,55 +144,24 @@
 
     
     <footer>
-        <div class="container-fluid px-4 px-lg-5">
-            <div class="gx-4 gy-5 row">
-                <div class="col-lg-4 col-md-6">
-                    <h5 class="border-bottom fw-bold mb-4 pb-3">About Aurora</h5>
-                    <p class="lh-lg text-light">
-                        Aurora is a graph visualization platform for bioinformatics. Dive deep into your transcript
-                        splice graph data with powerful interactive tools designed for research and data exploration.
-                    </p>
-                </div>
-                <div class="col-lg-3 col-md-6 offset-lg-1">
-                    <h5 class="border-bottom fw-bold mb-4 pb-3">Quick Links</h5>
-                    <ul class=list-unstyled>
-                        <li class=mb-3>
-                            <a href=# class="align-items-center d-flex text-decoration-none text-light">
-                                <i class="bi bi-house-door me-3"></i>Home
-                            </a>
-                        </li>
-                        <li class=mb-3>
-                            <a href=#features class="align-items-center d-flex text-decoration-none text-light">
-                                <i class="bi bi-stars me-3"></i>Features
-                            </a>
-                        </li>
-                        <li class=mb-3>
-                            <a href=/aurora/pr-18/app.html class="align-items-center d-flex text-decoration-none text-light">
-                                <i class="bi bi-rocket-takeoff me-3"></i>Launch App
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h5 class="border-bottom fw-bold mb-4 pb-3">Connect with Us</h5>
-                    <div class="d-flex gap-4">
-                        <a href=https://yangyangli.top class="fs-3 text-light" title="Personal Website">
-                            <i class="bi bi-person-circle"></i>
-                        </a>
-                        <a href=https://twitter.com/yangyangliz5 class="fs-3 text-light" title=Twitter>
-                            <i class="bi bi-twitter"></i>
-                        </a>
-                        <a href=https://github.com/cauliyang/aurora class="fs-3 text-light" title=GitHub>
-                            <i class="bi bi-github"></i>
-                        </a>
-                    </div>
-                </div>
+        <div class="container py-4 text-center">
+            <div class=mb-3>
+                <span class=fw-bold>Aurora</span>
+                <span class="mx-2 opacity-50">—</span>
+                <span class="opacity-75 text-light">Interactive Transcript Segment Graph Visualization</span>
             </div>
-            <div class="border-top mt-5 pt-4 row">
-                <div class="col-12 text-center">
-                    <p class=mb-0>© 2026 Yangyang Li. All rights reserved.</p>
-                </div>
+            <div class="d-flex gap-4 justify-content-center mb-3">
+                <a href=https://github.com/cauliyang/aurora class="fs-5 text-light" target=_blank rel=noopener title=GitHub>
+                    <i class="bi bi-github"></i>
+                </a>
+                <a href=https://yangyangli.top class="fs-5 text-light" target=_blank rel=noopener title=Website>
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <a href=https://twitter.com/yangyangliz5 class="fs-5 text-light" target=_blank rel=noopener title=Twitter>
+                    <i class="bi bi-twitter"></i>
+                </a>
             </div>
+            <p class="mb-0 opacity-50 small">© 2026 Yangyang Li</p>
         </div>
     </footer>
 
