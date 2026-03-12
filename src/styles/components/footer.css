@@ -408,7 +408,10 @@ footer:not(.footer-minimal) .container-fluid::before {
     padding: var(--space-sm, 8px) 0;
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.6);
-    position: relative;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 10;
     margin-top: 0 !important;
 }
