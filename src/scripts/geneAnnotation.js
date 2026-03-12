@@ -951,7 +951,7 @@ function setupGeneAnnotationListeners() {
     newAnnotateAllBtn.addEventListener("click", async () => {
       newAnnotateAllBtn.disabled = true;
       newAnnotateAllBtn.innerHTML =
-        '<i class="fas fa-spinner fa-spin me-1"></i> Annotating...';
+        '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Annotating...';
 
       try {
         if (!isGeneDataLoaded) {

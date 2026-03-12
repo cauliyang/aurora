@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Graph Visualization</title>
+    <title>Aurora — Graph Visualization</title>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
     <!-- Bootstrap 5 + Bootstrap Icons compiled via SCSS (no CDN duplicates) -->
     <link rel="stylesheet" href="./styles/scss/styles.scss" />
     <link rel="stylesheet" href="./styles/app.css" />
@@ -60,7 +60,7 @@
 
     <div id="tooltip" class="custom-tooltip"></div>
 
-    <div class="container-fluid h-100 p-3">
+    <main class="container-fluid h-100 p-3">
         <div class="row h-100">
             <!-- Toolbar -->
             <div class="col-12 mb-3">
@@ -70,7 +70,7 @@
                     <!-- File group -->
                     <div class="btn-group me-2 mb-2" role="group" aria-label="File operations">
                         <div class="btn btn-outline-primary" title="Upload JSON/TSG file"
-                            aria-label="Upload JSON or TSG file" role="button">
+                            aria-label="Upload JSON or TSG file" role="button" tabindex="0">
                             <input type="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
                             <label for="uploadInput" title="Upload JSON/TSG file"
                                 aria-label="Upload JSON or TSG file" style="cursor:pointer;margin:0"><i class="bi bi-upload"></i></label>
@@ -109,7 +109,7 @@
 
                     <!-- Layout group -->
                     <div class="btn-group me-2 mb-2" role="group" aria-label="Layout selection">
-                        <select id="layoutSelect" class="form-select toolbar-select">
+                        <select id="layoutSelect" class="form-select toolbar-select" aria-label="Graph layout algorithm">
                             <option value="dagre">DAG Layout</option>
                             <option value="grid">Grid Layout</option>
                             <option value="circle">Circle Layout</option>
@@ -128,7 +128,7 @@
                     <div id="graphSelectorContainer" class="d-none me-2 mb-2">
                         <div class="input-group toolbar-input-group">
                             <span class="input-group-text">Graph</span>
-                            <select id="graphSelect" class="form-select toolbar-select">
+                            <select id="graphSelect" class="form-select toolbar-select" aria-label="Select graph">
                                 <option value="0">Graph 1</option>
                             </select>
                         </div>
@@ -224,10 +224,11 @@
                     </div>
                 </div>
             </div>
-        </div>
+
+    </main>
 
         <!-- Modal for JSON Editor -->
-        <div class="modal fade" id="jsonModal" tabindex="-1">
+        <div class="modal fade" id="jsonModal" tabindex="-1" aria-labelledby="jsonModalLabel">
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -365,7 +366,7 @@
             <div class="container-fluid d-flex align-items-center justify-content-center gap-3">
                 <span>&copy; 2026 Yangyang Li</span>
                 <span class="footer-sep">|</span>
-                <a href="https://github.com/cauliyang/aurora" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://github.com/cauliyang/aurora" target="_blank" rel="noopener" title="GitHub"><i class="bi bi-github"></i></a>
                 <a href="https://yangyangli.top" target="_blank" rel="noopener" title="Website"><i class="bi bi-person-circle"></i></a>
                 <a href="https://twitter.com/yangyangliz5" target="_blank" rel="noopener" title="Twitter"><i class="bi bi-twitter"></i></a>
             </div>
