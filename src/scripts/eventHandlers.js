@@ -505,8 +505,10 @@ function setupGraphSelector(graphCount) {
     // Show the selector
     graphSelectorContainer.classList.remove("d-none");
 
-    // Add event listener for graph selection
-    graphSelect.addEventListener("change", function() {
+    // Replace element to remove any previous change listeners, then add fresh one
+    const freshSelect = graphSelect.cloneNode(true);
+    graphSelect.parentNode.replaceChild(freshSelect, graphSelect);
+    freshSelect.addEventListener("change", function() {
         const selectedIndex = parseInt(this.value);
         if (STATE.graph_jsons && STATE.graph_jsons.length > selectedIndex) {
             try {

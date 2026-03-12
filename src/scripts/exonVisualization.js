@@ -404,12 +404,15 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
         }
     }
 
-    // Add resize listener
+    // Add resize listener (disconnect any previous observer first)
+    if (parentContainer._exonResizeObserver) {
+        parentContainer._exonResizeObserver.disconnect();
+    }
     const resizeObserver = new ResizeObserver(() => {
         resizeVisualization();
     });
-
     resizeObserver.observe(parentContainer);
+    parentContainer._exonResizeObserver = resizeObserver;
 
     // Return info about the visualization
     return {
@@ -612,7 +615,16 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
     // Create Bootstrap modal instance
     const modalInstance = new bootstrap.Modal(modal);
 
-    // When modal is shown, render the visualization
+    // Clean up ResizeObserver when modal is hidden
+    modal.addEventListener('hidden.bs.modal', () => {
+        const container = document.getElementById('exonVisualizationContainer');
+        if (container && container._exonResizeObserver) {
+            container._exonResizeObserver.disconnect();
+            container._exonResizeObserver = null;
+        }
+    }, { once: true });
+
+    // When modal is shown, render the visualization (use { once: true } to avoid stacking)
     modal.addEventListener('shown.bs.modal', () => {
         const container = document.getElementById('exonVisualizationContainer');
         const statsContainer = document.getElementById('exonStatsContainer');
@@ -620,10 +632,12 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
         // Create the visualization
         const result = createExonVisualization(exonsStr, container, chromosomeInfo);
 
-        // Setup SVG export button
+        // Setup SVG export button (replace to remove old listeners)
         const exportSvgBtn = document.getElementById('exportExonSvgBtn');
         if (exportSvgBtn) {
-            exportSvgBtn.addEventListener('click', () => {
+            const newBtn = exportSvgBtn.cloneNode(true);
+            exportSvgBtn.parentNode.replaceChild(newBtn, exportSvgBtn);
+            newBtn.addEventListener('click', () => {
                 const filenameBase = chromosomeInfo ?
                     `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` :
                     `exon_structure_${new Date().toISOString().slice(0, 10)}`;
@@ -706,7 +720,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
         </div>
       `;
         }
-    });
+    }, { once: true });
 
     // Show the modal
     modalInstance.show();
