@@ -428,7 +428,7 @@ document.addEventListener("DOMContentLoaded", initializeJsonEditor);
 window.JSONEditor = {
     getEditor: () => editor,
     getOptions: () => editorOptions,
-    setMode: (mode) => editor ? .setMode(mode),
+    setMode: (mode) => editor?.setMode(mode),
     getMode: () => currentEditorMode
 };
 

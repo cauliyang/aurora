@@ -196,8 +196,7 @@ document.getElementById("MaxDepth").addEventListener("change", function() {
     STATE.maxPathLength = MaxDepth;
 
     if (STATE.minPathLength > STATE.maxPathLength) {
-        // altert user
-        alert("Min Depth cannot be greater than Max Depth");
+        window.showAlert?.("Min Depth cannot be greater than Max Depth", "warning", 3000);
         document.getElementById("MaxDepth").value = STATE.minPathLength;
         return;
     }
@@ -211,8 +210,7 @@ document.getElementById("MinDepth").addEventListener("change", function() {
     STATE.minPathLength = MinDepth;
 
     if (STATE.minPathLength > STATE.maxPathLength) {
-        // altert user
-        alert("Min Depth cannot be greater than Max Depth");
+        window.showAlert?.("Min Depth cannot be greater than Max Depth", "warning", 3000);
         document.getElementById("MinDepth").value = STATE.maxPathLength;
         return;
     }

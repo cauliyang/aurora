@@ -87,7 +87,7 @@ if (captureGraphBtn) {
  */
 function showExportDialog() {
     if (!STATE.cy) {
-        window.showAlert ? .("No graph loaded to export", "error");
+        window.showAlert?.("No graph loaded to export", "error");
         return;
     }
 
@@ -288,10 +288,10 @@ function setupExportHandlers(modal, bsModal) {
             try {
                 await exportGraph(format, { scale, fullGraph, transparentBg });
                 bsModal.hide();
-                window.showAlert ? .(`Graph exported as ${format.toUpperCase()}!`, "success", 2000);
+                window.showAlert?.(`Graph exported as ${format.toUpperCase()}!`, "success", 2000);
             } catch (error) {
                 console.error("Export failed:", error);
-                window.showAlert ? .(`Export failed: ${error.message}`, "error");
+                window.showAlert?.(`Export failed: ${error.message}`, "error");
             }
         });
     }
@@ -339,7 +339,7 @@ async function exportGraph(format, options = {}) {
             data = STATE.cy.jpg({
                 full: fullGraph,
                 scale: scale,
-                bg: transparentBg ? "#ffffff" : "#ffffff",
+                bg: "#ffffff", // JPG does not support transparency
                 quality: 0.9,
             });
             filename = `graph_${timestamp}.jpg`;
@@ -403,7 +403,7 @@ function handleFileUpload(event) {
 
     // Show loading indicator
     const loadingId = `upload-${Date.now()}`;
-    window.loadingIndicator ? .show(loadingId, {
+    window.loadingIndicator?.show(loadingId, {
         message: `Loading ${file.name}...`,
         type: "spinner",
         overlay: true,
@@ -417,21 +417,21 @@ function handleFileUpload(event) {
 
         try {
             if (fileExtension === "json") {
-                window.loadingIndicator ? .updateMessage(loadingId, "Parsing JSON data...");
+                window.loadingIndicator?.updateMessage(loadingId, "Parsing JSON data...");
                 // Handle JSON file
                 const jsonData = JSON.parse(content);
                 console.log("Loaded JSON data:", jsonData);
 
-                window.loadingIndicator ? .updateMessage(loadingId, "Rendering graph...");
+                window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
                 loadGraphDataFromServer(jsonData);
 
                 // Hide graph selector for single JSON files
                 document.getElementById("graphSelectorContainer").classList.add("d-none");
 
-                window.loadingIndicator ? .hide(loadingId);
-                window.showAlert ? .("Graph loaded successfully!", "success", 2000);
+                window.loadingIndicator?.hide(loadingId);
+                window.showAlert?.("Graph loaded successfully!", "success", 2000);
             } else if (fileExtension === "tsg") {
-                window.loadingIndicator ? .updateMessage(loadingId, "Parsing TSG file...");
+                window.loadingIndicator?.updateMessage(loadingId, "Parsing TSG file...");
                 // Handle TSG file
                 console.log("Loaded TSG data");
                 // wait for the result from promise
@@ -440,7 +440,7 @@ function handleFileUpload(event) {
 
                 // Show graph selector if multiple graphs are available
                 const graphCount = STATE.graph_jsons.length;
-                window.loadingIndicator ? .updateMessage(
+                window.loadingIndicator?.updateMessage(
                     loadingId,
                     `Found ${graphCount} graph${graphCount > 1 ? "s" : ""}...`
                 );
@@ -452,12 +452,12 @@ function handleFileUpload(event) {
                 }
 
                 // Load the first graph by default
-                window.loadingIndicator ? .updateMessage(loadingId, "Rendering graph...");
+                window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
                 const jsonData = JSON.parse(STATE.graph_jsons[0]);
                 loadGraphDataFromServer(jsonData);
 
-                window.loadingIndicator ? .hide(loadingId);
-                window.showAlert ? .(
+                window.loadingIndicator?.hide(loadingId);
+                window.showAlert?.(
                     `Loaded ${graphCount} graph${graphCount > 1 ? "s" : ""} successfully!`,
                     "success",
                     2000
@@ -465,14 +465,14 @@ function handleFileUpload(event) {
             }
         } catch (error) {
             console.error("Error processing file:", error);
-            window.loadingIndicator ? .hide(loadingId);
-            window.showAlert ? .("Error processing file: " + error.message, "error");
+            window.loadingIndicator?.hide(loadingId);
+            window.showAlert?.("Error processing file: " + error.message, "error");
         }
     };
 
     reader.onerror = () => {
-        window.loadingIndicator ? .hide(loadingId);
-        window.showAlert ? .("Failed to read file", "error");
+        window.loadingIndicator?.hide(loadingId);
+        window.showAlert?.("Failed to read file", "error");
     };
 
     reader.readAsText(file);
@@ -573,7 +573,7 @@ async function handleGeneAnnotation() {
         console.log("Starting gene annotation process directly...");
 
         // Show modern loading indicator
-        window.loadingIndicator ? .show(loadingId, {
+        window.loadingIndicator?.show(loadingId, {
             message: "Loading gene database...",
             type: "bar",
             overlay: true,
@@ -586,19 +586,19 @@ async function handleGeneAnnotation() {
             console.log("Gene data loaded successfully, annotating nodes...");
 
             // Update loading message
-            window.loadingIndicator ? .updateMessage(loadingId, "Annotating nodes...");
+            window.loadingIndicator?.updateMessage(loadingId, "Annotating nodes...");
 
             // Annotate all nodes in the graph
             const nodeCount = STATE.cy.nodes().length;
             const annotatedCount = await annotateAllNodes(STATE.cy);
 
             // Update progress
-            window.loadingIndicator ? .updateProgress(loadingId, 100);
+            window.loadingIndicator?.updateProgress(loadingId, 100);
 
             // Hide loading and show success
             setTimeout(() => {
-                window.loadingIndicator ? .hide(loadingId);
-                window.showAlert ? .(
+                window.loadingIndicator?.hide(loadingId);
+                window.showAlert?.(
                     `Annotated ${annotatedCount} of ${nodeCount} nodes with gene information!`,
                     "success",
                     3000
@@ -606,13 +606,13 @@ async function handleGeneAnnotation() {
             }, 500);
         } else {
             console.error("Could not load gene data or graph not initialized");
-            window.loadingIndicator ? .hide(loadingId);
-            window.showAlert ? .("Failed to load gene annotations.", "error");
+            window.loadingIndicator?.hide(loadingId);
+            window.showAlert?.("Failed to load gene annotations.", "error");
         }
     } catch (error) {
         console.error("Error in gene annotation:", error);
-        window.loadingIndicator ? .hide(loadingId);
-        window.showAlert ? .("Error in gene annotation process: " + error.message, "error");
+        window.loadingIndicator?.hide(loadingId);
+        window.showAlert?.("Error in gene annotation process: " + error.message, "error");
     }
 }
 
