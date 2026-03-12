@@ -79,13 +79,12 @@
 
                     <!-- File group -->
                     <div class="btn-group me-2 mb-2" role="group" aria-label="File operations">
-                        <form id="uploadForm" enctype="multipart/form-data" method="post" action="/upload"
-                            class="btn btn-outline-primary" title="Upload JSON/TSG file"
-                            aria-label="Upload JSON or TSG file">
-                            <input type="file" name="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
+                        <div class="btn btn-outline-primary" title="Upload JSON/TSG file"
+                            aria-label="Upload JSON or TSG file" role="button">
+                            <input type="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
                             <label for="uploadInput" title="Upload JSON/TSG file"
-                                aria-label="Upload JSON or TSG file"><i class="bi bi-upload"></i></label>
-                        </form>
+                                aria-label="Upload JSON or TSG file" style="cursor:pointer;margin:0"><i class="bi bi-upload"></i></label>
+                        </div>
                         <button id="captureGraph" class="btn btn-outline-primary" title="Export graph"
                             aria-label="Export graph">
                             <i class="bi bi-camera"></i>

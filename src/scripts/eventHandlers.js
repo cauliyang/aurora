@@ -476,6 +476,9 @@ function handleFileUpload(event) {
     };
 
     reader.readAsText(file);
+
+    // Reset the file input so the same file can be re-uploaded
+    event.target.value = "";
 }
 
 /**
