@@ -5,8 +5,7 @@
     "homepage": ".",
     "source": [
         "src/index.html",
-        "src/app.html",
-        "src/igv.html"
+        "src/app.html"
     ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 0",

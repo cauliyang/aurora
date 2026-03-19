@@ -99,7 +99,6 @@ function filterWalksByPossiblePaths(walks, possiblePaths) {
 // Function to update graph based on edge weight
 function updateGraph() {
     // Reset graph to original data
-    console.log("updateGraph", STATE);
     STATE.walks.length = 0;
     STATE.cy.elements().remove();
     STATE.cy.add(STATE.originalGraphData);
@@ -114,7 +113,6 @@ function updateGraph() {
 
 
     if (STATE.possibleWalks && Object.keys(STATE.possibleWalks).length > 0) {
-        console.log("UPDATE Graph: filtering walks by possible walks");
         STATE.walks = filterWalksByPossiblePaths(STATE.walks, STATE.possibleWalks);
     }
 
@@ -196,8 +194,7 @@ document.getElementById("MaxDepth").addEventListener("change", function() {
     STATE.maxPathLength = MaxDepth;
 
     if (STATE.minPathLength > STATE.maxPathLength) {
-        // altert user
-        alert("Min Depth cannot be greater than Max Depth");
+        window.showAlert?.("Min Depth cannot be greater than Max Depth", "warning", 3000);
         document.getElementById("MaxDepth").value = STATE.minPathLength;
         return;
     }
@@ -211,8 +208,7 @@ document.getElementById("MinDepth").addEventListener("change", function() {
     STATE.minPathLength = MinDepth;
 
     if (STATE.minPathLength > STATE.maxPathLength) {
-        // altert user
-        alert("Min Depth cannot be greater than Max Depth");
+        window.showAlert?.("Min Depth cannot be greater than Max Depth", "warning", 3000);
         document.getElementById("MinDepth").value = STATE.maxPathLength;
         return;
     }
@@ -221,6 +217,13 @@ document.getElementById("MinDepth").addEventListener("change", function() {
 });
 
 export function loadGraphDataFromServer(graphData) {
+    // Clear empty state and show loading indicator on the graph canvas
+    clearEmptyState();
+    const cyContainer = document.getElementById("cy");
+    if (cyContainer) {
+        cyContainer.classList.add("loading");
+    }
+
     //check if graphData has elements
     // if has elements, initialize graph using elements
     // if not has elements, initialize graph using graphData
@@ -232,8 +235,6 @@ export function loadGraphDataFromServer(graphData) {
         initializeGraph(graphData);
     }
 
-    console.log("graphData", graphData.data);
-
     // --- Filter walks using possible_paths if present in graphData.data ---
     let possiblePaths = null;
     if (Array.isArray(graphData.data)) {
@@ -244,18 +245,19 @@ export function loadGraphDataFromServer(graphData) {
     if (possiblePaths && typeof possiblePaths === 'object') {
         // Save all possible walks
         STATE.possibleWalks = possiblePaths;
-        console.log("possibleWalks", STATE.possibleWalks);
-
         let walks_number_before_filtering = STATE.walks.length;
         // Filter walks to only those matching possible_paths
         STATE.walks = filterWalksByPossiblePaths(STATE.walks, STATE.possibleWalks);
         let walks_number_after_filtering = STATE.walks.length;
 
-        console.log("walks_number_before_filtering", walks_number_before_filtering);
-        console.log("walks_number_after_filtering", walks_number_after_filtering);
     }
 
     setupGraphInteractions();
+
+    // Clear loading state after graph is ready
+    if (cyContainer) {
+        cyContainer.classList.remove("loading");
+    }
 }
 
 // Make loadGraphDataFromServer globally available to avoid circular dependencies
@@ -319,11 +321,48 @@ function initializeResetButton() {
     });
 }
 
+// Show empty state in graph canvas before any graph is loaded
+function initializeEmptyState() {
+    const cyContainer = document.getElementById("cy");
+    if (!cyContainer) return;
+
+    cyContainer.classList.add("empty");
+    // Only add the empty state message if it doesn't already exist
+    if (!cyContainer.querySelector(".graph-empty-state")) {
+        const emptyState = document.createElement("div");
+        emptyState.className = "graph-empty-state";
+        emptyState.innerHTML = `
+            <div class="graph-empty-state-icon">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+            <h3>No Graph Loaded</h3>
+            <p>Upload a JSON or TSG file to visualize your transcript segment graph.</p>
+        `;
+        cyContainer.appendChild(emptyState);
+    }
+}
+
+// Clear empty state when a graph is about to load
+function clearEmptyState() {
+    const cyContainer = document.getElementById("cy");
+    if (!cyContainer) return;
+
+    cyContainer.classList.remove("empty");
+    const emptyState = cyContainer.querySelector(".graph-empty-state");
+    if (emptyState) {
+        emptyState.remove();
+    }
+}
+
 // Initialize on DOM load
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeResetButton);
+    document.addEventListener("DOMContentLoaded", () => {
+        initializeResetButton();
+        initializeEmptyState();
+    });
 } else {
     initializeResetButton();
+    initializeEmptyState();
 }
 
 // Function to get color based on weight
@@ -388,57 +427,6 @@ async function toNumericIdentifier(inputString, length = 10) {
 
 
 /**
- * Convert a string to a hash-based identifier using SHA-256.
- * @param {string} inputString - The string to convert
- * @param {number|null} [length=16] - The desired length of the output identifier. If null, returns the full hash
- * @returns {Promise<string>} A valid identifier string derived from the SHA-256 hash
- * @throws {TypeError} If inputString is not a string or length is not a number/null
- * @throws {ValueError} If length is not positive
- *
- * @example
- * const identifier = await toHashIdentifier("Hello World!");
- * console.log(identifier); // Outputs something like 'a591a6d40bf420'
- */
-async function toHashIdentifier(inputString, length = 16) {
-    // Type checking
-    if (typeof inputString !== "string") {
-        throw new TypeError("Input must be a string");
-    }
-
-    if (
-        length !== null &&
-        (!Number.isInteger(length) || typeof length !== "number")
-    ) {
-        throw new TypeError("Length must be an integer or null");
-    }
-
-    if (length !== null && length <= 0) {
-        throw new Error("Length must be positive");
-    }
-
-    // Create SHA-256 hash
-    const encoder = new TextEncoder();
-    const data = encoder.encode(inputString);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    // Convert buffer to hex string
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-
-    // Take specified length of hash if provided
-    let result = length ? hashHex.slice(0, length) : hashHex;
-
-    // Ensure the identifier starts with a letter (prefix with 'a' if it starts with a number)
-    if (/^[0-9]/.test(result)) {
-        result = "a" + result.slice(1);
-    }
-
-    return result;
-}
-
-/**
  * Generates a unique Aurora ID for a given walk through the graph.
  * @param {Array} walk - Array of graph nodes representing a walk
  * @returns {Promise<string>} A unique identifier for the walk generated using toNumericIdentifier
@@ -458,7 +446,6 @@ async function getWalkAuroraId(walk) {
         .join("-");
 
     // Generate numeric identifier for the walk info
-    console.log(`Generating Aurora ID for walk: ${walkInfo}`);
     const auroraId = await toNumericIdentifier(walkInfo);
     return `TSP${auroraId}`;
 }
@@ -802,24 +789,12 @@ function filterWalkCards(searchValue, auroraIds = []) {
       shouldShow = false;
     }
 
-    // Debug information
-    if (shouldShow && searchValue) {
-      console.log(
-        `Match found: "${searchValue}" in walk ${walkIndex} (${walkText.substring(
-          0,
-          50
-        )}...)`
-      );
-    }
-
     card.style.display = shouldShow ? "" : "none";
 
     if (shouldShow) {
       visibleCardCount++;
     }
   });
-
-  console.log(`Filter results: ${visibleCardCount} walks match the criteria`);
 
   // Update the count of visible walks
   updateVisibleWalksCount();
@@ -877,7 +852,6 @@ function addWalkCardEventListeners() {
       const walkCard = btn.closest(".walk-card");
       const walkIndex = parseInt(walkCard.getAttribute("data-walk-index"), 10);
 
-      console.log(`Highlighting walk at index: ${walkIndex}`);
       if (walkIndex >= 0 && walkIndex < STATE.walks.length) {
         highlightWalk(STATE.walks[walkIndex]);
         // Add visual feedback
@@ -973,7 +947,7 @@ function addWalksStyles() {
             align-items: center;
             justify-content: center;
             padding: 30px 0;
-            color: #6c757d;
+            color: var(--text-secondary, #475569);
         }
 
         .walk-card {
@@ -985,7 +959,7 @@ function addWalksStyles() {
         }
 
         .walk-toggle-btn {
-            color: #212529;
+            color: var(--text-primary, #0f172a);
             text-decoration: none;
             width: 100%;
             text-align: left;
@@ -995,7 +969,7 @@ function addWalksStyles() {
         }
 
         .walk-toggle-btn:hover {
-            color: #0d6efd;
+            color: var(--aurora-primary, #6366f1);
         }
 
         .chevron-icon {
@@ -1008,16 +982,16 @@ function addWalksStyles() {
         }
 
         .aurora-id-container {
-            background: #f8f9fa;
+            background: var(--bg-secondary, #f8fafc);
             padding: 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm, 6px);
             margin-bottom: 10px;
         }
 
         .aurora-id {
             background: transparent;
             font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            color: #6610f2;
+            color: var(--aurora-secondary, #8b5cf6);
         }
 
         .path-visualization {
@@ -1042,16 +1016,16 @@ function addWalksStyles() {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: #6c757d;
+            background-color: var(--text-secondary, #475569);
             margin: 0 5px;
         }
 
         .start-node .node-dot {
-            background-color: #28a745;
+            background-color: var(--success, #10b981);
         }
 
         .end-node .node-dot {
-            background-color: #dc3545;
+            background-color: var(--error, #ef4444);
         }
 
         .node-label {
@@ -1060,13 +1034,13 @@ function addWalksStyles() {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            border: 1px solid #d1d5db;
-            border-radius: 999px;
-            background: #fff;
-            color: #222;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: var(--radius-full, 9999px);
+            background: var(--bg-primary, #ffffff);
+            color: var(--text-primary, #0f172a);
             padding: 4px 14px;
             margin: 0 2px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
             cursor: pointer;
             transition: border 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s, transform 0.1s;
             outline: none;
@@ -1074,27 +1048,27 @@ function addWalksStyles() {
             position: relative;
         }
         .node-label:focus, .node-label:hover {
-            background: #f3f4f6;
-            border-color: #a5b4fc;
-            color: #1d4ed8;
-            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.08);
+            background: var(--bg-tertiary, #f1f5f9);
+            border-color: var(--aurora-primary-light, #818cf8);
+            color: var(--aurora-primary-dark, #4f46e5);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
             transform: scale(1.04);
             z-index: 2;
         }
         .node-label:active {
-            background: #e0e7ff;
-            border-color: #6366f1;
-            color: #3730a3;
+            background: var(--info-light, #dbeafe);
+            border-color: var(--aurora-primary, #6366f1);
+            color: var(--aurora-primary-dark, #4f46e5);
             transform: scale(0.98);
         }
         .node-arrow {
             margin: 0 5px;
-            color: #adb5bd;
+            color: var(--text-tertiary, #94a3b8);
         }
 
         .highlight-walk-btn.active {
-            background-color: #ffc107;
-            border-color: #ffc107;
+            background-color: var(--warning, #f59e0b);
+            border-color: var(--warning, #f59e0b);
         }
     `;
 
@@ -1245,11 +1219,9 @@ function highlightNode(cy, nodeId) {
     const isAlreadyHighlighted = node.hasClass("highlighted");
 
     if (isAlreadyHighlighted) {
-      console.log("Node is already highlighted, clearing highlights");
       // If the node is already highlighted, clear all highlights
       clearNodeHighlights(cy);
     } else {
-      console.log("Highlighting node:", nodeId);
       // Clear any existing highlights first
       clearNodeHighlights(cy);
 
@@ -1281,9 +1253,7 @@ function highlightNode(cy, nodeId) {
 
 // Function to clear all highlighting
 export function clearNodeHighlights(cy) {
-  console.log("Clearing all highlights");
-
-  // Check if cy exists before accessing its elements
+    // Check if cy exists before accessing its elements
   if (!cy) {
     console.warn("Cannot clear highlights: graph object is null");
     return;

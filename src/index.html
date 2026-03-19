@@ -1,279 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!-- <base href="/aurora/"> -->
-  <!-- ref:https://uisual.com/demo/curve/ -->
 
-  <head>
-    <!-- META -->
+<head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="uisual" content="Made with Uisual (uisual.com)" />
-    <meta name="author" content="#" />
-    <meta name="description" content="#" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Yangyang Li" />
+    <meta name="description" content="Aurora - Interactive Transcript Segment Graph visualization for bioinformatics research" />
     <meta name="referrer" content="unsafe-url" />
     <meta name="robots" content="index, follow" />
-    <!-- SPEED -->
-    <link rel="preconnect" href="https://res.cloudinary.com" />
-    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <!-- LINK -->
-    <link rel="me" href="#" />
-    <link rel="canonical" href="#" />
-    <link rel="icon" type="assets/png" href="#" sizes="48x48" />
-    <!-- PERFORMANCE -->
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-    />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
+    <link rel="stylesheet" href="./styles/scss/styles.scss" />
+    <link rel="stylesheet" href="./styles/modern-theme.css" />
+    <link rel="stylesheet" href="./styles/components/footer.css" />
+    <link rel="stylesheet" href="./styles/landing.css" />
 
-    <link rel="preload" as="style" href="./styles/style.css" />
-    <link rel="stylesheet" href="./styles/style.css" />
-    <!-- TITLE -->
-    <title>Aurora: Visulize TSGraph</title>
-  </head>
+    <title>Aurora: Visualize TSGraph</title>
+</head>
 
-  <body>
-    <header role="banner" class="ui-section-header">
-      <div class="ui-layout-container">
-        <div class="ui-section-header__layout ui-layout-flex">
-          <!-- LOGO -->
-
-          <!-- <a href="#" role="link" aria-label="#" class="ui-section-header--logo"> -->
-          <!--     <svg viewBox="0 0 18 18" height="18" width="18" role="img" aria-label="#"> -->
-          <!--         <path fill="#353535" -->
-          <!--             d="M0 0h4.5v9a4.5 4.5 0 109 0V6H18v3A9 9 0 110 9V0zm18 4.5V0h-4.5v4.5H18z" /> -->
-          <!--     </svg> -->
-          <!-- </a> -->
-
-          <!-- HAMBURGER -->
-          <input type="checkbox" id="ui-section-header--menu-id" />
-          <label
-            for="ui-section-header--menu-id"
-            class="ui-section-header--menu-icon"
-          ></label>
-          <!-- MENU -->
-          <nav role="navigation" class="ui-section-header--nav ui-layout-flex">
-            <a
-              href="#"
-              role="link"
-              aria-label="#"
-              class="ui-section-header--nav-link"
-              >Features</a
-            >
-            <a
-              href="#"
-              role="link"
-              aria-label="#"
-              class="ui-section-header--nav-link"
-              >Examples</a
-            >
-            <a
-              href="https://github.com/cauliyang/Aurora"
-              role="link"
-              aria-label="#"
-              class="ui-section-header--nav-link"
-              >About</a
-            >
-          </nav>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-lightning-charge-fill"></i> Aurora
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav gap-2 align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/cauliyang/Aurora" target="_blank"
+                            rel="noopener noreferrer">GitHub</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="nav-link btn btn-sm btn-primary text-white px-3" href="app.html">Launch App</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </div>
-    </header>
-    <main role="main">
-      <section class="ui-section-hero">
-        <div class="ui-layout-container">
-          <div class="ui-section-hero__layout ui-layout-grid ui-layout-grid-2">
-            <!-- COPYWRITING -->
-            <div>
-              <h1>TSGraph Visualization</h1>
-              <p class="ui-text-intro">
-                Aurora is a web application for visualizing Transcript Segment
-                Graph (TSG). This application allows you to upload JSON data
-                representing graphs and visualize them with various layout
-                options.
-              </p>
-              <!-- CTA -->
+    </nav>
 
-              <div class="ui-component-cta ui-layout-flex">
-                <a
-                  href="app.html"
-                  role="link"
-                  aria-label="Go to web application"
-                  class="ui-component-button ui-component-button-normal ui-component-button-primary"
-                  >Get Started</a
-                >
-                <p class="ui-text-note">
-                  <small>more features are coming.</small>
+    <main>
+        <!-- Hero Section -->
+        <section class="landing-hero">
+            <div class="landing-hero-bg"></div>
+            <div class="container position-relative">
+                <div class="row align-items-center min-vh-75">
+                    <div class="col-lg-6">
+                        <h1 class="landing-hero-title">
+                            Visualize Transcript<br />
+                            <span class="landing-gradient-text">Segment Graphs</span>
+                        </h1>
+                        <p class="landing-hero-subtitle">
+                            Aurora is an interactive web application for visualizing Transcript Segment Graphs (TSG).
+                            Upload your data and explore graph structures with powerful layout algorithms,
+                            gene annotation, and walk path analysis.
+                        </p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="app.html" class="btn btn-primary btn-lg landing-btn-glow">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Get Started
+                            </a>
+                            <a href="https://github.com/cauliyang/Aurora" target="_blank" rel="noopener noreferrer"
+                                class="btn btn-outline-light btn-lg">
+                                <i class="bi bi-github me-2"></i>View on GitHub
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                        <img src="./assets/aurora_logo_cropped.png" alt="Aurora Logo"
+                            class="landing-hero-image" loading="lazy" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonial -->
+        <section class="landing-testimonial">
+            <div class="container">
+                <div class="landing-quote-card mx-auto">
+                    <img src="./assets/avatar.jpeg" alt="Yangyang Li" class="landing-avatar" />
+                    <blockquote>
+                        &ldquo;Seeing is believing; visualizing is understanding.&rdquo;
+                    </blockquote>
+                    <p class="landing-quote-author">
+                        <strong>Yangyang Li</strong><br />
+                        <small>Author of Aurora</small>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="landing-features">
+            <div class="container">
+                <h2 class="text-center mb-2">
+                    <span class="landing-gradient-text">Key Features</span>
+                </h2>
+                <p class="text-center text-secondary mb-5">
+                    Powerful tools for bioinformatics graph exploration
                 </p>
-              </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="landing-feature-card">
+                            <div class="landing-feature-icon">
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+                            <h4>Graph Visualization</h4>
+                            <p>Interactive graph visualization with multiple layout algorithms including
+                                dagre, klay, tidytree, and more. Explore your data dynamically.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="landing-feature-card">
+                            <div class="landing-feature-icon">
+                                <i class="bi bi-braces"></i>
+                            </div>
+                            <h4>JSON Editor</h4>
+                            <p>Built-in JSON editor for direct data manipulation. Modify graph structure
+                                on the fly and see changes reflected in real-time.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="landing-feature-card">
+                            <div class="landing-feature-icon">
+                                <i class="bi bi-arrows-angle-expand"></i>
+                            </div>
+                            <h4>Resizable Panels</h4>
+                            <p>Adjust the size of graph, walks, and info panels to fit your workflow.
+                                Fully customizable workspace for efficient analysis.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="landing-feature-card">
+                            <div class="landing-feature-icon">
+                                <i class="fas fa-dna"></i>
+                            </div>
+                            <h4>Gene Annotation</h4>
+                            <p>Exon-level gene annotation with GENCODE data. Precise overlap detection
+                                using efficient binary search and two-pointer algorithms.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- IMAGE -->
-            <img
-              src="./assets/aurora_logo_cropped.png"
-              loading="lazy"
-              alt="#"
-              class="ui-image-half-right"
-            />
-          </div>
-        </div>
-      </section>
-      <section class="ui-section-testimonial">
-        <div class="ui-layout-container">
-          <div class="ui-layout-column-4 ui-layout-column-center">
-            <img
-              src="./assets/avatar.jpeg"
-              alt="#"
-              class="ui-section-testimonial--avatar"
-            />
-            <p class="ui-section-testimonial--quote ui-text-intro">
-              &ldquo;Seeing is believing; visualizing is understanding.&rdquo;
-            </p>
-            <p class="ui-section-testimonial--author">
-              <strong>Yangyang Li</strong><br /><small class="ui-text-note"
-                >Author of Aurora</small
-              >
-            </p>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="ui-section-faq">
-        <div class="ui-layout-container">
-          <div class="ui-section-faq__layout ui-layout-grid ui-layout-grid-2">
-            <div>
-              <h4 class="ui-component-list--item ui-component-list--item-check">
-                Graph Visualization
-              </h4>
-              The main attraction of our project is the dynamic graph
-              visualization feature. This feature allows users to visualize
-              their data as interactive graphs, offering insights that can be
-              challenging to discern from raw data.
-              <p class="ui-section-faq--answer"></p>
+        <!-- CTA Section -->
+        <section class="landing-cta">
+            <div class="container text-center">
+                <div class="landing-cta-card mx-auto">
+                    <h2>Ready to explore your data?</h2>
+                    <p class="mb-4">
+                        Upload a JSON or TSG file and start visualizing transcript segment graphs in seconds.
+                    </p>
+                    <a href="app.html" class="btn btn-primary btn-lg landing-btn-glow">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Launch Aurora
+                    </a>
+                </div>
             </div>
-            <div>
-              <h4 class="ui-component-list--item ui-component-list--item-check">
-                JSON Editor
-              </h4>
-              <p class="ui-section-faq--answer">
-                To streamline the data manipulation process, our application
-                incorporates a built-in JSON editor. This editor allows users to
-                modify their data directly from the platfor.
-              </p>
-            </div>
-            <div>
-              <h4 class="ui-component-list--item ui-component-list--item-check">
-                Resizable Panels
-              </h4>
-              <p class="ui-section-faq--answer">
-                To cater to different visualization needs, our project
-                introduces resizable panels. Users can adjust the size of the
-                graph, walks, and info panels according to their preferences..
-              </p>
-            </div>
-            <div>
-              <h4 class="ui-component-list--item ui-component-list--item-check">
-                Interactive Tooltips
-              </h4>
-              <p class="ui-section-faq--answer">
-                To provide additional details without cluttering the interface,
-                our project incorporates interactive tooltips. These tooltips
-                display information about graph nodes and edges upon hovering.
-              </p>
-            </div>
-          </div>
-          <p class="ui-section-faq--note">
-            Still have questions?
-            <a href="#" role="link" aria-label="#">Contact us</a>.
-          </p>
-        </div>
-      </section>
-      <section class="ui-section-close">
-        <div class="ui-layout-container">
-          <div class="ui-section-close__layout ui-layout-flex">
-            <div>
-              <h2>Ready to start?</h2>
-              <p class="ui-text-intro">
-                Lorem ipsum dolor sit amet consectetur.
-              </p>
-            </div>
-            <!-- CTA -->
-            <div class="ui-component-cta ui-layout-flex">
-              <a
-                href="#"
-                role="link"
-                aria-label="#"
-                class="ui-component-button ui-component-button-normal ui-component-button-primary"
-                >Get Started</a
-              >
-              <p class="ui-text-note">
-                <small>More features are coming.</small>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
     </main>
-    <footer role="contentinfo" class="ui-section-footer">
-      <div class="ui-layout-container">
-        <div class="ui-section-footer__layout ui-layout-flex">
-          <!-- COPYRIGHT -->
-          <p class="ui-section-footer--copyright ui-text-note">
-            <small>&copy; 2023 Yangyang Li</small>
-          </p>
-          <!-- MENU -->
-          <a href="https://twitter.com/yangyangliz5" role="link" aria-label="#">
-            <svg
-              viewBox="0 0 24 24"
-              height="16"
-              width="16"
-              fill="none"
-              stroke="#AEAEAE"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              role="img"
-              aria-label="#"
-            >
-              <path
-                d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
-              />
-            </svg>
-          </a>
-          <a
-            href="https://github.com/cauliyang/Aurora"
-            role="link"
-            aria-label="#"
-          >
-            <i class="fab fa-github"></i>
-          </a>
-          <a href="http://yangyangli.top" role="link" aria-label="#">
-            <svg
-              viewBox="0 0 24 24"
-              height="16"
-              width="16"
-              fill="none"
-              stroke="#AEAEAE"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              role="img"
-              aria-label="#"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path
-                d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"
-              />
-            </svg>
-          </a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center py-4">
+            <div class="mb-3">
+                <span class="fw-bold">Aurora</span>
+                <span class="mx-2 opacity-50">&mdash;</span>
+                <span class="text-light opacity-75">Interactive Transcript Segment Graph Visualization</span>
+            </div>
+            <div class="d-flex justify-content-center gap-4 mb-3">
+                <a href="https://github.com/cauliyang/aurora" class="text-light fs-5" target="_blank" rel="noopener" title="GitHub">
+                    <i class="bi bi-github"></i>
+                </a>
+                <a href="https://yangyangli.top" class="text-light fs-5" target="_blank" rel="noopener" title="Website">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <a href="https://twitter.com/yangyangliz5" class="text-light fs-5" target="_blank" rel="noopener" title="Twitter">
+                    <i class="bi bi-twitter"></i>
+                </a>
+            </div>
+            <p class="mb-0 small opacity-50">&copy; 2026 Yangyang Li</p>
         </div>
-      </div>
     </footer>
-  </body>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+</body>
+
 </html>

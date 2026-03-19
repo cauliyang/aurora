@@ -6,136 +6,125 @@
 class HelpGuide {
     constructor() {
         this.helpSteps = [
-            // Panel help messages first
+            // Panels overview
             {
                 target: "#cy",
-                title: "Graph Visualization Panel",
-                content: "This is the main graph visualization area. Here you can interact with your graph: zoom in/out, pan, select nodes and edges, and visualize your data structure. You can click and drag nodes to rearrange them manually.",
+                title: "Graph Canvas",
+                content: "Your main workspace. Zoom, pan, click nodes and edges, or drag them to rearrange. Upload a JSON or TSG file to get started.",
                 placement: "left",
             },
             {
                 target: "#info",
-                title: "Information Panel",
-                content: "When you select a node or edge in the graph, detailed information about that element will be displayed here. This panel shows properties, metrics, and other attributes associated with the selected element.",
+                title: "Details Panel",
+                content: "Click any node or edge to see its properties here — coordinates, weight, gene annotations, and more.",
                 placement: "left",
             },
             {
                 target: "#walks",
-                title: "Graph Walks Panel",
-                content: "This panel displays all walks (paths) in your graph. You can search for specific walks, highlight them in the graph visualization, and upload Aurora IDs for batch searching. Walks provide important connectivity information in your graph structure.",
+                title: "Walks Panel",
+                content: "Lists all discovered paths through your graph. Search, highlight, or batch-filter walks by Aurora ID.",
                 placement: "left",
             },
 
-            // Button help messages next
+            // Toolbar — file operations
             {
-                target: "#toggleMaximize",
-                title: "Toggle Fullscreen",
-                content: "Click this button to enter or exit fullscreen mode, giving you more space to work with your graph.",
-                placement: "bottom",
-            },
-            {
-                target: "#uploadForm",
-                title: "Upload Files",
-                content: "Upload your JSON or TSG files here to visualize your graph data.",
+                target: "#uploadBtn",
+                title: "Upload File",
+                content: "Load a JSON or TSG file to visualize a transcript segment graph.",
                 placement: "bottom",
             },
             {
                 target: "#captureGraph",
-                title: "Capture Graph",
-                content: "Save your current graph view as a PNG image to use in presentations or documentation.",
+                title: "Export Image",
+                content: "Save the current graph view as a PNG image.",
+                placement: "bottom",
+            },
+
+            // Toolbar — view controls
+            {
+                target: "#toggleMaximize",
+                title: "Fullscreen",
+                content: "Expand the graph canvas to fill the entire screen.",
                 placement: "bottom",
             },
             {
                 target: "#hiddenLabel",
                 title: "Toggle Labels",
-                content: "Show or hide node and edge labels to customize your graph visualization.",
+                content: "Show or hide node names and edge weights on the graph.",
                 placement: "bottom",
             },
             {
                 target: "#toggleTooltip",
                 title: "Toggle Tooltips",
-                content: "Enable or disable tooltips that show information when hovering over graph elements.",
+                content: "Turn hover tooltips on or off for graph elements.",
                 placement: "bottom",
             },
             {
                 target: "#resetGraph",
-                title: "Reset Graph",
-                content: "Reset the graph layout to its original state.",
+                title: "Reset Layout",
+                content: "Re-run the layout algorithm to reposition all nodes.",
                 placement: "bottom",
             },
             {
                 target: "#clearHighlights",
                 title: "Clear Highlights",
-                content: "Remove all highlights from nodes in the graph.",
-                placement: "bottom",
-            },
-            {
-                target: "#geneAnnotationBtn",
-                title: "Gene Annotations",
-                content: "Add biological context to your graph by annotating nodes with gene information.",
-                placement: "bottom",
-            },
-            {
-                target: "#layoutSelect",
-                title: "Layout Selection",
-                content: "Choose different layout algorithms to organize your graph in various ways.",
+                content: "Remove all active node and walk highlights.",
                 placement: "bottom",
             },
 
-            // Graph selection and filtering parameters
+            // Toolbar — layout & graph selection
+            {
+                target: "#layoutSelect",
+                title: "Layout Algorithm",
+                content: "Switch between layout algorithms — dagre, klay, tidytree, and more — to arrange the graph differently.",
+                placement: "bottom",
+            },
             {
                 target: "#graphSelectorContainer",
                 title: "Graph Selector",
-                content: "If your data contains multiple graphs, you can switch between them using this dropdown menu. Each graph represents a different dataset or view that you can analyze independently.",
-                placement: "bottom",
-            },
-            {
-                target: "#minEdgeWeight",
-                title: "Minimum Edge Weight",
-                content: "Filter the graph by setting the minimum weight for edges. Edges with weights below this value will be hidden, allowing you to focus on the strongest connections in your graph.",
-                placement: "bottom",
-            },
-            {
-                target: "#MinDepth",
-                title: "Minimum Depth",
-                content: "Set the minimum depth for graph traversal. This limits the graph to only show paths that have at least this many edges, helping to filter out shallow or less significant paths.",
-                placement: "bottom",
-            },
-            {
-                target: "#MaxDepth",
-                title: "Maximum Depth",
-                content: "Set the maximum depth for graph traversal. This prevents the graph from showing excessively long paths, making the visualization more manageable and focused on the most relevant connections.",
+                content: "When a TSG file contains multiple graphs, use this dropdown to switch between them.",
                 placement: "bottom",
             },
 
+            // Toolbar — filters (consolidated)
+            {
+                target: ".toolbar-filter-group",
+                title: "Graph Filters",
+                content: "Control walk discovery: set a minimum edge weight, and minimum/maximum path depth to focus on the most relevant walks.",
+                placement: "bottom",
+            },
+
+            // Toolbar — tools
+            {
+                target: "#geneAnnotationBtn",
+                title: "Gene Annotations",
+                content: "Annotate graph nodes with gene names and exon data from GENCODE.",
+                placement: "bottom",
+            },
             {
                 target: "#openJsonEditor",
                 title: "JSON Editor",
-                content: "Open the JSON editor to view or modify the underlying graph data structure.",
-                placement: "left",
-            },
-            {
-                target: "#redirectToIgv",
-                title: "IGV Browser",
-                content: "Launch the Integrative Genomics Viewer for detailed genomic visualization.",
+                content: "View or edit the raw graph JSON data in a tree, code, or form view.",
                 placement: "left",
             },
             {
                 target: "#showNodeRanking",
                 title: "Node Ranking",
-                content: "View nodes ranked by importance based on graph metrics.",
+                content: "Rank nodes by degree, centrality, or other graph metrics.",
                 placement: "left",
             },
+
+            // Walks panel — search
             {
                 target: "#walkSearch",
                 title: "Search Walks",
-                content: "Search for specific walks or Aurora IDs in the graph.",
+                content: "Type to filter walks by node IDs or Aurora IDs.",
                 placement: "top",
             },
             {
                 target: "#uploadAuroraIds",
                 title: "Batch Search",
-                content: "Upload a list of Aurora IDs for batch searching across your graph.",
+                content: "Upload a .txt file of Aurora IDs to filter walks in bulk.",
                 placement: "top",
             },
         ];
@@ -172,10 +161,10 @@ class HelpGuide {
             <button class="help-guide-welcome-close">&times;</button>
           </div>
           <div class="help-guide-welcome-body">
-            <p>We've added an interactive help guide to help you learn how to use Aurora.</p>
-            <p class="mb-2">Click the Help link in the navbar to start the interactive tour.</p>
+            <p>New here? Take a quick interactive tour to learn the interface.</p>
+            <p class="mb-2 small text-muted">Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate, <kbd>Esc</kbd> to close.</p>
             <button class="btn btn-sm btn-primary w-100" id="startWelcomeHelpBtn">
-              <i class="bi bi-question-circle me-2"></i> Start Help Guide
+              <i class="bi bi-rocket-takeoff me-2"></i> Start Tour
             </button>
           </div>
         </div>
@@ -201,8 +190,8 @@ class HelpGuide {
           display: flex;
           align-items: center;
           padding: 12px 15px;
-          background-color: #f8f9fa;
-          border-bottom: 1px solid #dee2e6;
+          background-color: var(--bg-secondary, #f8f9fa);
+          border-bottom: 1px solid var(--border-color, #dee2e6);
         }
 
         .help-guide-welcome-close {
@@ -212,7 +201,7 @@ class HelpGuide {
           font-size: 1.5rem;
           line-height: 1;
           cursor: pointer;
-          color: #6c757d;
+          color: var(--text-secondary, #475569);
         }
 
         .help-guide-welcome-body {
@@ -335,68 +324,6 @@ class HelpGuide {
             this.overlay = document.createElement("div");
             this.overlay.className = "help-guide-overlay";
             document.body.appendChild(this.overlay);
-
-            // Add CSS for overlay
-            const style = document.createElement("style");
-            style.textContent = `
-                .help-guide-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    z-index: 9998;
-                    pointer-events: none;
-                }
-
-                .help-guide-tooltip {
-                    position: absolute;
-                    z-index: 9999;
-                    background-color: white;
-                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-                    border-radius: 4px;
-                    padding: 15px;
-                    max-width: 300px;
-                    pointer-events: auto;
-                }
-
-                .help-guide-tooltip h5 {
-                    margin-top: 0;
-                    color: #007bff;
-                }
-
-                .help-guide-tooltip p {
-                    margin-bottom: 10px;
-                }
-
-                .help-guide-buttons {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 10px;
-                    margin-top: 10px;
-                }
-
-                .help-guide-nav-group {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-
-                .help-guide-step-indicator {
-                    min-width: 70px;
-                    text-align: center;
-                    font-weight: 500;
-                }
-
-                .target-highlight {
-                    position: relative;
-                    z-index: 9999;
-                    pointer-events: auto;
-                }
-            `;
-            document.head.appendChild(style);
         }
 
         // Create tooltip if it doesn't exist
@@ -405,13 +332,45 @@ class HelpGuide {
             this.tooltip.className = "help-guide-tooltip";
             document.body.appendChild(this.tooltip);
         }
+
+        // Add keyboard event listeners
+        this.addKeyboardListeners();
+    }
+
+    /**
+     * Add keyboard navigation support
+     */
+    addKeyboardListeners() {
+        if (this.keyboardHandler) return; // Already added
+
+        this.keyboardHandler = (event) => {
+            if (!this.isGuideActive) return;
+
+            switch (event.key) {
+                case "ArrowLeft":
+                    event.preventDefault();
+                    this.previousStep();
+                    break;
+                case "ArrowRight":
+                case "Enter":
+                    event.preventDefault();
+                    this.nextStep();
+                    break;
+                case "Escape":
+                    event.preventDefault();
+                    this.endGuide();
+                    break;
+            }
+        };
+
+        document.addEventListener("keydown", this.keyboardHandler);
     }
 
     /**
      * Show a specific step in the guide
      * @param {number} index - The index of the step to show
      */
-    showStep(index) {
+    showStep(index, direction = 1) {
         // Ensure index is valid
         if (index < 0 || index >= this.helpSteps.length) {
             this.endGuide();
@@ -424,9 +383,19 @@ class HelpGuide {
         const step = this.helpSteps[index];
         const targetElement = document.querySelector(step.target);
 
-        if (!targetElement) {
-            console.error(`Target element ${step.target} not found`);
-            this.nextStep();
+        // Skip missing or hidden elements (e.g., graphSelectorContainer with d-none)
+        const shouldSkip = !targetElement || (
+            targetElement.offsetParent === null &&
+            !targetElement.matches('#cy') &&
+            (targetElement.classList.contains('d-none') || getComputedStyle(targetElement).display === 'none')
+        );
+        if (shouldSkip) {
+            const nextIndex = index + direction;
+            if (nextIndex >= 0 && nextIndex < this.helpSteps.length) {
+                this.showStep(nextIndex, direction);
+            } else {
+                this.endGuide();
+            }
             return;
         }
 
@@ -438,8 +407,14 @@ class HelpGuide {
             // Position tooltip near target after scrolling
             this.positionTooltip(targetElement, step.placement);
 
-            // Update tooltip content
+            // Calculate progress percentage
+            const progress = ((index + 1) / this.helpSteps.length) * 100;
+
+            // Update tooltip content with progress bar and keyboard shortcuts
             this.tooltip.innerHTML = `
+        <div class="help-guide-progress">
+          <div class="help-guide-progress-bar" style="width: ${progress}%"></div>
+        </div>
         <h5>${step.title}</h5>
         <p>${step.content}</p>
         <div class="help-guide-buttons">
@@ -450,7 +425,7 @@ class HelpGuide {
               <i class="bi bi-chevron-left"></i> Previous
             </button>
             <span class="help-guide-step-indicator">${index + 1} of ${this.helpSteps.length}</span>
-            <button id="helpGuideNext" class="btn btn-sm btn-outline-primary">
+            <button id="helpGuideNext" class="btn btn-sm btn-primary">
               ${
                 index === this.helpSteps.length - 1
                   ? 'Finish <i class="bi bi-check-lg"></i>'
@@ -462,7 +437,21 @@ class HelpGuide {
             <i class="bi bi-x-lg"></i> Close
           </button>
         </div>
+        <div class="help-guide-shortcuts">
+          <span><kbd>←</kbd> <kbd>→</kbd> Navigate</span>
+          <span><kbd>Enter</kbd> Next</span>
+          <span><kbd>Esc</kbd> Close</span>
+        </div>
       `;
+
+            // Set placement attribute for arrow positioning
+            this.tooltip.setAttribute('data-placement', step.placement);
+
+            // Add step transition animation
+            this.tooltip.classList.add('step-transition');
+            setTimeout(() => {
+                this.tooltip.classList.remove('step-transition');
+            }, 300);
 
             // Add event listeners to navigation buttons
             document.getElementById("helpGuidePrev").addEventListener("click", () => {
@@ -631,7 +620,7 @@ class HelpGuide {
 
         // Move to previous step if not at first step
         if (this.currentStepIndex > 0) {
-            this.showStep(this.currentStepIndex - 1);
+            this.showStep(this.currentStepIndex - 1, -1);
         }
     }
 
@@ -659,6 +648,12 @@ class HelpGuide {
         if (this.tooltip) {
             document.body.removeChild(this.tooltip);
             this.tooltip = null;
+        }
+
+        // Remove keyboard event listener
+        if (this.keyboardHandler) {
+            document.removeEventListener("keydown", this.keyboardHandler);
+            this.keyboardHandler = null;
         }
 
         // Reset current step index for next time

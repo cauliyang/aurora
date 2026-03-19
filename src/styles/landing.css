@@ -1,0 +1,293 @@
+/**
+ * Landing Page Styles for Aurora
+ * Complements modern-theme.css with landing-specific sections
+ */
+
+
+/* ===========================
+   GENERAL
+   =========================== */
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    overflow-x: hidden;
+}
+
+
+/* ===========================
+   HERO SECTION
+   =========================== */
+
+.landing-hero {
+    position: relative;
+    padding: 6rem 0 4rem;
+    overflow: hidden;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.landing-hero-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    z-index: -2;
+}
+
+.landing-hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.3) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(6, 182, 212, 0.2) 0%, transparent 50%);
+    animation: hero-aurora 20s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes hero-aurora {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scale(1) translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05) translateY(-10px);
+    }
+}
+
+.landing-hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+}
+
+.landing-gradient-text {
+    background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.landing-hero-subtitle {
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 540px;
+}
+
+.landing-hero-image {
+    max-width: 380px;
+    width: 100%;
+    filter: drop-shadow(0 20px 40px rgba(99, 102, 241, 0.3));
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.landing-btn-glow {
+    background: var(--aurora-gradient-accent);
+    border: none;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    transition: all var(--transition-base);
+}
+
+.landing-btn-glow:hover {
+    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+    transform: translateY(-2px);
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+
+/* ===========================
+   TESTIMONIAL
+   =========================== */
+
+.landing-testimonial {
+    padding: 5rem 0;
+    background: var(--bg-secondary);
+}
+
+.landing-quote-card {
+    max-width: 600px;
+    text-align: center;
+    padding: 2.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.landing-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--aurora-primary-light);
+    margin-bottom: 1.5rem;
+}
+
+.landing-quote-card blockquote {
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.landing-quote-author {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+
+/* ===========================
+   FEATURES
+   =========================== */
+
+.landing-features {
+    padding: 5rem 0;
+    background: var(--bg-primary);
+}
+
+.landing-feature-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem;
+    height: 100%;
+    transition: all var(--transition-base);
+    text-align: center;
+}
+
+.landing-feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--aurora-primary-light);
+}
+
+.landing-feature-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    background: var(--aurora-gradient-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.landing-feature-card h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.landing-feature-card p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* ===========================
+   CTA SECTION
+   =========================== */
+
+.landing-cta {
+    padding: 5rem 0;
+    background: var(--bg-secondary);
+}
+
+.landing-cta-card {
+    max-width: 650px;
+    padding: 3rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.landing-cta-card h2 {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.landing-cta-card p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 991px) {
+    .landing-hero {
+        padding: 4rem 0 3rem;
+        min-height: auto;
+    }
+
+    .landing-hero-title {
+        font-size: 2.25rem;
+    }
+
+    .landing-hero-image {
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 575px) {
+    .landing-hero-title {
+        font-size: 1.85rem;
+    }
+
+    .landing-hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .landing-feature-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .landing-cta-card {
+        padding: 2rem 1.5rem;
+    }
+}
+
+
+/* ===========================
+   ACCESSIBILITY
+   =========================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-hero-bg::before,
+    .landing-hero-image {
+        animation: none;
+    }
+
+    .landing-feature-card:hover {
+        transform: none;
+    }
+}
