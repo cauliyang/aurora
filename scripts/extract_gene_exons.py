@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
 """
-Extract protein-coding gene exons from a GENCODE GTF file.
+Extract protein-coding gene exons from a GENCODE or NCBI RefSeq GTF file.
 
-Reads a GENCODE GTF (optionally gzipped), extracts all exon records for
+Reads a GTF (optionally gzipped), extracts all exon records for
 protein-coding genes, merges overlapping/adjacent exon intervals across
 all transcripts of each gene (union), and outputs a tab-delimited file
 compatible with Aurora's gene annotation system.
+
+Supports two GTF flavours (auto-detected):
+
+  - **GENCODE**: exon lines carry ``gene_type "protein_coding"`` so a
+    single-pass extraction suffices.
+  - **NCBI RefSeq** (e.g. GRCh38.p14): only ``gene`` feature lines carry
+    ``gene_biotype "protein_coding"``; exon lines do not.  A two-pass
+    approach is used: first collect the set of protein-coding gene IDs
+    from ``gene`` lines, then extract exons whose ``gene_id`` is in that
+    set.
 
 Output format (7 columns, tab-delimited):
     gene_id  chromosome  start  end  strand  gene_name  exons
@@ -16,8 +26,9 @@ Where `exons` is a comma-separated list of merged, sorted intervals:
 Usage:
     python extract_gene_exons.py <input.gtf[.gz]> <output.txt>
 
-Example:
+Examples:
     python extract_gene_exons.py data/gencode.v49.basic.annotation.gtf.gz src/assets/genes.txt
+    python extract_gene_exons.py data/GRCh38.p14.gtf.gz src/assets/genes.txt
 """
 
 import gzip
@@ -70,8 +81,68 @@ def strip_version(gene_id):
     return gene_id.split(".")[0]
 
 
-def extract_protein_coding_exons(gtf_path):
-    """Parse a GENCODE GTF file and extract exon intervals for protein-coding genes.
+def detect_gtf_format(gtf_path):
+    """Detect whether a GTF file is GENCODE or NCBI RefSeq.
+
+    Inspects header comment lines for known annotations, then falls back
+    to checking whether the first data line uses ``gene_type`` (GENCODE)
+    or ``gene_biotype`` (RefSeq).
+
+    Returns ``"gencode"`` or ``"refseq"``.
+    """
+    opener = gzip.open if gtf_path.endswith(".gz") else open
+    with opener(gtf_path, "rt") as f:
+        for line in f:
+            if line.startswith("#"):
+                if "NCBI RefSeq" in line or "annotation-source NCBI" in line:
+                    return "refseq"
+                if "GENCODE" in line or "gencodegenes.org" in line:
+                    return "gencode"
+                continue
+            # Reached data lines — check attribute style
+            fields = line.rstrip("\n").split("\t")
+            if len(fields) >= 9:
+                if "gene_type" in fields[8]:
+                    return "gencode"
+                if "gene_biotype" in fields[8]:
+                    return "refseq"
+            break
+    # Default to gencode for backward compatibility
+    return "gencode"
+
+
+def collect_protein_coding_gene_ids(gtf_path):
+    """Scan ``gene`` feature lines in a RefSeq GTF and return the set of
+    ``gene_id`` values that have ``gene_biotype "protein_coding"``.
+
+    This is the first pass of the two-pass RefSeq extraction strategy.
+    """
+    opener = gzip.open if gtf_path.endswith(".gz") else open
+    pc_genes = set()
+    with opener(gtf_path, "rt") as f:
+        for line in f:
+            if line.startswith("#"):
+                continue
+            fields = line.rstrip("\n").split("\t")
+            if len(fields) < 9:
+                continue
+            if fields[2] != "gene":
+                continue
+            attrs = parse_gtf_attributes(fields[8])
+            if attrs.get("gene_biotype") == "protein_coding":
+                pc_genes.add(attrs.get("gene_id", ""))
+    print(f"  Found {len(pc_genes)} protein-coding gene IDs (first pass)")
+    return pc_genes
+
+
+def extract_protein_coding_exons(gtf_path, gtf_format="gencode", pc_gene_ids=None):
+    """Parse a GTF file and extract exon intervals for protein-coding genes.
+
+    For GENCODE GTFs, filters exon lines directly via
+    ``gene_type == "protein_coding"``.
+
+    For RefSeq GTFs, filters exon lines by checking whether the ``gene_id``
+    belongs to *pc_gene_ids* (pre-collected from ``gene`` feature lines).
 
     Returns a dict:
         gene_key -> {
@@ -82,7 +153,7 @@ def extract_protein_coding_exons(gtf_path):
             'exons': [(start, end), ...]  # raw, un-merged
         }
 
-    gene_key is (stripped_gene_id, chromosome, strand) to handle edge cases.
+    gene_key is (gene_id, chromosome, strand) to handle edge cases.
     """
     opener = gzip.open if gtf_path.endswith(".gz") else open
 
@@ -103,16 +174,25 @@ def extract_protein_coding_exons(gtf_path):
                 continue
 
             attrs = parse_gtf_attributes(fields[8])
-            gene_type = attrs.get("gene_type", "")
-            if gene_type != "protein_coding":
-                continue
+
+            # --- Filter to protein-coding genes ---
+            if gtf_format == "gencode":
+                if attrs.get("gene_type", "") != "protein_coding":
+                    continue
+                gene_id = strip_version(attrs.get("gene_id", ""))
+                gene_name = attrs.get("gene_name", gene_id)
+            else:  # refseq
+                gene_id = attrs.get("gene_id", "")
+                if pc_gene_ids is not None and gene_id not in pc_gene_ids:
+                    continue
+                # RefSeq uses the "gene" attribute for the symbol; gene_id
+                # is already the symbol, so use it as both id and name.
+                gene_name = attrs.get("gene", gene_id)
 
             chrom = fields[0]
             start = int(fields[3])
             end = int(fields[4])
             strand = fields[6]
-            gene_id = strip_version(attrs.get("gene_id", ""))
-            gene_name = attrs.get("gene_name", gene_id)
 
             key = (gene_id, chrom, strand)
             if key not in genes:
@@ -191,6 +271,7 @@ def main():
             f"Example: {sys.argv[0]} data/gencode.v49.basic.annotation.gtf.gz"
             " src/assets/genes.txt"
         )
+        print(f"         {sys.argv[0]} data/GRCh38.p14.gtf.gz src/assets/genes.txt")
         sys.exit(1)
 
     input_path = sys.argv[1]
@@ -200,8 +281,18 @@ def main():
         print(f"Error: Input file '{input_path}' not found.")
         sys.exit(1)
 
+    # Auto-detect GTF format
+    gtf_format = detect_gtf_format(input_path)
+    print(f"Detected GTF format: {gtf_format}")
+
+    # For RefSeq, first pass to collect protein-coding gene IDs
+    pc_gene_ids = None
+    if gtf_format == "refseq":
+        print("First pass: collecting protein-coding gene IDs...")
+        pc_gene_ids = collect_protein_coding_gene_ids(input_path)
+
     print(f"Extracting protein-coding gene exons from: {input_path}")
-    genes = extract_protein_coding_exons(input_path)
+    genes = extract_protein_coding_exons(input_path, gtf_format, pc_gene_ids)
 
     print("Merging exon intervals per gene...")
     rows = build_gene_table(genes)
@@ -215,6 +306,7 @@ def main():
     file_size = os.path.getsize(output_path)
 
     print(f"\nSummary:")
+    print(f"  GTF format: {gtf_format}")
     print(f"  Genes: {len(rows)}")
     print(f"  Total merged exon intervals: {total_exon_intervals}")
     print(f"  Average exons per gene: {avg_exons:.1f}")
