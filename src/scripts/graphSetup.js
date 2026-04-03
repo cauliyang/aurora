@@ -166,21 +166,4 @@ export function initializeGraph(graphData) {
     dfs(sourceNode, [], sinkNodes);
   });
 
-  // Make sure displayWalks is available to the event handlers
-  if (
-    typeof window !== "undefined" &&
-    typeof window.displayWalks === "undefined" &&
-    typeof displayWalks === "function"
-  ) {
-    window.displayWalks = displayWalks;
-  }
-
-  // Make sure handleAuroraIdsFileUpload is available to the event handlers
-  if (
-    typeof window !== "undefined" &&
-    typeof window.handleAuroraIdsFileUpload === "undefined" &&
-    typeof handleAuroraIdsFileUpload === "function"
-  ) {
-    window.handleAuroraIdsFileUpload = handleAuroraIdsFileUpload;
-  }
 }

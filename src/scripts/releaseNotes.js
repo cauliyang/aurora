@@ -5,27 +5,23 @@
 
 // Get release notes from the latest version in the CHANGELOG
 const RELEASE_NOTES = {
-  version: "1.1.0",
-  date: "2025-04-08",
+  version: "1.2.0",
+  date: "2026-03-12",
   features: [
-    "Node ranking by property, degree, and centrality",
-    "Clear highlights button functionality",
-    "Enhanced tooltip functionality with improved styling",
-    "Improved walks panel with advanced search functionality",
-    "Gene annotation functionality and enhanced graph data structure",
-    "Global alert utility for system notifications",
-    "Bootstrap integration for improved styling",
-    "Enhanced gene file upload functionality and handling",
-    "Support for raw text file transformation",
-    "Improved JSON editor with mode selection and keyboard shortcuts",
-    "Aurora IDs file upload functionality and enhanced walk filtering",
+    "Modernized UI with Aurora glassmorphism theme and CSS variable design system",
+    "Redesigned landing page, info panel, toolbar, and compact footer",
+    "Improved HTML semantics and accessibility (ARIA labels, keyboard navigation)",
+    "Unified icon system with Bootstrap Icons across the entire app",
+    "Interactive help guide with step-by-step tour and keyboard shortcuts",
+    "Consistent color theming via Aurora CSS variables (no more hardcoded colors)",
   ],
   fixes: [
-    "Improved highlightNode function to handle existing highlights and node not found errors",
-    "Updated label data attributes for consistency",
-    "Enhanced walk sorting logic",
-    "Sorted overlapping genes by overlap percentage",
-    "Various UI and styling improvements",
+    "Fixed upload button unresponsive due to CSS overflow clipping",
+    "Fixed broken optional chaining syntax across event handlers",
+    "Fixed memory leaks in exon modal and graph selector listeners",
+    "Fixed global CSS leaks affecting h3 styles and container padding",
+    "Fixed @keyframes animation conflicts between stylesheets",
+    "Removed ~1,500 lines of dead code and ~50 debug console.log statements",
   ],
 };
 
@@ -71,7 +67,7 @@ function showReleaseNotes() {
     modal.innerHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
+                    <div class="modal-header text-white" style="background: var(--aurora-gradient-accent)">
                         <h5 class="modal-title" id="releaseNotesModalLabel">
                             <i class="bi bi-lightning-charge-fill me-2"></i>
                             Aurora ${RELEASE_NOTES.version} - Release Notes

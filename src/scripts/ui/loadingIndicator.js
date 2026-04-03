@@ -212,7 +212,7 @@ class LoadingIndicator {
             }
 
             .loading-spinner circle {
-                stroke: #007bff;
+                stroke: var(--aurora-primary, #6366f1);
                 stroke-linecap: round;
                 stroke-dasharray: 1, 150;
                 stroke-dashoffset: 0;
@@ -229,7 +229,7 @@ class LoadingIndicator {
                 width: 12px;
                 height: 12px;
                 border-radius: 50%;
-                background: #007bff;
+                background: var(--aurora-primary, #6366f1);
                 animation: loadingBounce 1.4s infinite ease-in-out both;
             }
 
@@ -252,7 +252,7 @@ class LoadingIndicator {
 
             .loading-progress-bar {
                 height: 100%;
-                background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+                background: linear-gradient(90deg, var(--aurora-primary, #6366f1) 0%, var(--aurora-primary-dark, #4f46e5) 100%);
                 border-radius: 2px;
                 transition: width 0.3s ease;
                 width: 0%;
