@@ -5,7 +5,7 @@ Extract protein-coding gene exons from a GENCODE or NCBI RefSeq GTF file.
 Reads a GTF (optionally gzipped), extracts all exon records for
 protein-coding genes, merges overlapping/adjacent exon intervals across
 all transcripts of each gene (union), and outputs a tab-delimited file
-compatible with Aurora's gene annotation system.
+compatible with GTAViz's gene annotation system.
 
 Supports two GTF flavours (auto-detected):
 

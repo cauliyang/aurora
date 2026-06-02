@@ -1,6 +1,6 @@
 /**
  * helpGuide.js
- * A module to manage a step-by-step help guide for the Aurora application
+ * A module to manage a step-by-step help guide for the GTAViz application
  */
 
 class HelpGuide {
@@ -157,7 +157,7 @@ class HelpGuide {
         <div class="help-guide-welcome-toast">
           <div class="help-guide-welcome-header">
             <i class="bi bi-question-circle text-primary me-2"></i>
-            <strong>Welcome to Aurora!</strong>
+            <strong>Welcome to GTAViz!</strong>
             <button class="help-guide-welcome-close">&times;</button>
           </div>
           <div class="help-guide-welcome-body">

@@ -1,7 +1,7 @@
-# Aurora
+# GTAViz
 
 <p align="center">
-  <img src="src/assets/aurora_logo_cropped.png" alt="Aurora Logo" width="200" />
+  <img src="src/assets/aurora_logo_cropped.png" alt="GTAViz Logo" width="200" />
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 - **Node Ranking** — Rank nodes by degree, centrality, or custom properties
 - **Image Export** — Save the current graph view as a PNG image
 - **Interactive Help Guide** — Step-by-step tour with keyboard navigation (arrow keys, Esc)
-- **Modern UI** — Glassmorphism theme with Aurora CSS variable design system
+- **Modern UI** — Glassmorphism theme with a cohesive CSS variable design system
 
 ## Getting Started
 
@@ -80,7 +80,7 @@ Outputs to `dist/` with public URL `/aurora/`.
 | UI framework | [Bootstrap 5](https://getbootstrap.com/) + Bootstrap Icons |
 | Exon visualization | [D3.js](https://d3js.org/) |
 | TSG parsing | WASM ([tsg_core](src/assets/pkg/)) |
-| Styling | SCSS + Aurora CSS variable design system |
+| Styling | SCSS + CSS variable design system |
 
 ## Sample Data
 
@@ -110,4 +110,4 @@ This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
 ## Acknowledgments
 
-Aurora is named after the Roman goddess of dawn. The project uses Cytoscape.js for graph visualization and is inspired by the beauty of the dawn sky.
+GTAViz is a graph-based transcript annotation visualizer. The project uses Cytoscape.js for graph visualization.

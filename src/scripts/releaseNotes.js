@@ -70,7 +70,7 @@ function showReleaseNotes() {
                     <div class="modal-header text-white" style="background: var(--aurora-gradient-accent)">
                         <h5 class="modal-title" id="releaseNotesModalLabel">
                             <i class="bi bi-lightning-charge-fill me-2"></i>
-                            Aurora ${RELEASE_NOTES.version} - Release Notes
+                            GTAViz ${RELEASE_NOTES.version} - Release Notes
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
