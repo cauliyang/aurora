@@ -649,21 +649,64 @@ function renderCirclePlot(container, items, opts = {}) {
             animateEntry(path, idx);
         });
     } else {
-        // Dedup mode: one path per directional (chr1,pos1,chr2,pos2,svType) group.
-        groupsAll.forEach((g, idx) => {
-            const a1 = posToAngle(g.chr1, g.pos1);
-            const a2 = posToAngle(g.chr2, g.pos2);
-            if (a1 == null || a2 == null) return;
-            const p1 = pointForAngle(a1, ribbonRadius);
-            const p2 = pointForAngle(a2, ribbonRadius);
+        // Pre-pass: pixel-bin endpoints to detect near-collision groups whose
+        // chord endpoints land on (almost) the same pixel even though their
+        // genomic coords differ. Without this, multiple distinct ribbons stack
+        // into one visible line on long chromosomes (e.g. four chr8 breakpoints
+        // within a 1 kb window collapse to one pixel on a ~5° arc).
+        const PIXEL_BIN = 4; // px — endpoints within this distance are "near-collision"
+        const enriched = groupsAll
+            .map((g) => {
+                const a1 = posToAngle(g.chr1, g.pos1);
+                const a2 = posToAngle(g.chr2, g.pos2);
+                if (a1 == null || a2 == null) return null;
+                const p1 = pointForAngle(a1, ribbonRadius);
+                const p2 = pointForAngle(a2, ribbonRadius);
+                return { g, a1, a2, p1, p2 };
+            })
+            .filter(Boolean);
 
+        // Build pixel-bucket key: round each endpoint to PIXEL_BIN grid.
+        // Direction-preserving (source bucket then target bucket).
+        const pixelBuckets = new Map();
+        enriched.forEach((e) => {
+            const k = [
+                Math.round(e.p1.x / PIXEL_BIN),
+                Math.round(e.p1.y / PIXEL_BIN),
+                Math.round(e.p2.x / PIXEL_BIN),
+                Math.round(e.p2.y / PIXEL_BIN),
+            ].join(":");
+            if (!pixelBuckets.has(k)) pixelBuckets.set(k, []);
+            pixelBuckets.get(k).push(e);
+        });
+
+        // Assign a pixel-collision offset rank within each bucket so ribbons
+        // landing on the same pixel fan apart deterministically.
+        pixelBuckets.forEach((bucket) => {
+            if (bucket.length <= 1) {
+                bucket[0].pixelOffsetFrac = 0;
+                return;
+            }
+            // Stable ordering across re-renders: by group key
+            bucket.sort((a, b) => a.g.key.localeCompare(b.g.key));
+            const n = bucket.length;
+            bucket.forEach((e, i) => {
+                // Spread symmetrically: e.g. n=4 -> [-1.5, -0.5, 0.5, 1.5]/n
+                e.pixelOffsetFrac = ((i - (n - 1) / 2) / n) * 2.5;
+            });
+        });
+
+        // Dedup mode: one path per directional (chr1,pos1,chr2,pos2,svType) group.
+        enriched.forEach(({ g, p1, p2, pixelOffsetFrac }, idx) => {
             const color = colorFor(g.svType);
             const count = g.members.length;
 
-            const offsetFrac =
+            // Combine SVTYPE-collision offset (existing) with pixel-collision offset.
+            const svTypeOffset =
                 g.offsetTotal && g.offsetTotal > 1
                     ? (g.offsetRank / g.offsetTotal) * 1.5
                     : 0;
+            const offsetFrac = svTypeOffset + pixelOffsetFrac;
 
             const grad = makeChordGradient(p1, p2, color);
             const baseWidth = widthScale(g.sumWeight);
