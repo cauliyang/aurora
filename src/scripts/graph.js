@@ -64,7 +64,7 @@ layoutSelect.addEventListener("change", () => {
 
 // Filter walks by possiblePaths
 // walks: array of walks (each walk is array of cytoscape node objects)
-// possiblePaths: object { auroraId: [elementId1, elementId2, ...] }
+// possiblePaths: object { gtavizId: [elementId1, elementId2, ...] }
 function filterWalksByPossiblePaths(walks, possiblePaths) {
     // Build a set of stringified element ID sequences for fast lookup
     const possibleSequences = new Set(
@@ -427,14 +427,14 @@ async function toNumericIdentifier(inputString, length = 10) {
 
 
 /**
- * Generates a unique Aurora ID for a given walk through the graph.
+ * Generates a unique GTAViz ID for a given walk through the graph.
  * @param {Array} walk - Array of graph nodes representing a walk
  * @returns {Promise<string>} A unique identifier for the walk generated using toNumericIdentifier
  *
  * @example
  * const walk = [node1, node2, node3];
- * const auroraId = await getWalkAuroraId(walk);
- * console.log(auroraId); // Outputs something like 'a591a6d40bf420'
+ * const gtavizId = await getWalkAuroraId(walk);
+ * console.log(gtavizId); // Outputs something like 'a591a6d40bf420'
  */
 async function getWalkAuroraId(walk) {
     // Create the walk info string by joining node information
@@ -471,7 +471,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
                     type="text"
                     class="form-control"
                     id="walkSearch"
-                    placeholder="Search walks or Aurora ID..."
+                    placeholder="Search walks or GTAViz ID..."
                     aria-label="Search walks"
                 >
                 <button class="btn btn-outline-secondary" type="button" id="clearWalkSearch">
@@ -484,7 +484,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
                     class="form-control"
                     id="auroraIdsFile"
                     accept=".txt"
-                    aria-label="Upload Aurora IDs file"
+                    aria-label="Upload GTAViz IDs file"
                 />
                 <button class="btn btn-outline-primary" type="button" id="uploadAuroraIds">
                     <i class="bi bi-upload"></i> Batch Search
@@ -493,7 +493,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
             ${
               auroraIds.length > 0
                 ? `<div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i> Searching for ${auroraIds.length} Aurora IDs
+                <i class="bi bi-info-circle me-2"></i> Searching for ${auroraIds.length} GTAViz IDs
                 <button class="btn btn-sm btn-outline-secondary float-end" id="clearAuroraIds">Clear</button>
             </div>`
                 : ""
@@ -535,7 +535,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
     clearSearchBtn.addEventListener("click", () => {
       if (searchInput) {
         searchInput.value = "";
-        // Only filter by Aurora IDs if they exist
+        // Only filter by GTAViz IDs if they exist
         filterWalkCards("", auroraIds);
         searchInput.focus();
       }
@@ -550,7 +550,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
 
   if (clearAuroraIdsBtn) {
     clearAuroraIdsBtn.addEventListener("click", () => {
-      // Redisplay walks without Aurora ID filtering
+      // Redisplay walks without GTAViz ID filtering
       displayWalks(searchText);
     });
   }
@@ -626,7 +626,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
           shouldHide = true;
         }
 
-        // Hide based on Aurora IDs, unless it's in the list
+        // Hide based on GTAViz IDs, unless it's in the list
         if (auroraIds.length > 0 && !auroraIds.includes(auroraId)) {
           shouldHide = true;
         }
@@ -652,7 +652,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
                                 <button class="btn btn-outline-primary highlight-walk-btn" title="Highlight this walk">
                                     <i class="bi bi-lightbulb"></i>
                                 </button>
-                                <button class="btn btn-outline-secondary copy-aurora-btn" title="Copy Aurora ID">
+                                <button class="btn btn-outline-secondary copy-aurora-btn" title="Copy GTAViz ID">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                             </div>
@@ -661,7 +661,7 @@ async function displayWalks(searchText = "", auroraIds = []) {
                             <div class="card-body">
                                 <div class="aurora-id-container">
                                     <small class="text-muted d-flex align-items-center">
-                                        <span class="me-2">Aurora ID:</span>
+                                        <span class="me-2">GTAViz ID:</span>
                                         <code class="aurora-id">${auroraId}</code>
                                     </small>
                                 </div>
@@ -714,13 +714,13 @@ async function displayWalks(searchText = "", auroraIds = []) {
   addWalksStyles();
 }
 
-// Function to handle Aurora IDs file upload
+// Function to handle GTAViz IDs file upload
 async function handleAuroraIdsFileUpload() {
   const fileInput = document.getElementById("auroraIdsFile");
 
   if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
     window.showAlert(
-      "Please select a text file containing Aurora IDs.",
+      "Please select a text file containing GTAViz IDs.",
       "warning"
     );
     return;
@@ -730,13 +730,13 @@ async function handleAuroraIdsFileUpload() {
 
   try {
     // Show a loading indicator
-    window.showAlert("Processing Aurora IDs file...", "info");
+    window.showAlert("Processing GTAViz IDs file...", "info");
 
     const text = await file.text();
     const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "");
 
     if (lines.length === 0) {
-      window.showAlert("No Aurora IDs found in the file.", "warning");
+      window.showAlert("No GTAViz IDs found in the file.", "warning");
       return;
     }
 
@@ -744,15 +744,15 @@ async function handleAuroraIdsFileUpload() {
     const searchInput = document.getElementById("walkSearch");
     const searchText = searchInput ? searchInput.value : "";
 
-    // Redisplay walks with the specified Aurora IDs
+    // Redisplay walks with the specified GTAViz IDs
     displayWalks(searchText, lines);
 
     window.showAlert(
-      `Found ${lines.length} Aurora IDs in the file.`,
+      `Found ${lines.length} GTAViz IDs in the file.`,
       "success"
     );
   } catch (error) {
-    console.error("Error reading Aurora IDs file:", error);
+    console.error("Error reading GTAViz IDs file:", error);
     window.showAlert(
       "Error reading the file. Please make sure it's a valid text file.",
       "danger"
@@ -760,7 +760,7 @@ async function handleAuroraIdsFileUpload() {
   }
 }
 
-// Function to filter walk cards based on search text and Aurora IDs
+// Function to filter walk cards based on search text and GTAViz IDs
 function filterWalkCards(searchValue, auroraIds = []) {
   // Keep track of the visible cards and their corresponding walk indices
   let visibleCardCount = 0;
@@ -781,7 +781,7 @@ function filterWalkCards(searchValue, auroraIds = []) {
       shouldShow = false;
     }
 
-    // Filter by Aurora IDs if provided
+    // Filter by GTAViz IDs if provided
     if (
       auroraIds.length > 0 &&
       !auroraIds.includes(card.getAttribute("data-aurora-id"))
@@ -867,7 +867,7 @@ function addWalkCardEventListeners() {
     });
   });
 
-  // Copy Aurora ID buttons
+  // Copy GTAViz ID buttons
   document.querySelectorAll(".copy-aurora-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const auroraId = btn.closest(".walk-card").getAttribute("data-aurora-id");

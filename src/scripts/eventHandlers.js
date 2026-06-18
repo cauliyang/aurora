@@ -637,7 +637,7 @@ async function handleGeneAnnotation() {
     }
 }
 
-// Add event handler for Aurora IDs file upload
+// Add event handler for GTAViz IDs file upload
 document.addEventListener("click", (event) => {
     if (
         event.target.id === "uploadAuroraIds" ||

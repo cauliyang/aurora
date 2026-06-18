@@ -22,7 +22,7 @@ class HelpGuide {
             {
                 target: "#walks",
                 title: "Walks Panel",
-                content: "Lists all discovered paths through your graph. Search, highlight, or batch-filter walks by Aurora ID.",
+                content: "Lists all discovered paths through your graph. Search, highlight, or batch-filter walks by GTAViz ID.",
                 placement: "left",
             },
 
@@ -118,13 +118,13 @@ class HelpGuide {
             {
                 target: "#walkSearch",
                 title: "Search Walks",
-                content: "Type to filter walks by node IDs or Aurora IDs.",
+                content: "Type to filter walks by node IDs or GTAViz IDs.",
                 placement: "top",
             },
             {
                 target: "#uploadAuroraIds",
                 title: "Batch Search",
-                content: "Upload a .txt file of Aurora IDs to filter walks in bulk.",
+                content: "Upload a .txt file of GTAViz IDs to filter walks in bulk.",
                 placement: "top",
             },
         ];
