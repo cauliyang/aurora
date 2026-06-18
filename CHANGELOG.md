@@ -2,6 +2,60 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-06-18
+
+### 🚀 Features
+
+- Use numeric identifier to replace string one
+- Add clipboard functionality to copy exon coordinates on click
+- Enhance node interaction in path visualization with clickable IDs and improved styling
+- Improve accessibility by adding aria-labels and titles to buttons in app.html
+- Enhance help guide navigation with improved layout and close button functionality
+- Add options to hide uninvolved elements and singleton nodes in graph visualization
+- Refactor walks header styles for improved consistency and organization
+- Implement filtering of walks based on possible paths from graph data
+- Add logging for walk filtering process and ensure consistent file endings
+- Enable hiding uninvolved elements in graph and update filtering logic for walks
+- Format listed content to be a table with copy button
+- Modernize informtion panel
+- Add export button to export read/read_ids
+- Make style of info panel consistent
+- Add modern export dialog with SVG support and loading indicators
+- Implement modern navbar and add new theme styles
+- Add automated PR preview deployment and setup guide
+- Enhance help guide with keyboard navigation and modern styles
+- Introduce graph canvas styles for enhanced visual experience
+- Add modern footer styles and integrate into app
+- Add exon-level gene annotation with efficient chromosome-indexed lookup
+- Support NCBI RefSeq GTF format in extract_gene_exons.py
+- Breakpoint circle plot visualization for TSG edges
+- *(ui)* Rename user-facing "Aurora ID" to "GTAViz ID"
+
+### 🐛 Bug Fixes
+
+- Add a approve list for property which will be shown in a table
+- Update pre-commit-hooks version to v6.0.0
+- Update PR preview workflow for consistency and cleanup
+- Make export exon button bigger
+- Address PR review — prefixMaxEnd optimization, conditional gene_name, UI label, unused import
+- Preserve PR preview dirs during main deploy
+
+### 🚜 Refactor
+
+- Remove IGV feature and update app interface
+
+### 🎨 Styling
+
+- Remove footer from app page
+
+### ⚙️ Miscellaneous Tasks
+
+- Format code
+- Update dependencies
+- Revise gitignore
+- Rename project brand from Aurora to GTAViz
+- *(release)* Bump version to 1.2.0 and refresh release notes
+
 ## [1.1.0] - 2025-04-08
 
 ### 🚀 Features
