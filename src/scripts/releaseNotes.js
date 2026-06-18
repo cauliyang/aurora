@@ -6,8 +6,11 @@
 // Get release notes from the latest version in the CHANGELOG
 const RELEASE_NOTES = {
   version: "1.2.0",
-  date: "2026-03-12",
+  date: "2026-06-18",
   features: [
+    "Breakpoint Circle Plot: publication-quality hg38 karyotype with directional chord ribbons, SV-type coloring (INV/DEL/DUP/TRA/IT**/IC**), legend filtering, dedup/expand modes, count badges, and SVG export",
+    'Renamed user-facing "Aurora ID" to "GTAViz ID" across the walks panel, help guide, alerts, and tooltips',
+    "Edge info panel now surfaces breakpoint coordinates and an inline 'View on Circle Plot' shortcut",
     "Modernized UI with Aurora glassmorphism theme and CSS variable design system",
     "Redesigned landing page, info panel, toolbar, and compact footer",
     "Improved HTML semantics and accessibility (ARIA labels, keyboard navigation)",
@@ -16,6 +19,10 @@ const RELEASE_NOTES = {
     "Consistent color theming via Aurora CSS variables (no more hardcoded colors)",
   ],
   fixes: [
+    "Circle plot: SV-type legend now hides matching count badges in addition to ribbons when toggled off",
+    "Circle plot: direction-preserving grouping by (chr1,pos1,chr2,pos2,svType) with perpendicular offset for co-located different-SVTYPE edges",
+    "Circle plot: distinct color per SV type (ITTL/ITPL/ICRL no longer share hues)",
+    "Switched circle-plot module to static import to avoid stale dynamic-chunk failures after dev-server restarts",
     "Fixed upload button unresponsive due to CSS overflow clipping",
     "Fixed broken optional chaining syntax across event handlers",
     "Fixed memory leaks in exon modal and graph selector listeners",
