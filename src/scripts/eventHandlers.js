@@ -3,6 +3,7 @@ import { resizePanels } from "./graphUtilities";
 import { loadGraphDataFromServer } from "./graph";
 import { getLabelsVisible, setLabelsVisible } from "./graphSetup";
 import { loadGeneData, annotateAllNodes } from "./geneAnnotation";
+import { showBreakpointCirclePlotModal } from "./breakpointCirclePlot";
 
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
@@ -527,6 +528,26 @@ function setupGraphSelector(graphCount) {
             }
         }
     });
+}
+
+// Breakpoint Circle Plot button — opens the circos-style modal.
+// Statically imported (see top of file) so we don't depend on a dynamic
+// chunk URL that can go stale after a Parcel dev-server restart.
+const circlePlotBtn = document.getElementById("circlePlotBtn");
+if (circlePlotBtn) {
+    circlePlotBtn.addEventListener("click", () => {
+        try {
+            showBreakpointCirclePlotModal();
+        } catch (err) {
+            console.error("Failed to open circle plot:", err);
+            window.showAlert?.(
+                "Failed to open circle plot: " + (err?.message || err),
+                "error"
+            );
+        }
+    });
+} else {
+    console.warn("Element with ID 'circlePlotBtn' not found in the DOM");
 }
 
 // Add the clear highlights button event handler

@@ -1,6 +1,7 @@
 import interact from "interactjs";
 import { STATE } from "./graph";
 import { renderGeneAnnotations } from "./geneAnnotation";
+import { showBreakpointCirclePlotModal } from "./breakpointCirclePlot";
 
 import "jsoneditor/dist/jsoneditor.min.css";
 
@@ -160,10 +161,14 @@ export function displayElementInfo(element, container) {
         }
     } else {
         // Edge — compact header
+        const edgeLabel = (data.label && String(data.label).trim()) ||
+            (data.name && String(data.name).trim()) ||
+            data.id ||
+            `${data.source || "?"} -> ${data.target || "?"}`;
         html += `
         <div class="info-header-compact">
           <i class="bi bi-arrow-right-circle-fill"></i>
-          <h4>Edge</h4>
+          <h4>${edgeLabel}</h4>
           <span class="info-id">${data.id || ""}</span>
         </div>`;
 
@@ -185,6 +190,48 @@ export function displayElementInfo(element, container) {
             </div>
           </div>
         </div>`;
+
+        // Breakpoint info (parsed from data.breakpoints or derived from endpoints)
+        const bp = parseEdgeBreakpointForInfo(element);
+        if (bp) {
+            html += `
+        <div class="info-section">
+          <div class="info-section-title"><i class="bi bi-geo-alt-fill"></i> Breakpoints</div>
+          <div class="position-grid">
+            <div><div class="pos-val">${bp.chr1}</div><div class="pos-label">Chr A</div></div>
+            <div><div class="pos-val">${bp.pos1.toLocaleString()}</div><div class="pos-label">Pos A</div></div>
+            <div><div class="pos-val">${bp.chr2}</div><div class="pos-label">Chr B</div></div>
+            <div><div class="pos-val">${bp.pos2.toLocaleString()}</div><div class="pos-label">Pos B</div></div>
+          </div>
+          <div class="genomic-bar mt-2">
+            <span class="genomic-badge chrom">${bp.svType}</span>
+            ${data.insertion_info ? `<span class="genomic-badge">${data.insertion_info}</span>` : ''}
+          </div>
+          <div class="mt-2">
+            <button class="btn btn-sm btn-outline-primary edge-circle-plot-btn" data-edge-id="${data.id || ''}">
+              <i class="bi bi-circle-half me-1"></i> View on Circle Plot
+            </button>
+          </div>
+        </div>`;
+
+            setTimeout(() => {
+                const buttons = document.querySelectorAll('.edge-circle-plot-btn');
+                buttons.forEach((btn) => {
+                    if (!btn.hasAttribute('data-listener-added')) {
+                        btn.setAttribute('data-listener-added', 'true');
+                        btn.addEventListener('click', function() {
+                            const edgeId = this.getAttribute('data-edge-id');
+                            try {
+                                showBreakpointCirclePlotModal(edgeId);
+                            } catch (err) {
+                                console.error('Failed to open circle plot:', err);
+                                window.showAlert?.('Failed to open circle plot: ' + (err?.message || err), 'error');
+                            }
+                        });
+                    }
+                });
+            }, 100);
+        }
     }
 
     // Additional properties
@@ -193,7 +240,7 @@ export function displayElementInfo(element, container) {
             "id", "name", "chrom", "ref_start", "ref_end", "strand",
             "exons", "ptc", "ptf", "node_id", "is_head", "value",
             "source-node", "geneAnnotations", "gene_name",
-        ] : ["id", "source", "target", "weight"];
+        ] : ["id", "source", "target", "weight", "breakpoints", "insertion_info"];
     const additionalProps = Object.keys(data).filter(
         (key) => !standardProps.includes(key)
     );
@@ -218,6 +265,48 @@ export function displayElementInfo(element, container) {
     if (type === "Node") {
         renderGeneAnnotations(element, container);
     }
+}
+
+/**
+ * Parse breakpoint data from an edge element, using explicit `breakpoints` field
+ * when present, otherwise falling back to source/target node coordinates.
+ * Returns { chr1, pos1, chr2, pos2, svType } or null.
+ */
+function parseEdgeBreakpointForInfo(edge) {
+    const data = edge.data();
+    const bpStr = data.breakpoints;
+
+    let chr1, chr2, pos1, pos2, svType;
+    if (typeof bpStr === "string" && bpStr.length > 0) {
+        const parts = bpStr.split(",").map((s) => s.trim());
+        if (parts.length >= 5) {
+            [chr1, chr2, pos1, pos2, svType] = parts;
+            pos1 = Number(pos1);
+            pos2 = Number(pos2);
+        }
+    }
+
+    if (!chr1 || !chr2 || !Number.isFinite(pos1) || !Number.isFinite(pos2)) {
+        const src = edge.source();
+        const tgt = edge.target();
+        if (!src || !tgt) return null;
+        chr1 = src.data("chrom");
+        chr2 = tgt.data("chrom");
+        pos1 = Number(src.data("ref_end"));
+        pos2 = Number(tgt.data("ref_start"));
+        if (!chr1 || !chr2 || !Number.isFinite(pos1) || !Number.isFinite(pos2)) {
+            return null;
+        }
+        if (!svType) svType = chr1 === chr2 ? "INTRA" : "INTER";
+    }
+
+    return {
+        chr1,
+        chr2,
+        pos1,
+        pos2,
+        svType: (svType || "").toUpperCase() || "DEFAULT",
+    };
 }
 
 /**
