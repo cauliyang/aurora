@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang=en><script type=importmap>{"imports":{"f3XbX":"/aurora/pr-18/exonVisualization.533eda5b.js","iBGpI":"/aurora/pr-18/genes.9ac6f4ee.txt","lWLpV":"/aurora/pr-18/tsg_core_js_bg.c1fceb77.wasm"}}</script><link rel=stylesheet href=/aurora/pr-18/app.1ba26db7.css><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>GTAViz — Graph Visualization</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"><link rel=stylesheet href=/aurora/pr-18/aurora.04e64bff.css><link rel=stylesheet href=/aurora/pr-18/app.6507bccc.css><link rel=stylesheet href=/aurora/pr-18/app.61db2c24.css><link rel=stylesheet href=/aurora/pr-18/app.bada55bf.css><link rel=stylesheet href=/aurora/pr-18/aurora.01cd5384.css><link rel=stylesheet href=/aurora/pr-18/app.9fc30236.css><link rel=stylesheet href=/aurora/pr-18/app.4d7102e4.css><link rel=stylesheet href=/aurora/pr-18/app.2032b743.css><body class=fade-in>
+<!DOCTYPE html><html lang=en><script type=importmap>{"imports":{"0E2O5":"/aurora/pr-18/globalAnalysis.a584adfc.js","f3XbX":"/aurora/pr-18/exonVisualization.533eda5b.js","iBGpI":"/aurora/pr-18/genes.9ac6f4ee.txt","lWLpV":"/aurora/pr-18/tsg_core_js_bg.c1fceb77.wasm"}}</script><link rel=stylesheet href=/aurora/pr-18/app.1ba26db7.css><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>GTAViz — Graph Visualization</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap"><link rel=stylesheet href=/aurora/pr-18/aurora.04e64bff.css><link rel=stylesheet href=/aurora/pr-18/app.6507bccc.css><link rel=stylesheet href=/aurora/pr-18/app.61db2c24.css><link rel=stylesheet href=/aurora/pr-18/app.bada55bf.css><link rel=stylesheet href=/aurora/pr-18/aurora.01cd5384.css><link rel=stylesheet href=/aurora/pr-18/app.9fc30236.css><link rel=stylesheet href=/aurora/pr-18/app.4d7102e4.css><link rel=stylesheet href=/aurora/pr-18/app.2032b743.css><link rel=stylesheet href=/aurora/pr-18/app.a22f0fcf.css><body class=fade-in>
     
     <nav class="navbar navbar-expand-lg">
         <div class=container-fluid>
@@ -37,7 +37,24 @@
 
     <div id=tooltip class=custom-tooltip></div>
 
-    <main class="container-fluid h-100 p-3">
+    <main class="container-fluid d-flex flex-column h-100 p-3">
+        
+        <ul class="mb-2 nav nav-tabs" id=viewTabs role=tablist>
+            <li class=nav-item role=presentation>
+                <button class="active nav-link" id=graphViewTab data-bs-toggle=tab data-bs-target=#graphViewPane type=button role=tab aria-controls=graphViewPane aria-selected=true>
+                    <i class="bi bi-diagram-3 me-1"></i> Graph View
+                </button>
+            </li>
+            <li class=nav-item role=presentation>
+                <button class=nav-link id=globalAnalysisTab data-bs-toggle=tab data-bs-target=#globalAnalysisPane type=button role=tab aria-controls=globalAnalysisPane aria-selected=false>
+                    <i class="bi bi-bar-chart-line me-1"></i> Global Analysis
+                </button>
+            </li>
+        </ul>
+
+        <div class="flex-grow-1 overflow-hidden tab-content" id=viewTabContent>
+        
+        <div class="active fade h-100 show tab-pane" id=graphViewPane role=tabpanel aria-labelledby=graphViewTab>
         <div class="h-100 row">
             
             <div class="col-12 mb-3">
@@ -181,6 +198,96 @@
                     </div>
                 </div>
             </div>
+        </div>
+        
+
+        
+        <div class="fade h-100 tab-pane" id=globalAnalysisPane role=tabpanel aria-labelledby=globalAnalysisTab>
+            <div class="d-flex flex-column ga-dashboard h-100">
+                
+                <div class="align-items-center d-flex ga-toolbar gap-2 mb-2">
+                    <h5 class="mb-0 me-auto">
+                        <i class="bi bi-bar-chart-line me-1"></i> Global Analysis
+                        <small class=text-muted>— all graphs in the uploaded file</small>
+                    </h5>
+                    <button id=ga-annotate-genes-btn class="btn btn-outline-success btn-sm" type=button title="Annotate gene for every node across all graphs">
+                        <i class="fa-dna fas me-1"></i> Annotate Genes
+                    </button>
+                    <button id=ga-refresh-btn class="btn btn-outline-primary btn-sm" type=button title="Recompute analysis">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+
+                
+                <div class="flex-grow-1 ga-grid overflow-auto">
+                    <div class="card ga-card ga-card-summary">
+                        <div class=card-header>
+                            <i class="bi bi-table me-1"></i> Per-graph Summary
+                        </div>
+                        <div class=card-body id=ga-summary-table>
+                            <div class=ga-empty>
+                                <i class="bi bi-info-circle me-2"></i>Upload a TSG/GTA file to see global analysis.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card ga-card">
+                        <div class=card-header>
+                            <i class="bi bi-bar-chart me-1"></i> Edge Variation (SV) Type Frequency
+                        </div>
+                        <div class="card-body ga-chart-body" id=ga-svtype-chart></div>
+                    </div>
+
+                    <div class="card ga-card">
+                        <div class=card-header>
+                            <i class="bi bi-graph-up me-1"></i> Edge Weight Distribution
+                        </div>
+                        <div class="card-body ga-chart-body" id=ga-weight-hist></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-circle">
+                        <div class="align-items-center card-header d-flex flex-wrap gap-2">
+                            <span>
+                                <i class="bi bi-circle-half me-1"></i> All Edges — Breakpoint Circle Plot
+                                <small class=text-muted>(click a ribbon to open that graph)</small>
+                            </span>
+                            <div class="align-items-center d-flex gap-2 ms-auto">
+                                <div id=ga-circle-legend class=ga-circle-legend></div>
+                                <button id=ga-circle-expand-btn type=button class="btn btn-outline-secondary btn-sm" title="Toggle grouped / expanded ribbons">
+                                    <i class="bi bi-arrows-collapse me-1"></i> Grouped
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body ga-chart-body ga-circle-body" id=ga-circle-plot></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-genefreq">
+                        <div class=card-header>
+                            <i class="fa-dna fas me-1"></i> Gene Frequency
+                            <small class=text-muted>(top genes by node count · color = graphs shared)</small>
+                        </div>
+                        <div class="card-body ga-chart-body" id=ga-gene-frequency>
+                            <div class=ga-empty>
+                                <i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to compute gene annotations.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card ga-card ga-card-geneshare">
+                        <div class=card-header>
+                            <i class="bi bi-diagram-2 me-1"></i> Gene Sharing Across Graphs
+                        </div>
+                        <div class=card-body id=ga-gene-sharing>
+                            <div class=ga-empty>
+                                <i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to see how genes are shared across graphs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        </div>
 
     </main>
 
@@ -312,11 +419,11 @@
 
         
         <script src=/aurora/pr-18/app.60bde22c.js type=module></script>
-        <script src=/aurora/pr-18/app.d839f039.js type=module></script>
+        <script src=/aurora/pr-18/app.81c9e2c2.js type=module></script>
         <script src=/aurora/pr-18/app.d79ead43.js type=module></script>
-        <script src=/aurora/pr-18/app.78bfe9e2.js type=module></script>
+        <script src=/aurora/pr-18/app.2c0fa167.js type=module></script>
         <script src=/aurora/pr-18/app.b064ec85.js type=module></script>
-        <script src=/aurora/pr-18/app.80d43ccc.js type=module></script>
+        <script src=/aurora/pr-18/app.94eef427.js type=module></script>
 
 
 
