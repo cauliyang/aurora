@@ -17,6 +17,31 @@ async function getGlobalAnalysis() {
     return _globalAnalysisMod;
 }
 
+/**
+ * Refresh the Global Analysis dashboard after a new file is uploaded.
+ * Always invalidates the cached aggregation so the next render uses fresh data.
+ * If the Global Analysis tab is currently visible, re-renders it immediately;
+ * otherwise the (cleared) dashboard re-renders lazily when the tab is shown.
+ */
+async function refreshGlobalAnalysisAfterUpload() {
+    try {
+        const m = await getGlobalAnalysis();
+        m.invalidateGlobalAnalysisCache?.();
+
+        // Reset the gene panels — gene annotation must be re-triggered for the
+        // new file (it's an explicit, potentially slow action).
+        m.resetGeneAnalysis?.();
+
+        const pane = document.getElementById("globalAnalysisPane");
+        const isVisible = pane && pane.classList.contains("active");
+        if (isVisible) {
+            await m.renderGlobalAnalysis();
+        }
+    } catch (err) {
+        console.error("Failed to refresh global analysis after upload:", err);
+    }
+}
+
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
 const infoPanel = document.getElementById("info");
@@ -458,9 +483,6 @@ function handleFileUpload(event) {
         const content = e.target.result;
         const fileExtension = file.name.split(".").pop().toLowerCase();
 
-        // New file → invalidate any cached global-analysis aggregation.
-        getGlobalAnalysis().then((m) => m.invalidateGlobalAnalysisCache?.());
-
         try {
             if (fileExtension === "json") {
                 window.loadingIndicator?.updateMessage(loadingId, "Parsing JSON data...");
@@ -471,6 +493,9 @@ function handleFileUpload(event) {
                 loadGraphDataFromServer(jsonData);
 
                 // Single JSON file: one graph at index 0, no IDs.
+                // Populate graph_jsons so Global Analysis can read this graph
+                // (content is already the JSON string in the format expected).
+                STATE.graph_jsons = [content];
                 STATE.graph_ids = [];
                 STATE.currentGraphIndex = 0;
 
@@ -518,6 +543,11 @@ function handleFileUpload(event) {
                     2000
                 );
             }
+
+            // New file loaded → refresh Global Analysis (invalidate cache and
+            // re-render if its tab is currently visible). Done after
+            // STATE.graph_jsons is set so the new data is picked up.
+            refreshGlobalAnalysisAfterUpload();
         } catch (error) {
             console.error("Error processing file:", error);
             window.loadingIndicator?.hide(loadingId);
@@ -651,10 +681,24 @@ if (circlePlotBtn) {
     console.warn("Element with ID 'circlePlotBtn' not found in the DOM");
 }
 
+// Hide the graph-view node/edge tooltip. The Cytoscape "mouseout" event does
+// not fire when the canvas is hidden by a tab switch, so the tooltip can stay
+// stuck on screen. Call this when leaving the Graph View.
+function hideGraphTooltip() {
+    const tooltip = document.getElementById("tooltip");
+    if (tooltip) {
+        tooltip.classList.remove("tooltip-visible");
+        tooltip.style.display = "none";
+    }
+}
+
 // Global Analysis tab — lazily render the dashboard when the tab is shown.
 // Deferred until visible so D3 can measure the chart containers correctly.
 const globalAnalysisTab = document.getElementById("globalAnalysisTab");
 if (globalAnalysisTab) {
+    // Hide the Graph View tooltip as soon as we start switching tabs.
+    globalAnalysisTab.addEventListener("show.bs.tab", hideGraphTooltip);
+
     globalAnalysisTab.addEventListener("shown.bs.tab", async() => {
         try {
             const m = await getGlobalAnalysis();

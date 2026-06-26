@@ -50,12 +50,24 @@ let _cache = null;
 let _cacheKey = null;
 
 function cacheKey() {
-    // Cheap identity key: number of graphs + length of first/last JSON string.
-    const n = STATE.graph_jsons ? STATE.graph_jsons.length : 0;
+    // Identity key combining graph count, total length, and a cheap content
+    // hash so that different files (even of identical size) get distinct keys.
+    const jsons = STATE.graph_jsons || [];
+    const n = jsons.length;
     if (!n) return "empty";
-    const first = STATE.graph_jsons[0]?.length || 0;
-    const last = STATE.graph_jsons[n - 1]?.length || 0;
-    return `${n}:${first}:${last}`;
+
+    let totalLen = 0;
+    let hash = 5381; // djb2
+    for (let i = 0; i < n; i++) {
+        const s = jsons[i] || "";
+        totalLen += s.length;
+        // Sample a handful of chars per graph (cheap but distinguishing).
+        const step = Math.max(1, Math.floor(s.length / 64));
+        for (let j = 0; j < s.length; j += step) {
+            hash = ((hash << 5) + hash + s.charCodeAt(j)) | 0;
+        }
+    }
+    return `${n}:${totalLen}:${hash >>> 0}`;
 }
 
 /**
@@ -435,6 +447,25 @@ function renderSummaryTable(container, perGraph, agg) {
     });
 }
 
+// Build a subtle top-to-bottom gradient (lighter top -> base -> slightly
+// darker bottom) for a given base color, returning a url(#id) fill reference.
+// Gives flat bars a clean, publication-grade sense of depth.
+function makeBarGradient(defs, id, baseColor) {
+    const d3 = window.d3;
+    const c = d3.color(baseColor);
+    const top = c.brighter(0.45).formatHex();
+    const bottom = c.darker(0.35).formatHex();
+    const grad = defs
+        .append("linearGradient")
+        .attr("id", id)
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "0%").attr("y2", "100%");
+    grad.append("stop").attr("offset", "0%").attr("stop-color", top);
+    grad.append("stop").attr("offset", "45%").attr("stop-color", baseColor);
+    grad.append("stop").attr("offset", "100%").attr("stop-color", bottom);
+    return `url(#${id})`;
+}
+
 function renderSvTypeFrequency(container, svTypeCounts) {
     const d3 = window.d3;
     container.innerHTML = "";
@@ -450,7 +481,7 @@ function renderSvTypeFrequency(container, svTypeCounts) {
 
     const W = container.clientWidth || 480;
     const H = container.clientHeight || 300;
-    const margin = { top: 16, right: 16, bottom: 48, left: 48 };
+    const margin = { top: 18, right: 18, bottom: 50, left: 52 };
     const innerW = W - margin.left - margin.right;
     const innerH = H - margin.top - margin.bottom;
 
@@ -462,6 +493,9 @@ function renderSvTypeFrequency(container, svTypeCounts) {
         .attr("viewBox", `0 0 ${W} ${H}`)
         .attr("preserveAspectRatio", "xMidYMid meet");
 
+    const defs = svg.append("defs");
+    const uid = `gasv-${Math.random().toString(36).slice(2, 8)}`;
+
     const g = svg
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -470,7 +504,7 @@ function renderSvTypeFrequency(container, svTypeCounts) {
         .scaleBand()
         .domain(data.map((d) => d.svType))
         .range([0, innerW])
-        .padding(0.25);
+        .padding(0.28);
 
     const y = d3
         .scaleLinear()
@@ -478,15 +512,19 @@ function renderSvTypeFrequency(container, svTypeCounts) {
         .nice()
         .range([innerH, 0]);
 
+    // Light horizontal gridlines for readability (publication style).
     g.append("g")
-        .attr("transform", `translate(0,${innerH})`)
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("transform", "rotate(-35)")
-        .style("text-anchor", "end")
-        .style("font-size", "10px");
+        .attr("class", "ga-grid")
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) =>
+            sel.selectAll("line").attr("stroke", "rgba(0,0,0,0.06)")
+        );
 
-    g.append("g").call(d3.axisLeft(y).ticks(5)).style("font-size", "10px");
+    // Pre-build a gradient per SV type.
+    data.forEach((d, i) => {
+        d._fill = makeBarGradient(defs, `${uid}-${i}`, colorFor(d.svType));
+    });
 
     g.selectAll(".ga-bar")
         .data(data)
@@ -497,18 +535,35 @@ function renderSvTypeFrequency(container, svTypeCounts) {
         .attr("y", (d) => y(d.count))
         .attr("width", x.bandwidth())
         .attr("height", (d) => innerH - y(d.count))
-        .attr("fill", (d) => colorFor(d.svType))
+        .attr("rx", 3)
+        .attr("fill", (d) => d._fill)
+        .attr("stroke", (d) => d3.color(colorFor(d.svType)).darker(0.6).formatHex())
+        .attr("stroke-width", 0.75)
         .append("title")
         .text((d) => `${d.svType}: ${d.count} edge(s)`);
+
+    g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "rotate(-35)")
+        .style("text-anchor", "end")
+        .style("font-size", "11px")
+        .style("font-weight", "600");
+
+    g.append("g")
+        .call(d3.axisLeft(y).ticks(5))
+        .style("font-size", "10.5px");
 
     g.selectAll(".ga-bar-label")
         .data(data)
         .join("text")
         .attr("class", "ga-bar-label")
         .attr("x", (d) => x(d.svType) + x.bandwidth() / 2)
-        .attr("y", (d) => y(d.count) - 4)
+        .attr("y", (d) => y(d.count) - 5)
         .attr("text-anchor", "middle")
-        .style("font-size", "10px")
+        .style("font-size", "11px")
+        .style("font-weight", "600")
         .style("fill", "var(--bs-body-color, #333)")
         .text((d) => d.count);
 }
@@ -537,6 +592,9 @@ function renderWeightHistogram(container, weights) {
         .attr("viewBox", `0 0 ${W} ${H}`)
         .attr("preserveAspectRatio", "xMidYMid meet");
 
+    const defs = svg.append("defs");
+    const uid = `gawh-${Math.random().toString(36).slice(2, 8)}`;
+
     const g = svg
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -551,18 +609,32 @@ function renderWeightHistogram(container, weights) {
             weights
         );
 
+    const maxCount = d3.max(bins, (b) => b.length) || 1;
     const y = d3
         .scaleLinear()
-        .domain([0, d3.max(bins, (b) => b.length)])
+        .domain([0, maxCount])
         .nice()
         .range([innerH, 0]);
 
-    g.append("g")
-        .attr("transform", `translate(0,${innerH})`)
-        .call(d3.axisBottom(x).ticks(6))
-        .style("font-size", "10px");
+    // Publication-grade sequential color: taller (more frequent) bins are
+    // deeper. Uses ColorBrewer "Blues"-style interpolation for print clarity.
+    const colorScale = d3
+        .scaleSequential(d3.interpolateBlues)
+        .domain([0, maxCount * 1.15]);
 
-    g.append("g").call(d3.axisLeft(y).ticks(5)).style("font-size", "10px");
+    // Light horizontal gridlines.
+    g.append("g")
+        .attr("class", "ga-grid")
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) =>
+            sel.selectAll("line").attr("stroke", "rgba(0,0,0,0.06)")
+        );
+
+    // Per-bin vertical gradient for depth.
+    bins.forEach((b, i) => {
+        b._fill = makeBarGradient(defs, `${uid}-${i}`, colorScale(b.length));
+    });
 
     g.selectAll(".ga-hist-bar")
         .data(bins)
@@ -572,16 +644,27 @@ function renderWeightHistogram(container, weights) {
         .attr("y", (b) => y(b.length))
         .attr("width", (b) => Math.max(0, x(b.x1) - x(b.x0) - 1))
         .attr("height", (b) => innerH - y(b.length))
-        .attr("fill", "#377eb8")
+        .attr("rx", 2)
+        .attr("fill", (b) => b._fill)
+        .attr("stroke", (b) => d3.color(colorScale(b.length)).darker(0.5).formatHex())
+        .attr("stroke-width", 0.6)
         .append("title")
         .text((b) => `weight ${b.x0}–${b.x1}: ${b.length} edge(s)`);
+
+    g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(x).ticks(6))
+        .style("font-size", "10.5px");
+
+    g.append("g").call(d3.axisLeft(y).ticks(5)).style("font-size", "10.5px");
 
     // Axis label
     svg.append("text")
         .attr("x", margin.left + innerW / 2)
         .attr("y", H - 4)
         .attr("text-anchor", "middle")
-        .style("font-size", "11px")
+        .style("font-size", "11.5px")
+        .style("font-weight", "600")
         .style("fill", "var(--bs-body-color, #333)")
         .text("Edge weight");
 }
@@ -690,10 +773,10 @@ function renderGeneFrequency(container, gene) {
         return;
     }
 
-    const rowH = 20;
-    const margin = { top: 8, right: 48, bottom: 24, left: 120 };
-    const W = container.clientWidth || 480;
-    const innerW = Math.max(120, W - margin.left - margin.right);
+    const rowH = 34;
+    const margin = { top: 12, right: 72, bottom: 32, left: 170 };
+    const W = container.clientWidth || 720;
+    const innerW = Math.max(160, W - margin.left - margin.right);
     const innerH = data.length * rowH;
     const H = innerH + margin.top + margin.bottom;
 
@@ -725,7 +808,10 @@ function renderGeneFrequency(container, gene) {
         .scaleSequential(d3.interpolateViridis)
         .domain([1, maxGraphs]);
 
-    g.append("g").call(d3.axisLeft(y).tickSize(0)).style("font-size", "10px");
+    g.append("g")
+        .call(d3.axisLeft(y).tickSize(0))
+        .style("font-size", "13px")
+        .call((sel) => sel.selectAll("text").style("font-weight", "500"));
 
     g.selectAll(".ga-gene-bar")
         .data(data)
@@ -747,10 +833,11 @@ function renderGeneFrequency(container, gene) {
         .data(data)
         .join("text")
         .attr("class", "ga-gene-label")
-        .attr("x", (d) => x(d.count) + 4)
+        .attr("x", (d) => x(d.count) + 6)
         .attr("y", (d) => y(d.name) + y.bandwidth() / 2)
         .attr("dominant-baseline", "central")
-        .style("font-size", "9.5px")
+        .style("font-size", "12px")
+        .style("font-weight", "600")
         .style("fill", "var(--bs-body-color, #333)")
         .text((d) => `${d.count} · ${d.graphs}g`);
 }
@@ -838,6 +925,22 @@ function renderGeneSharing(container, gene) {
         <div class="ga-gene-chips">${topShared || '<span class="text-muted">None shared across graphs.</span>'}</div>
       </div>
     </div>`;
+}
+
+/**
+ * Reset the gene analysis panels to their initial empty state. Called after a
+ * new file is uploaded, since gene annotation must be explicitly re-triggered.
+ */
+export function resetGeneAnalysis() {
+    const freqEl = document.getElementById("ga-gene-frequency");
+    const shareEl = document.getElementById("ga-gene-sharing");
+    const hint =
+        '<div class="ga-empty"><i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to compute gene annotations.</div>';
+    if (freqEl) freqEl.innerHTML = hint;
+    if (shareEl) {
+        shareEl.innerHTML =
+            '<div class="ga-empty"><i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to see how genes are shared across graphs.</div>';
+    }
 }
 
 /**
