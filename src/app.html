@@ -152,6 +152,12 @@
                             <select id="graphSelect" class="form-select toolbar-select" aria-label="Select graph">
                                 <option value="0">Graph 1</option>
                             </select>
+                            <div class="graph-search-wrap">
+                                <input type="text" id="graphSearchInput" class="form-control toolbar-select"
+                                    placeholder="Search graph ID…" autocomplete="off" spellcheck="false"
+                                    aria-label="Search graph by ID" />
+                                <div id="graphSearchResults" class="graph-search-results d-none"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -297,6 +303,29 @@
                             <i class="bi bi-graph-up me-1"></i> Edge Weight Distribution
                         </div>
                         <div class="card-body ga-chart-body" id="ga-weight-hist"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-scatter">
+                        <div class="card-header">
+                            <i class="bi bi-bounding-box-circles me-1"></i> Nodes vs Edges per Graph
+                            <small class="text-muted">(click a point to open that graph)</small>
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-nodes-edges-scatter"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-svbox">
+                        <div class="card-header">
+                            <i class="bi bi-box me-1"></i> Edge Weight by SV Type
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-weight-by-svtype"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-sizedist">
+                        <div class="card-header">
+                            <i class="bi bi-bar-chart-steps me-1"></i> Graph Size Distribution
+                            <small class="text-muted">(nodes &amp; edges per graph)</small>
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-size-dist"></div>
                     </div>
 
                     <div class="card ga-card ga-card-circle">

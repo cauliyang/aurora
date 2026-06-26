@@ -659,6 +659,167 @@ function setupGraphSelector(graphCount) {
         const selectedIndex = parseInt(this.value);
         loadGraphByIndex(selectedIndex);
     });
+
+    // (Re)initialize the fuzzy graph-ID search for this set of graphs.
+    setupGraphSearch(graphCount);
+}
+
+/**
+ * Fuzzy subsequence matcher. Returns a score (higher = better) if every
+ * character of `query` appears in `text` in order, otherwise -1.
+ * Rewards contiguous runs, start-of-string, and shorter targets.
+ * @param {string} query
+ * @param {string} text
+ * @returns {number}
+ */
+function fuzzyScore(query, text) {
+    const q = query.toLowerCase();
+    const t = text.toLowerCase();
+    if (!q) return 0;
+
+    // Fast path: exact substring gets a high base score.
+    const subIdx = t.indexOf(q);
+    if (subIdx !== -1) {
+        return 1000 - subIdx * 2 - (t.length - q.length);
+    }
+
+    let ti = 0;
+    let score = 0;
+    let run = 0;
+    let prevMatch = -2;
+    for (let qi = 0; qi < q.length; qi++) {
+        const ch = q[qi];
+        let found = -1;
+        for (let j = ti; j < t.length; j++) {
+            if (t[j] === ch) {
+                found = j;
+                break;
+            }
+        }
+        if (found === -1) return -1; // not a subsequence
+        if (found === prevMatch + 1) {
+            run += 1;
+            score += 5 + run * 2; // contiguous bonus
+        } else {
+            run = 0;
+            score += 1;
+        }
+        if (found === 0) score += 4; // start-of-string bonus
+        prevMatch = found;
+        ti = found + 1;
+    }
+    // Prefer shorter targets (closer match density).
+    score -= Math.max(0, t.length - q.length) * 0.2;
+    return score;
+}
+
+/**
+ * Sets up the fuzzy graph-ID search box next to the graph selector.
+ * Typing filters graphs by ID; clicking a result (or pressing Enter on the top
+ * match) loads that graph.
+ * @param {number} graphCount
+ */
+function setupGraphSearch(graphCount) {
+    const input = document.getElementById("graphSearchInput");
+    const results = document.getElementById("graphSearchResults");
+    if (!input || !results) return;
+
+    // Clone to drop any previous listeners (re-init per upload).
+    const freshInput = input.cloneNode(true);
+    input.parentNode.replaceChild(freshInput, input);
+    freshInput.value = "";
+    results.innerHTML = "";
+    results.classList.add("d-none");
+
+    // Build the searchable label list once.
+    const items = [];
+    for (let i = 0; i < graphCount; i++) {
+        items.push({ index: i, label: getGraphLabel(i) });
+    }
+
+    let currentMatches = [];
+
+    function computeMatches(query) {
+        if (!query.trim()) {
+            // Empty query → show all graphs (capped).
+            return items.slice(0, 20).map((it) => ({ ...it, score: 0 }));
+        }
+        return items
+            .map((it) => ({ ...it, score: fuzzyScore(query, it.label) }))
+            .filter((it) => it.score >= 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 12);
+    }
+
+    function renderResults(matches) {
+        currentMatches = matches;
+        if (!matches.length) {
+            results.innerHTML =
+                '<div class="graph-search-empty">No matching graph</div>';
+            results.classList.remove("d-none");
+            return;
+        }
+        results.innerHTML = matches
+            .map(
+                (m, i) =>
+                    `<button type="button" class="graph-search-item${i === 0 ? " active" : ""}"
+                        data-index="${m.index}">
+                        <span class="gs-label">${escapeHtmlSafe(m.label)}</span>
+                        <span class="gs-idx">#${m.index + 1}</span>
+                    </button>`
+            )
+            .join("");
+        results.classList.remove("d-none");
+
+        results.querySelectorAll(".graph-search-item").forEach((btn) => {
+            btn.addEventListener("mousedown", (e) => {
+                // mousedown (not click) so it fires before input blur hides list
+                e.preventDefault();
+                const idx = parseInt(btn.getAttribute("data-index"), 10);
+                selectMatch(idx);
+            });
+        });
+    }
+
+    function selectMatch(idx) {
+        loadGraphByIndex(idx);
+        freshInput.value = "";
+        results.classList.add("d-none");
+        const sel = document.getElementById("graphSelect");
+        if (sel) sel.value = String(idx);
+    }
+
+    freshInput.addEventListener("input", () => {
+        renderResults(computeMatches(freshInput.value));
+    });
+
+    freshInput.addEventListener("focus", () => {
+        renderResults(computeMatches(freshInput.value));
+    });
+
+    freshInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (currentMatches.length) selectMatch(currentMatches[0].index);
+        } else if (e.key === "Escape") {
+            results.classList.add("d-none");
+            freshInput.blur();
+        }
+    });
+
+    freshInput.addEventListener("blur", () => {
+        // Delay so a result mousedown can register first.
+        setTimeout(() => results.classList.add("d-none"), 120);
+    });
+}
+
+// Minimal HTML escaping for search result labels.
+function escapeHtmlSafe(s) {
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 
 // Breakpoint Circle Plot button — opens the circos-style modal.

@@ -669,6 +669,374 @@ function renderWeightHistogram(container, weights) {
         .text("Edge weight");
 }
 
+// --------------------------------------------------------------------------
+// Nodes vs Edges per graph (scatter). Click a point to open that graph.
+// --------------------------------------------------------------------------
+function renderNodesEdgesScatter(container, perGraph) {
+    const d3 = window.d3;
+    container.innerHTML = "";
+
+    if (!perGraph || !perGraph.length) {
+        container.innerHTML = '<div class="ga-empty">No graphs to plot.</div>';
+        return;
+    }
+
+    // Fixed design dimensions: viewBox + preserveAspectRatio scale the whole
+    // figure to fit the card without relying on (unstable) clientHeight, which
+    // could clip axis labels.
+    const W = 480;
+    const H = 320;
+    const margin = { top: 16, right: 18, bottom: 48, left: 56 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+
+    const svg = d3
+        .select(container)
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const maxNodes = d3.max(perGraph, (d) => d.nodeCount) || 1;
+    const maxEdges = d3.max(perGraph, (d) => d.edgeCount) || 1;
+    const x = d3.scaleLinear().domain([0, maxNodes]).nice().range([0, innerW]);
+    const y = d3.scaleLinear().domain([0, maxEdges]).nice().range([innerH, 0]);
+
+    // Gridlines
+    g.append("g")
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) => sel.selectAll("line").attr("stroke", "rgba(0,0,0,0.06)"));
+
+    // Faint y=x reference line for context.
+    const lim = Math.min(x.domain()[1], y.domain()[1]);
+    g.append("line")
+        .attr("x1", x(0)).attr("y1", y(0))
+        .attr("x2", x(lim)).attr("y2", y(lim))
+        .attr("stroke", "rgba(0,0,0,0.18)")
+        .attr("stroke-dasharray", "4 4")
+        .attr("stroke-width", 1);
+
+    g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(x).ticks(6))
+        .style("font-size", "10.5px");
+    g.append("g").call(d3.axisLeft(y).ticks(5)).style("font-size", "10.5px");
+
+    // Axis labels
+    svg.append("text")
+        .attr("x", margin.left + innerW / 2)
+        .attr("y", H - 4)
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .style("font-weight", "600")
+        .style("fill", "var(--bs-body-color, #333)")
+        .text("Nodes");
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -(margin.top + innerH / 2))
+        .attr("y", 14)
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .style("font-weight", "600")
+        .style("fill", "var(--bs-body-color, #333)")
+        .text("Edges");
+
+    g.selectAll(".ga-scatter-pt")
+        .data(perGraph)
+        .join("circle")
+        .attr("class", "ga-scatter-pt")
+        .attr("cx", (d) => x(d.nodeCount))
+        .attr("cy", (d) => y(d.edgeCount))
+        .attr("r", 6)
+        .attr("fill", "var(--aurora-primary, #0d6efd)")
+        .attr("fill-opacity", 0.7)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1.2)
+        .style("cursor", "pointer")
+        .on("mouseenter", function() {
+            d3.select(this).attr("r", 8).attr("fill-opacity", 1);
+        })
+        .on("mouseleave", function() {
+            d3.select(this).attr("r", 6).attr("fill-opacity", 0.7);
+        })
+        .on("click", (event, d) => navigateToGraph(d.graphIndex))
+        .append("title")
+        .text(
+            (d) =>
+                `${d.graphId || `Graph ${d.graphIndex + 1}`}\nnodes: ${d.nodeCount}, edges: ${d.edgeCount}`
+        );
+}
+
+// --------------------------------------------------------------------------
+// Graph size distribution: side-by-side histograms of nodes/edges per graph.
+// --------------------------------------------------------------------------
+function renderSizeDistribution(container, perGraph) {
+    const d3 = window.d3;
+    container.innerHTML = "";
+
+    if (!perGraph || perGraph.length < 2) {
+        container.innerHTML =
+            '<div class="ga-empty">Graph size distribution needs at least 2 graphs.</div>';
+        return;
+    }
+
+    const wrap = d3
+        .select(container)
+        .append("div")
+        .attr("class", "ga-sizedist-wrap");
+
+    const mkHist = (title, values, baseColor) => {
+        const cell = wrap.append("div").attr("class", "ga-sizedist-cell");
+        cell.append("div")
+            .attr("class", "ga-sizedist-title")
+            .text(title);
+
+        const W = 320;
+        const H = 200;
+        const margin = { top: 10, right: 12, bottom: 34, left: 38 };
+        const innerW = W - margin.left - margin.right;
+        const innerH = H - margin.top - margin.bottom;
+
+        const svg = cell
+            .append("svg")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("viewBox", `0 0 ${W} ${H}`)
+            .attr("preserveAspectRatio", "xMidYMid meet");
+
+        const defs = svg.append("defs");
+        const uid = `gasz-${Math.random().toString(36).slice(2, 8)}`;
+        const g = svg
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const maxV = d3.max(values) || 1;
+        const x = d3.scaleLinear().domain([0, maxV]).nice().range([0, innerW]);
+        const bins = d3
+            .bin()
+            .domain(x.domain())
+            .thresholds(Math.min(15, Math.max(4, Math.ceil(Math.sqrt(values.length)))))(
+                values
+            );
+        const maxCount = d3.max(bins, (b) => b.length) || 1;
+        const y = d3.scaleLinear().domain([0, maxCount]).nice().range([innerH, 0]);
+
+        g.append("g")
+            .call(d3.axisLeft(y).ticks(4).tickSize(-innerW).tickFormat(""))
+            .call((sel) => sel.select(".domain").remove())
+            .call((sel) => sel.selectAll("line").attr("stroke", "rgba(0,0,0,0.06)"));
+
+        bins.forEach((b, i) => {
+            b._fill = makeBarGradient(defs, `${uid}-${i}`, baseColor);
+        });
+
+        g.selectAll(".ga-bar")
+            .data(bins)
+            .join("rect")
+            .attr("class", "ga-bar")
+            .attr("x", (b) => x(b.x0) + 1)
+            .attr("y", (b) => y(b.length))
+            .attr("width", (b) => Math.max(0, x(b.x1) - x(b.x0) - 1))
+            .attr("height", (b) => innerH - y(b.length))
+            .attr("rx", 2)
+            .attr("fill", (b) => b._fill)
+            .attr("stroke", d3.color(baseColor).darker(0.5).formatHex())
+            .attr("stroke-width", 0.6)
+            .append("title")
+            .text((b) => `${b.x0}–${b.x1}: ${b.length} graph(s)`);
+
+        g.append("g")
+            .attr("transform", `translate(0,${innerH})`)
+            .call(d3.axisBottom(x).ticks(5))
+            .style("font-size", "9.5px");
+        g.append("g").call(d3.axisLeft(y).ticks(4)).style("font-size", "9.5px");
+    };
+
+    mkHist("Nodes per graph", perGraph.map((d) => d.nodeCount), "#4daf4a");
+    mkHist("Edges per graph", perGraph.map((d) => d.edgeCount), "#984ea3");
+}
+
+// --------------------------------------------------------------------------
+// Edge weight by SV type (box-and-whisker, colored by SV type).
+// --------------------------------------------------------------------------
+function renderWeightBySvType(container, breakpoints) {
+    const d3 = window.d3;
+    container.innerHTML = "";
+
+    // Group weights by SV type.
+    const groups = new Map();
+    for (const bp of breakpoints || []) {
+        if (!groups.has(bp.svType)) groups.set(bp.svType, []);
+        groups.get(bp.svType).push(bp.weight);
+    }
+
+    const data = Array.from(groups.entries())
+        .map(([svType, weights]) => {
+            const sorted = weights.slice().sort((a, b) => a - b);
+            const q1 = d3.quantileSorted(sorted, 0.25);
+            const med = d3.quantileSorted(sorted, 0.5);
+            const q3 = d3.quantileSorted(sorted, 0.75);
+            const iqr = q3 - q1;
+            const lo = Math.max(d3.min(sorted), q1 - 1.5 * iqr);
+            const hi = Math.min(d3.max(sorted), q3 + 1.5 * iqr);
+            return {
+                svType,
+                values: sorted,
+                n: sorted.length,
+                q1, med, q3,
+                lo, hi,
+                min: d3.min(sorted),
+                max: d3.max(sorted),
+                outliers: sorted.filter((v) => v < lo || v > hi),
+            };
+        })
+        .sort((a, b) => b.med - a.med || b.n - a.n);
+
+    if (!data.length) {
+        container.innerHTML = '<div class="ga-empty">No edges to summarize.</div>';
+        return;
+    }
+
+    // Fixed design dimensions (scale-to-fit via viewBox) so rotated SV-type
+    // labels and the axis title are never clipped by container measurement.
+    const W = 480;
+    const H = 320;
+    const margin = { top: 18, right: 18, bottom: 56, left: 56 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+
+    const svg = d3
+        .select(container)
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .attr("preserveAspectRatio", "xMidYMid meet");
+
+    const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3
+        .scaleBand()
+        .domain(data.map((d) => d.svType))
+        .range([0, innerW])
+        .padding(0.4);
+
+    const yMax = d3.max(data, (d) => d.max) || 1;
+    const y = d3.scaleLinear().domain([0, yMax]).nice().range([innerH, 0]);
+
+    g.append("g")
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) => sel.selectAll("line").attr("stroke", "rgba(0,0,0,0.06)"));
+
+    const bw = Math.min(x.bandwidth(), 48);
+    const groupSel = g
+        .selectAll(".ga-box")
+        .data(data)
+        .join("g")
+        .attr("class", "ga-box")
+        .attr("transform", (d) => `translate(${x(d.svType) + x.bandwidth() / 2},0)`);
+
+    // Whisker line
+    groupSel
+        .append("line")
+        .attr("x1", 0).attr("x2", 0)
+        .attr("y1", (d) => y(d.lo))
+        .attr("y2", (d) => y(d.hi))
+        .attr("stroke", (d) => d3.color(colorFor(d.svType)).darker(0.6).formatHex())
+        .attr("stroke-width", 1.2);
+
+    // Whisker caps
+    groupSel
+        .append("line")
+        .attr("x1", -bw / 4).attr("x2", bw / 4)
+        .attr("y1", (d) => y(d.lo)).attr("y2", (d) => y(d.lo))
+        .attr("stroke", (d) => d3.color(colorFor(d.svType)).darker(0.6).formatHex())
+        .attr("stroke-width", 1.2);
+    groupSel
+        .append("line")
+        .attr("x1", -bw / 4).attr("x2", bw / 4)
+        .attr("y1", (d) => y(d.hi)).attr("y2", (d) => y(d.hi))
+        .attr("stroke", (d) => d3.color(colorFor(d.svType)).darker(0.6).formatHex())
+        .attr("stroke-width", 1.2);
+
+    // Box (Q1–Q3)
+    groupSel
+        .append("rect")
+        .attr("x", -bw / 2)
+        .attr("y", (d) => y(d.q3))
+        .attr("width", bw)
+        .attr("height", (d) => Math.max(1, y(d.q1) - y(d.q3)))
+        .attr("rx", 2)
+        .attr("fill", (d) => colorFor(d.svType))
+        .attr("fill-opacity", 0.55)
+        .attr("stroke", (d) => d3.color(colorFor(d.svType)).darker(0.6).formatHex())
+        .attr("stroke-width", 1)
+        .append("title")
+        .text(
+            (d) =>
+                `${d.svType}\nn=${d.n}\nmedian=${d.med}\nIQR=[${d.q1}, ${d.q3}]\nrange=[${d.min}, ${d.max}]`
+        );
+
+    // Median line
+    groupSel
+        .append("line")
+        .attr("x1", -bw / 2).attr("x2", bw / 2)
+        .attr("y1", (d) => y(d.med)).attr("y2", (d) => y(d.med))
+        .attr("stroke", (d) => d3.color(colorFor(d.svType)).darker(1.0).formatHex())
+        .attr("stroke-width", 2);
+
+    // Outliers
+    groupSel
+        .selectAll(".ga-box-outlier")
+        .data((d) => d.outliers.map((v) => ({ svType: d.svType, v })))
+        .join("circle")
+        .attr("class", "ga-box-outlier")
+        .attr("cx", () => (Math.random() - 0.5) * (bw / 2))
+        .attr("cy", (o) => y(o.v))
+        .attr("r", 2.4)
+        .attr("fill", (o) => d3.color(colorFor(o.svType)).darker(0.4).formatHex())
+        .attr("fill-opacity", 0.7);
+
+    // n label above each box
+    groupSel
+        .append("text")
+        .attr("x", 0)
+        .attr("y", (d) => y(d.hi) - 5)
+        .attr("text-anchor", "middle")
+        .style("font-size", "9.5px")
+        .style("fill", "var(--bs-secondary-color, #6c757d)")
+        .text((d) => `n=${d.n}`);
+
+    g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "rotate(-35)")
+        .style("text-anchor", "end")
+        .style("font-size", "10.5px")
+        .style("font-weight", "600");
+    g.append("g").call(d3.axisLeft(y).ticks(5)).style("font-size", "10.5px");
+
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -(margin.top + innerH / 2))
+        .attr("y", 14)
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .style("font-weight", "600")
+        .style("fill", "var(--bs-body-color, #333)")
+        .text("Edge weight");
+}
+
 // State for the global circle plot's grouped/expanded mode and legend filter.
 const _circleState = {
     items: [],
@@ -999,6 +1367,9 @@ export async function renderGlobalAnalysis() {
     const svTypeEl = document.getElementById("ga-svtype-chart");
     const histEl = document.getElementById("ga-weight-hist");
     const circleEl = document.getElementById("ga-circle-plot");
+    const scatterEl = document.getElementById("ga-nodes-edges-scatter");
+    const sizeDistEl = document.getElementById("ga-size-dist");
+    const svBoxEl = document.getElementById("ga-weight-by-svtype");
 
     if (!summaryEl || !svTypeEl || !histEl || !circleEl) {
         console.warn("[globalAnalysis] Dashboard containers not found");
@@ -1012,6 +1383,9 @@ export async function renderGlobalAnalysis() {
         svTypeEl.innerHTML = "";
         histEl.innerHTML = "";
         circleEl.innerHTML = "";
+        if (scatterEl) scatterEl.innerHTML = "";
+        if (sizeDistEl) sizeDistEl.innerHTML = "";
+        if (svBoxEl) svBoxEl.innerHTML = "";
         return;
     }
 
@@ -1028,6 +1402,9 @@ export async function renderGlobalAnalysis() {
     renderSummaryTable(summaryEl, agg.perGraph, agg);
     renderSvTypeFrequency(svTypeEl, agg.svTypeCounts);
     renderWeightHistogram(histEl, agg.weights);
+    if (scatterEl) renderNodesEdgesScatter(scatterEl, agg.perGraph);
+    if (svBoxEl) renderWeightBySvType(svBoxEl, agg.breakpoints);
+    if (sizeDistEl) renderSizeDistribution(sizeDistEl, agg.perGraph);
     await renderGlobalCirclePlot(circleEl, agg.breakpoints);
 }
 

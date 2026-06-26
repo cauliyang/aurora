@@ -46,6 +46,49 @@
     min-height: 460px;
 }
 
+/* New analytical figures */
+.ga-card-scatter,
+.ga-card-svbox {
+    min-height: 360px;
+}
+
+.ga-card-sizedist {
+    grid-column: 1 / -1;
+    min-height: 280px;
+}
+
+/* Side-by-side histograms inside the size-distribution card */
+.ga-sizedist-wrap {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .ga-sizedist-wrap {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ga-sizedist-cell {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.ga-sizedist-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.25rem;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.ga-scatter-pt {
+    transition: r 0.12s ease, fill-opacity 0.12s ease;
+}
+
 @media (max-width: 992px) {
     .ga-grid {
         grid-template-columns: 1fr;
