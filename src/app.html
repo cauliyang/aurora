@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="./styles/components/help-guide.css" />
     <link rel="stylesheet" href="./styles/components/graph-canvas.css" />
     <link rel="stylesheet" href="./styles/components/info-panel.css" />
+    <link rel="stylesheet" href="./styles/components/global-analysis.css" />
 </head>
 
 <body class="fade-in">
@@ -59,7 +60,29 @@
 
     <div id="tooltip" class="custom-tooltip"></div>
 
-    <main class="container-fluid h-100 p-3">
+    <main class="container-fluid h-100 p-3 d-flex flex-column">
+        <!-- View tabs: single graph workspace vs. cross-graph global analysis -->
+        <ul class="nav nav-tabs mb-2" id="viewTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="graphViewTab" data-bs-toggle="tab"
+                    data-bs-target="#graphViewPane" type="button" role="tab"
+                    aria-controls="graphViewPane" aria-selected="true">
+                    <i class="bi bi-diagram-3 me-1"></i> Graph View
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="globalAnalysisTab" data-bs-toggle="tab"
+                    data-bs-target="#globalAnalysisPane" type="button" role="tab"
+                    aria-controls="globalAnalysisPane" aria-selected="false">
+                    <i class="bi bi-bar-chart-line me-1"></i> Global Analysis
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content flex-grow-1 overflow-hidden" id="viewTabContent">
+        <!-- ===================== Graph View pane ===================== -->
+        <div class="tab-pane fade show active h-100" id="graphViewPane" role="tabpanel"
+            aria-labelledby="graphViewTab">
         <div class="row h-100">
             <!-- Toolbar -->
             <div class="col-12 mb-3">
@@ -226,6 +249,100 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <!-- =================== end Graph View pane =================== -->
+
+        <!-- ================== Global Analysis pane ================== -->
+        <div class="tab-pane fade h-100" id="globalAnalysisPane" role="tabpanel"
+            aria-labelledby="globalAnalysisTab">
+            <div class="ga-dashboard h-100 d-flex flex-column">
+                <!-- Dashboard toolbar -->
+                <div class="ga-toolbar d-flex align-items-center gap-2 mb-2">
+                    <h5 class="mb-0 me-auto">
+                        <i class="bi bi-bar-chart-line me-1"></i> Global Analysis
+                        <small class="text-muted">— all graphs in the uploaded file</small>
+                    </h5>
+                    <button id="ga-annotate-genes-btn" class="btn btn-sm btn-outline-success"
+                        type="button" title="Annotate gene for every node across all graphs">
+                        <i class="fas fa-dna me-1"></i> Annotate Genes
+                    </button>
+                    <button id="ga-refresh-btn" class="btn btn-sm btn-outline-primary"
+                        type="button" title="Recompute analysis">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+
+                <!-- Dashboard grid -->
+                <div class="ga-grid flex-grow-1 overflow-auto">
+                    <div class="card ga-card ga-card-summary">
+                        <div class="card-header">
+                            <i class="bi bi-table me-1"></i> Per-graph Summary
+                        </div>
+                        <div class="card-body" id="ga-summary-table">
+                            <div class="ga-empty">
+                                <i class="bi bi-info-circle me-2"></i>Upload a TSG/GTA file to see global analysis.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card ga-card">
+                        <div class="card-header">
+                            <i class="bi bi-bar-chart me-1"></i> Edge Variation (SV) Type Frequency
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-svtype-chart"></div>
+                    </div>
+
+                    <div class="card ga-card">
+                        <div class="card-header">
+                            <i class="bi bi-graph-up me-1"></i> Edge Weight Distribution
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-weight-hist"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-circle">
+                        <div class="card-header d-flex align-items-center flex-wrap gap-2">
+                            <span>
+                                <i class="bi bi-circle-half me-1"></i> All Edges — Breakpoint Circle Plot
+                                <small class="text-muted">(click a ribbon to open that graph)</small>
+                            </span>
+                            <div class="ms-auto d-flex align-items-center gap-2">
+                                <div id="ga-circle-legend" class="ga-circle-legend"></div>
+                                <button id="ga-circle-expand-btn" type="button"
+                                    class="btn btn-sm btn-outline-secondary" title="Toggle grouped / expanded ribbons">
+                                    <i class="bi bi-arrows-collapse me-1"></i> Grouped
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body ga-chart-body ga-circle-body" id="ga-circle-plot"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-genefreq">
+                        <div class="card-header">
+                            <i class="fas fa-dna me-1"></i> Gene Frequency
+                            <small class="text-muted">(top genes by node count · color = graphs shared)</small>
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-gene-frequency">
+                            <div class="ga-empty">
+                                <i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to compute gene annotations.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card ga-card ga-card-geneshare">
+                        <div class="card-header">
+                            <i class="bi bi-diagram-2 me-1"></i> Gene Sharing Across Graphs
+                        </div>
+                        <div class="card-body" id="ga-gene-sharing">
+                            <div class="ga-empty">
+                                <i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to see how genes are shared across graphs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ================ end Global Analysis pane ================ -->
+        </div>
 
     </main>
 

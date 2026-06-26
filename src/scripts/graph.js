@@ -25,6 +25,8 @@ export const STATE = {
     possibleWalks: [],
 
     graph_jsons: [],
+    graph_ids: [], // graph IDs parsed from raw TSG "G" lines (parallel to graph_jsons)
+    currentGraphIndex: 0, // index of the graph currently loaded into cy
     minEdgeWeight: 1,
     minPathLength: 1,
     maxPathLength: 900,

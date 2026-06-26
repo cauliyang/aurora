@@ -52,7 +52,47 @@ export function setupClickEvent() {
 
         // Show element information in the info panel
         displayElementInfo(element, infoContent);
+
+        // Graph -> Charts linking: when an edge is selected, reflect it in the
+        // Global Analysis dashboard (no-op if the dashboard isn't rendered).
+        if (element.isEdge()) {
+            const svType = getEdgeSvType(element);
+            import("./globalAnalysis.js")
+                .then((m) => {
+                    m.highlightInCharts?.(
+                        element.data("id"),
+                        svType,
+                        STATE.currentGraphIndex
+                    );
+                })
+                .catch(() => {
+                    /* dashboard module optional */
+                });
+        }
     });
+}
+
+/**
+ * Derive the SV/variation type for an edge, mirroring the breakpoint parsing
+ * used elsewhere (5th field of the "breakpoints" string, with an INTRA/INTER
+ * fallback inferred from the connected nodes' chromosomes).
+ * @param {Object} edge - Cytoscape edge
+ * @returns {string} uppercase SV type
+ */
+function getEdgeSvType(edge) {
+    const bpStr = edge.data("breakpoints");
+    if (typeof bpStr === "string" && bpStr.length > 0) {
+        const parts = bpStr.split(",").map((s) => s.trim());
+        if (parts.length >= 5 && parts[4]) return parts[4].toUpperCase();
+    }
+    const src = edge.source();
+    const tgt = edge.target();
+    if (src && tgt) {
+        const c1 = src.data("chrom");
+        const c2 = tgt.data("chrom");
+        if (c1 && c2) return c1 === c2 ? "INTRA" : "INTER";
+    }
+    return "DEFAULT";
 }
 
 /**

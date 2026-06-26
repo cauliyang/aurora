@@ -4,6 +4,18 @@ import { loadGraphDataFromServer } from "./graph";
 import { getLabelsVisible, setLabelsVisible } from "./graphSetup";
 import { loadGeneData, annotateAllNodes } from "./geneAnnotation";
 import { showBreakpointCirclePlotModal } from "./breakpointCirclePlot";
+// NOTE: globalAnalysis is intentionally NOT statically imported here.
+// eventHandlers <-> globalAnalysis would form a circular dependency (the
+// dashboard navigates back into graph loading), which under Parcel's CommonJS
+// interop leaves the exports object partially initialized and yields
+// "renderGlobalAnalysis is not a function". We load it lazily instead.
+let _globalAnalysisMod = null;
+async function getGlobalAnalysis() {
+    if (!_globalAnalysisMod) {
+        _globalAnalysisMod = await import("./globalAnalysis.js");
+    }
+    return _globalAnalysisMod;
+}
 
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
@@ -403,6 +415,31 @@ if (uploadBtn && uploadInput) {
     console.warn("Upload button or input not found in the DOM");
 }
 
+/**
+ * Parses graph IDs from raw TSG content.
+ * The TSG format delimits graphs with a "G <graphId>" line. The WASM parser
+ * drops these IDs, so we recover them here to label the graph selector.
+ * Returns an array of graph IDs in file order. Falls back to an empty array
+ * when no G-lines are present (e.g. single-graph TSG without an explicit ID).
+ * @param {string} content - Raw TSG file text
+ * @returns {string[]}
+ */
+function parseGraphIds(content) {
+    const ids = [];
+    if (typeof content !== "string") return ids;
+    const lines = content.split(/\r?\n/);
+    for (const line of lines) {
+        // G-line: "G\t<graphId>" (tab or whitespace separated)
+        if (/^G\s/.test(line)) {
+            const parts = line.split(/\s+/);
+            if (parts.length >= 2 && parts[1]) {
+                ids.push(parts[1].trim());
+            }
+        }
+    }
+    return ids;
+}
+
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -421,6 +458,9 @@ function handleFileUpload(event) {
         const content = e.target.result;
         const fileExtension = file.name.split(".").pop().toLowerCase();
 
+        // New file → invalidate any cached global-analysis aggregation.
+        getGlobalAnalysis().then((m) => m.invalidateGlobalAnalysisCache?.());
+
         try {
             if (fileExtension === "json") {
                 window.loadingIndicator?.updateMessage(loadingId, "Parsing JSON data...");
@@ -429,6 +469,10 @@ function handleFileUpload(event) {
 
                 window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
                 loadGraphDataFromServer(jsonData);
+
+                // Single JSON file: one graph at index 0, no IDs.
+                STATE.graph_ids = [];
+                STATE.currentGraphIndex = 0;
 
                 // Hide graph selector for single JSON files
                 document.getElementById("graphSelectorContainer").classList.add("d-none");
@@ -440,6 +484,13 @@ function handleFileUpload(event) {
                 // Handle TSG file
                 // wait for the result from promise
                 STATE.graph_jsons = await window.parse_tsgFile(content);
+
+                // Recover graph IDs from the raw TSG "G" lines (WASM drops them).
+                // Only keep them if the count matches the parsed graph count, so
+                // the selector labels stay aligned with the actual graphs.
+                const parsedIds = parseGraphIds(content);
+                STATE.graph_ids =
+                    parsedIds.length === STATE.graph_jsons.length ? parsedIds : [];
 
                 // Show graph selector if multiple graphs are available
                 const graphCount = STATE.graph_jsons.length;
@@ -458,6 +509,7 @@ function handleFileUpload(event) {
                 window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
                 const jsonData = JSON.parse(STATE.graph_jsons[0]);
                 loadGraphDataFromServer(jsonData);
+                STATE.currentGraphIndex = 0;
 
                 window.loadingIndicator?.hide(loadingId);
                 window.showAlert?.(
@@ -485,6 +537,66 @@ function handleFileUpload(event) {
 }
 
 /**
+ * Returns a human-readable label for a graph at the given index.
+ * Uses the parsed TSG graph ID when available, otherwise falls back to
+ * "Graph N". The ID (e.g. "aebca61723b9b758") is shown directly.
+ * @param {number} index - Zero-based graph index
+ * @returns {string}
+ */
+export function getGraphLabel(index) {
+    const id = STATE.graph_ids && STATE.graph_ids[index];
+    return id ? id : `Graph ${index + 1}`;
+}
+
+/**
+ * Loads the graph at the given index into the Cytoscape view, updates
+ * STATE.currentGraphIndex, and keeps the #graphSelect dropdown in sync.
+ * Shared by the selector change handler and the Global Analysis click-throughs
+ * (cross-graph navigation).
+ * @param {number} index - Zero-based graph index
+ * @param {boolean} [notify=true] - Whether to show a success alert
+ * @returns {boolean} true if the graph was loaded
+ */
+export function loadGraphByIndex(index, notify = true) {
+    if (!STATE.graph_jsons || index < 0 || index >= STATE.graph_jsons.length) {
+        console.warn(`loadGraphByIndex: invalid index ${index}`);
+        return false;
+    }
+    if (index === STATE.currentGraphIndex && STATE.cy) {
+        // Already loaded — no-op (avoids a costly re-init).
+        return true;
+    }
+    try {
+        const jsonData = JSON.parse(STATE.graph_jsons[index]);
+        loadGraphDataFromServer(jsonData);
+        STATE.currentGraphIndex = index;
+
+        // Keep the toolbar dropdown in sync when navigation is programmatic.
+        const graphSelect = document.getElementById("graphSelect");
+        if (graphSelect && String(graphSelect.value) !== String(index)) {
+            graphSelect.value = String(index);
+        }
+
+        if (notify) {
+            window.showAlert?.(`Loaded ${getGraphLabel(index)}`, "success", 2000);
+        }
+        // Refresh the dashboard's active-row highlight if it's rendered.
+        return true;
+    } catch (error) {
+        console.error("Error loading selected graph:", error);
+        window.showAlert?.(
+            `Error loading ${getGraphLabel(index)}: ${error.message}`,
+            "error"
+        );
+        return false;
+    }
+}
+
+// Expose for cross-module use without creating static import cycles
+// (breakpointCirclePlot.js calls this for cross-graph navigation).
+window.loadGraphByIndex = loadGraphByIndex;
+
+/**
  * Sets up the graph selector dropdown with options based on the number of available graphs
  * @param {number} graphCount - The number of available graphs
  */
@@ -497,11 +609,13 @@ function setupGraphSelector(graphCount) {
     // Clear existing options
     graphSelect.innerHTML = "";
 
-    // Add options for each graph
+    // Add options for each graph, labelled by graph ID when available
     for (let i = 0; i < graphCount; i++) {
         const option = document.createElement("option");
         option.value = i;
-        option.textContent = `Graph ${i + 1}`;
+        option.textContent = getGraphLabel(i);
+        // Always expose the index-based name as a tooltip for disambiguation
+        option.title = `Graph ${i + 1}${STATE.graph_ids[i] ? ` (${STATE.graph_ids[i]})` : ""}`;
         graphSelect.appendChild(option);
     }
 
@@ -513,20 +627,7 @@ function setupGraphSelector(graphCount) {
     graphSelect.parentNode.replaceChild(freshSelect, graphSelect);
     freshSelect.addEventListener("change", function() {
         const selectedIndex = parseInt(this.value);
-        if (STATE.graph_jsons && STATE.graph_jsons.length > selectedIndex) {
-            try {
-                // Parse and load the selected graph
-                const jsonData = JSON.parse(STATE.graph_jsons[selectedIndex]);
-                loadGraphDataFromServer(jsonData);
-                window.showAlert(`Loaded graph ${selectedIndex + 1}`, "success", 2000);
-            } catch (error) {
-                console.error("Error loading selected graph:", error);
-                window.showAlert(
-                    `Error loading graph ${selectedIndex + 1}: ${error.message}`,
-                    "error"
-                );
-            }
-        }
+        loadGraphByIndex(selectedIndex);
     });
 }
 
@@ -548,6 +649,59 @@ if (circlePlotBtn) {
     });
 } else {
     console.warn("Element with ID 'circlePlotBtn' not found in the DOM");
+}
+
+// Global Analysis tab — lazily render the dashboard when the tab is shown.
+// Deferred until visible so D3 can measure the chart containers correctly.
+const globalAnalysisTab = document.getElementById("globalAnalysisTab");
+if (globalAnalysisTab) {
+    globalAnalysisTab.addEventListener("shown.bs.tab", async() => {
+        try {
+            const m = await getGlobalAnalysis();
+            await m.renderGlobalAnalysis();
+        } catch (err) {
+            console.error("Failed to render global analysis:", err);
+            window.showAlert?.(
+                "Failed to render global analysis: " + (err?.message || err),
+                "error"
+            );
+        }
+    });
+}
+
+// Manual refresh button inside the Global Analysis dashboard
+const gaRefreshBtn = document.getElementById("ga-refresh-btn");
+if (gaRefreshBtn) {
+    gaRefreshBtn.addEventListener("click", async() => {
+        try {
+            const m = await getGlobalAnalysis();
+            m.invalidateGlobalAnalysisCache?.();
+            await m.renderGlobalAnalysis();
+        } catch (err) {
+            console.error("Failed to refresh global analysis:", err);
+            window.showAlert?.(
+                "Failed to refresh global analysis: " + (err?.message || err),
+                "error"
+            );
+        }
+    });
+}
+
+// Global Analysis: annotate genes across all graphs and render gene panels
+const gaAnnotateGenesBtn = document.getElementById("ga-annotate-genes-btn");
+if (gaAnnotateGenesBtn) {
+    gaAnnotateGenesBtn.addEventListener("click", async() => {
+        try {
+            const m = await getGlobalAnalysis();
+            await m.renderGeneAnalysis();
+        } catch (err) {
+            console.error("Failed to annotate genes:", err);
+            window.showAlert?.(
+                "Failed to annotate genes: " + (err?.message || err),
+                "error"
+            );
+        }
+    });
 }
 
 // Add the clear highlights button event handler

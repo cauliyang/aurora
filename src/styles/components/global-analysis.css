@@ -1,0 +1,242 @@
+/* global-analysis.css
+   Styling for the cross-graph Global Analysis dashboard (app.html).
+   Uses Bootstrap variables / the Aurora modern-theme custom properties where
+   available so it adapts to light/dark themes. */
+
+/* ---- Tab content sizing ---------------------------------------------- */
+#viewTabContent {
+    min-height: 0; /* allow flex child to shrink and scroll */
+}
+
+.ga-dashboard {
+    min-height: 0;
+}
+
+.ga-toolbar h5 {
+    font-size: 1.05rem;
+}
+
+/* ---- Dashboard grid -------------------------------------------------- */
+.ga-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(260px, auto);
+    gap: 1rem;
+    padding-right: 0.25rem;
+}
+
+/* Summary table spans full width on top; circle plot spans full width and is
+   taller. SV-type and weight charts sit side by side. */
+.ga-card-summary {
+    grid-column: 1 / -1;
+}
+
+.ga-card-circle {
+    grid-column: 1 / -1;
+    grid-row: span 2;
+    min-height: 560px;
+}
+
+.ga-card-genefreq,
+.ga-card-geneshare {
+    grid-column: 1 / -1;
+}
+
+.ga-card-genefreq {
+    min-height: 320px;
+}
+
+@media (max-width: 992px) {
+    .ga-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- Cards ----------------------------------------------------------- */
+.ga-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-md, 0.5rem);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+}
+
+.ga-card .card-header {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.ga-card .card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+}
+
+.ga-chart-body {
+    position: relative;
+    min-height: 240px;
+    padding: 0.5rem;
+}
+
+.ga-circle-body {
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Legend in the circle-plot card header: wrap chips, cap height with scroll. */
+.ga-circle-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+    max-height: 64px;
+    overflow-y: auto;
+    justify-content: flex-end;
+}
+
+.ga-chart-body svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---- Empty state ----------------------------------------------------- */
+.ga-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 120px;
+    color: var(--bs-secondary-color, #6c757d);
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* ---- Summary table --------------------------------------------------- */
+.ga-summary-table {
+    font-size: 0.85rem;
+}
+
+.ga-summary-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.ga-summary-row:hover {
+    background-color: var(--bs-tertiary-bg, rgba(13, 110, 253, 0.08));
+}
+
+.ga-active-row {
+    background-color: rgba(13, 110, 253, 0.16) !important;
+    box-shadow: inset 3px 0 0 var(--aurora-primary, #0d6efd);
+}
+
+.ga-total-row td {
+    border-top: 2px solid var(--bs-border-color, #dee2e6);
+}
+
+/* ---- Bars ------------------------------------------------------------ */
+.ga-bar {
+    transition: opacity 0.15s ease, stroke-width 0.15s ease;
+}
+
+.ga-bar:hover {
+    opacity: 0.85;
+}
+
+.ga-bar-active {
+    stroke: var(--aurora-primary, #0d6efd);
+    stroke-width: 2.5px;
+}
+
+.ga-svbar {
+    cursor: default;
+}
+
+/* ---- Gene sharing panel ---------------------------------------------- */
+.ga-share-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.ga-share-stat {
+    flex: 1 1 120px;
+    text-align: center;
+    padding: 0.6rem 0.4rem;
+    border-radius: var(--radius-md, 0.5rem);
+    background: var(--bs-tertiary-bg, rgba(13, 110, 253, 0.06));
+}
+
+.ga-share-num {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--aurora-primary, #0d6efd);
+    line-height: 1.1;
+}
+
+.ga-share-lbl {
+    font-size: 0.72rem;
+    color: var(--bs-secondary-color, #6c757d);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.ga-share-grid {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 2fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .ga-share-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ga-share-subtitle {
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: 0.4rem;
+}
+
+.ga-share-table {
+    font-size: 0.82rem;
+}
+
+.ga-gene-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.ga-gene-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: var(--bs-tertiary-bg, rgba(13, 110, 253, 0.08));
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.ga-gene-chip-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--aurora-primary, #0d6efd);
+    border-radius: 999px;
+    padding: 1px 6px;
+}
+
+.ga-gene-label {
+    font-variant-numeric: tabular-nums;
+}

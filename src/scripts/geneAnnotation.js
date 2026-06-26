@@ -594,6 +594,78 @@ export function annotateNode(node) {
 }
 
 /**
+ * Annotate a plain node-data object (NOT a live Cytoscape node) with gene
+ * information, reusing the same exon-overlap logic as annotateNode. Used by
+ * the Global Analysis dashboard, which works on raw parsed-JSON nodes for
+ * graphs that are not currently loaded into Cytoscape.
+ *
+ * @param {Object} nodeData - Raw node data ({ chrom, ref_start, ref_end, strand, exons, ... })
+ * @returns {Array<Object>} - Array of gene annotation objects (possibly empty)
+ */
+export function annotateNodeData(nodeData) {
+  if (!nodeData || !isGeneDataLoaded) return [];
+
+  const chrom = nodeData.chrom;
+  const start = parseInt(nodeData.ref_start);
+  const end = parseInt(nodeData.ref_end);
+  const strand = nodeData.strand || "+";
+
+  if (!chrom || isNaN(start) || isNaN(end)) return [];
+
+  const nodeExons = parseExonString(nodeData.exons);
+  const hasExonData = nodeExons.length > 0;
+
+  const candidateGenes = findOverlappingGenes(chrom, start, end, strand);
+
+  let overlappingGenes;
+  if (hasExonData) {
+    overlappingGenes = candidateGenes.filter((gene) =>
+      gene.overlapsExons(nodeExons)
+    );
+  } else {
+    overlappingGenes = candidateGenes;
+  }
+
+  if (overlappingGenes.length === 0) return [];
+
+  if (hasExonData) {
+    overlappingGenes.sort(
+      (a, b) =>
+        b.calculateExonOverlapPercentage(nodeExons) -
+        a.calculateExonOverlapPercentage(nodeExons)
+    );
+  } else {
+    overlappingGenes.sort(
+      (a, b) =>
+        b.calculateOverlapPercentage(start, end) -
+        a.calculateOverlapPercentage(start, end)
+    );
+  }
+
+  return overlappingGenes.map((gene) => {
+    const overlapPct = hasExonData
+      ? gene.calculateExonOverlapPercentage(nodeExons)
+      : gene.calculateOverlapPercentage(start, end);
+    return {
+      geneId: gene.geneId,
+      geneName: gene.geneName,
+      strand: gene.strand,
+      start: gene.start,
+      end: gene.end,
+      exonCount: gene.exons.length,
+      overlapPercentage: overlapPct.toFixed(1),
+    };
+  });
+}
+
+/**
+ * @returns {boolean} Whether the gene database has been loaded.
+ */
+export function isGeneDataReady() {
+  return isGeneDataLoaded && geneDatabase.length > 0;
+}
+
+/**
  * Annotate all nodes in a graph with gene information
  * @param {Object} cy - Cytoscape instance
  * @returns {Promise<number>} - Number of nodes annotated

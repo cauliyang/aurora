@@ -16,10 +16,29 @@
 
 import { STATE } from "./graph";
 
+// Monotonic counter used to namespace SVG def IDs uniquely across all circle
+// plot renders (see uid in renderCirclePlot). Prevents url(#id) cross-plot bleed.
+let _plotSeq = 0;
+
+// Pending hide timer for the shared, selectable breakpoint tooltip.
+let _tipHideTimer = null;
+
+// Immediately hide the tooltip and clear any pending delayed-hide timer.
+function hideTipNow(tip) {
+    if (_tipHideTimer) {
+        clearTimeout(_tipHideTimer);
+        _tipHideTimer = null;
+    }
+    if (tip) {
+        tip.style.opacity = "0";
+        tip.style.transform = "translateY(2px)";
+    }
+}
+
 // --------------------------------------------------------------------------
 // hg38 chromosome sizes (GRCh38.p14 primary assembly)
 // --------------------------------------------------------------------------
-const HG38_CHROM_SIZES = {
+export const HG38_CHROM_SIZES = {
     chr1: 248956422,
     chr2: 242193529,
     chr3: 198295559,
@@ -47,14 +66,14 @@ const HG38_CHROM_SIZES = {
     chrM: 16569,
 };
 
-const HG38_ORDER = [
+export const HG38_ORDER = [
     "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8",
     "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16",
     "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX", "chrY", "chrM",
 ];
 
 // Accept input chromosomes with or without 'chr' prefix; normalise to hg38 key
-function normaliseChrom(raw) {
+export function normaliseChrom(raw) {
     if (raw == null) return null;
     let c = String(raw).trim();
     if (!c) return null;
@@ -74,7 +93,7 @@ function normaliseChrom(raw) {
 // Inter-chromosomal translocations (IT**) sit in the warm/purple band,
 // intra-chromosomal rearrangements (IC**) sit in the orange/yellow band,
 // and the canonical SV types (INV/DEL/DUP/TRA) keep classic ColorBrewer hues.
-const SV_COLORS = {
+export const SV_COLORS = {
     INV: "#e41a1c", // red
     DEL: "#377eb8", // blue
     DUP: "#4daf4a", // green
@@ -88,14 +107,14 @@ const SV_COLORS = {
     DEFAULT: "#bbbbbb",
 };
 
-function colorFor(svType) {
+export function colorFor(svType) {
     return SV_COLORS[svType] || SV_COLORS.DEFAULT;
 }
 
 // --------------------------------------------------------------------------
 // D3 lazy loader (CDN), shared with exonVisualization.js pattern
 // --------------------------------------------------------------------------
-function loadD3() {
+export function loadD3() {
     return new Promise((resolve, reject) => {
         if (window.d3) {
             resolve();
@@ -119,9 +138,38 @@ function resolveEdgeLabel(data) {
     return `${data.source || "?"} -> ${data.target || "?"}`;
 }
 
+// Resolve a gene label for a node from its annotation data. Returns the gene
+// name(s) when gene annotations exist, otherwise "NEO" (novel/neo — no known
+// overlapping gene). Accepts a Cytoscape node OR a raw node-data object.
+export function geneLabelForNode(nodeOrData) {
+    if (!nodeOrData) return "NEO";
+    const data =
+        typeof nodeOrData.data === "function" ? nodeOrData.data() : nodeOrData;
+    if (!data) return "NEO";
+
+    const annotations = data.geneAnnotations;
+    if (Array.isArray(annotations) && annotations.length > 0) {
+        const names = annotations
+            .map((g) => g && g.geneName)
+            .filter(Boolean);
+        if (names.length) {
+            // De-duplicate while preserving order.
+            return Array.from(new Set(names)).join(", ");
+        }
+    }
+
+    // Fall back to a meaningful gene_name if present (and not just the node id).
+    const gn = data.gene_name;
+    if (gn && gn !== data.id && gn !== data.name) return String(gn);
+
+    return "NEO";
+}
+
 function parseEdgeBreakpoint(edge) {
     const data = edge.data();
     const bpStr = data.breakpoints;
+    const src = edge.source();
+    const tgt = edge.target();
 
     let chr1, chr2, pos1, pos2, svType;
 
@@ -136,8 +184,6 @@ function parseEdgeBreakpoint(edge) {
 
     // Fallback: reconstruct from connected nodes
     if (!chr1 || !chr2 || !Number.isFinite(pos1) || !Number.isFinite(pos2)) {
-        const src = edge.source();
-        const tgt = edge.target();
         if (!src || !tgt) return null;
         chr1 = src.data("chrom");
         chr2 = tgt.data("chrom");
@@ -163,6 +209,8 @@ function parseEdgeBreakpoint(edge) {
         pos1,
         pos2,
         svType: (svType || "").toUpperCase() || "DEFAULT",
+        sourceGene: src && !src.empty() ? geneLabelForNode(src) : "NEO",
+        targetGene: tgt && !tgt.empty() ? geneLabelForNode(tgt) : "NEO",
     };
 }
 
@@ -311,7 +359,7 @@ function buildHumanKaryotype(breakpoints) {
 // --------------------------------------------------------------------------
 // Render the circle plot
 // --------------------------------------------------------------------------
-function renderCirclePlot(container, items, opts = {}) {
+export function renderCirclePlot(container, items, opts = {}) {
     const d3 = window.d3;
     container.innerHTML = "";
 
@@ -361,8 +409,15 @@ function renderCirclePlot(container, items, opts = {}) {
     // ----- Defs: radial background, drop shadow, chord gradients (built lazily) -----
     const defs = svg.append("defs");
 
+    // Unique per-render namespace for all SVG def IDs. Multiple circle plots can
+    // coexist in the DOM (e.g. the Graph View modal and the Global Analysis
+    // dashboard). SVG url(#id) references resolve to the FIRST matching element
+    // in document order, so non-unique IDs caused cross-plot bleed — most
+    // visibly, chords referencing the wrong gradient and rendering invisible.
+    const uid = `cp-${(_plotSeq++).toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
     // Radial background gradient
-    const bgGrad = defs.append("radialGradient").attr("id", "cp-bg-grad")
+    const bgGrad = defs.append("radialGradient").attr("id", `${uid}-bg-grad`)
         .attr("cx", "50%").attr("cy", "50%").attr("r", "75%");
     bgGrad.append("stop").attr("offset", "0%").attr("stop-color", "rgba(120,130,160,0.07)");
     bgGrad.append("stop").attr("offset", "70%").attr("stop-color", "rgba(120,130,160,0.0)");
@@ -371,21 +426,21 @@ function renderCirclePlot(container, items, opts = {}) {
     svg.append("rect")
         .attr("x", -W / 2).attr("y", -H / 2)
         .attr("width", W).attr("height", H)
-        .attr("fill", "url(#cp-bg-grad)");
+        .attr("fill", `url(#${uid}-bg-grad)`);
 
     // Subtle glow halo behind the ring
-    const haloGrad = defs.append("radialGradient").attr("id", "cp-halo")
+    const haloGrad = defs.append("radialGradient").attr("id", `${uid}-halo`)
         .attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
     haloGrad.append("stop").attr("offset", "70%").attr("stop-color", "rgba(99,102,241,0.0)");
     haloGrad.append("stop").attr("offset", "92%").attr("stop-color", "rgba(99,102,241,0.10)");
     haloGrad.append("stop").attr("offset", "100%").attr("stop-color", "rgba(99,102,241,0.0)");
     svg.append("circle")
         .attr("r", outerRadius + 28)
-        .attr("fill", "url(#cp-halo)");
+        .attr("fill", `url(#${uid}-halo)`);
 
     // Soft drop shadow filter for ribbons
     const filter = defs.append("filter")
-        .attr("id", "cp-ribbon-shadow")
+        .attr("id", `${uid}-ribbon-shadow`)
         .attr("x", "-20%").attr("y", "-20%")
         .attr("width", "140%").attr("height", "140%");
     filter.append("feGaussianBlur").attr("in", "SourceAlpha").attr("stdDeviation", 1.2);
@@ -395,7 +450,7 @@ function renderCirclePlot(container, items, opts = {}) {
     merge.append("feMergeNode").attr("in", "SourceGraphic");
 
     // Drop shadow for chr labels (improves legibility against varied bg)
-    const labelFilter = defs.append("filter").attr("id", "cp-label-shadow")
+    const labelFilter = defs.append("filter").attr("id", `${uid}-label-shadow`)
         .attr("x", "-40%").attr("y", "-40%").attr("width", "180%").attr("height", "180%");
     labelFilter.append("feGaussianBlur").attr("in", "SourceAlpha").attr("stdDeviation", 0.6);
     labelFilter.append("feOffset").attr("dx", 0).attr("dy", 0.4).attr("result", "lo");
@@ -424,7 +479,7 @@ function renderCirclePlot(container, items, opts = {}) {
         const base = d3.color(c);
         const dark = base.darker(0.65).formatHex();
         const grad = defs.append("linearGradient")
-            .attr("id", `cp-chr-${cssSafeAttr(k.chr)}`)
+            .attr("id", `${uid}-chr-${cssSafeAttr(k.chr)}`)
             .attr("x1", "0%").attr("y1", "0%").attr("x2", "0%").attr("y2", "100%");
         grad.append("stop").attr("offset", "0%").attr("stop-color", c);
         grad.append("stop").attr("offset", "100%").attr("stop-color", dark);
@@ -449,7 +504,7 @@ function renderCirclePlot(container, items, opts = {}) {
         .join("path")
         .attr("class", "chr-arc")
         .attr("d", (d) => arcGen({ startAngle: d.startAngle, endAngle: d.endAngle }))
-        .attr("fill", (d) => `url(#cp-chr-${cssSafeAttr(d.chr)})`)
+        .attr("fill", (d) => `url(#${uid}-chr-${cssSafeAttr(d.chr)})`)
         .attr("fill-opacity", 1)
         .attr("stroke", "rgba(255,255,255,0.85)")
         .attr("stroke-width", 0.8)
@@ -488,16 +543,20 @@ function renderCirclePlot(container, items, opts = {}) {
         .style("font-weight", "700")
         .style("fill", "#1a1a2e")
         .style("letter-spacing", "0.5px")
-        .style("filter", "url(#cp-label-shadow)")
+        .style("filter", `url(#${uid}-label-shadow)`)
         .text((d) => d.chr.replace(/^chr/, ""));
 
     // ----- Tooltip (solid card, no blur) -----
+    // Interactive + selectable: the user can move the pointer into the tooltip
+    // and select/copy its text. A short hide delay bridges the gap between the
+    // ribbon and the tooltip; hovering the tooltip cancels the pending hide.
     let tip = document.getElementById("circle-plot-tooltip");
     if (!tip) {
         tip = document.createElement("div");
         tip.id = "circle-plot-tooltip";
         tip.style.cssText = `
-      position: fixed; pointer-events: none; opacity: 0;
+      position: fixed; pointer-events: auto; opacity: 0;
+      user-select: text; -webkit-user-select: text; cursor: text;
       background: #15171f;
       color: #f5f6fa;
       padding: 10px 12px; border-radius: 10px; font-size: 12px;
@@ -509,8 +568,21 @@ function renderCirclePlot(container, items, opts = {}) {
       transform: translateY(2px);
     `;
         document.body.appendChild(tip);
+        // Keep the tooltip open while the pointer is over it (so text can be
+        // selected), hide it once the pointer truly leaves.
+        tip.addEventListener("mouseenter", () => {
+            if (_tipHideTimer) {
+                clearTimeout(_tipHideTimer);
+                _tipHideTimer = null;
+            }
+        });
+        tip.addEventListener("mouseleave", () => hideTipNow(tip));
     }
     function showTip(html, evt) {
+        if (_tipHideTimer) {
+            clearTimeout(_tipHideTimer);
+            _tipHideTimer = null;
+        }
         tip.innerHTML = html;
         tip.style.opacity = "1";
         tip.style.transform = "translateY(0)";
@@ -521,9 +593,10 @@ function renderCirclePlot(container, items, opts = {}) {
         tip.style.left = `${evt.clientX + pad}px`;
         tip.style.top = `${evt.clientY + pad}px`;
     }
+    // Schedule a delayed hide so the pointer can travel into the tooltip.
     function hideTip() {
-        tip.style.opacity = "0";
-        tip.style.transform = "translateY(2px)";
+        if (_tipHideTimer) clearTimeout(_tipHideTimer);
+        _tipHideTimer = setTimeout(() => hideTipNow(tip), 260);
     }
 
     // ----- Weight scales -----
@@ -536,7 +609,7 @@ function renderCirclePlot(container, items, opts = {}) {
     // ----- Ribbons -----
     const ribbonsG = svg.append("g")
         .attr("class", "ribbons")
-        .style("filter", "url(#cp-ribbon-shadow)");
+        .style("filter", `url(#${uid}-ribbon-shadow)`);
 
     // Cubic Bezier "pulled to origin" — produces smooth chord curves akin to d3.chord
     function ribbonPath(p1, p2, offsetFrac = 0) {
@@ -565,7 +638,7 @@ function renderCirclePlot(container, items, opts = {}) {
     // Build per-ribbon directional gradients in defs (source -> darker target)
     let gradSeq = 0;
     function makeChordGradient(p1, p2, color) {
-        const id = `cp-chord-grad-${gradSeq++}`;
+        const id = `${uid}-chord-grad-${gradSeq++}`;
         const dark = d3.color(color).darker(0.7).formatHex();
         const light = d3.color(color).brighter(0.15).formatHex();
         defs.append("linearGradient")
@@ -644,7 +717,7 @@ function renderCirclePlot(container, items, opts = {}) {
                         .attr("stroke-width", baseWidth);
                     hideTip();
                 })
-                .on("click", () => focusEdgeOnGraph(bp.edgeId));
+                .on("click", () => focusEdgeOnGraph(bp.edgeId, bp.graphIndex ?? null));
 
             animateEntry(path, idx);
         });
@@ -742,7 +815,10 @@ function renderCirclePlot(container, items, opts = {}) {
                     hideTip();
                 })
                 .on("click", () => {
-                    focusEdgeOnGraph(g.members[0].edgeId);
+                    focusEdgeOnGraph(
+                        g.members[0].edgeId,
+                        g.members[0].graphIndex ?? null
+                    );
                 });
 
             animateEntry(path, idx);
@@ -770,7 +846,7 @@ function renderCirclePlot(container, items, opts = {}) {
                 // Build a soft halo + badge
                 const badgeColor = d3.color(color);
                 const badgeGrad = defs.append("radialGradient")
-                    .attr("id", `cp-badge-${gradSeq++}`)
+                    .attr("id", `${uid}-badge-${gradSeq++}`)
                     .attr("cx", "50%").attr("cy", "40%").attr("r", "60%");
                 badgeGrad.append("stop").attr("offset", "0%")
                     .attr("stop-color", badgeColor.brighter(0.6).formatHex());
@@ -815,6 +891,22 @@ function svBadge(color, type) {
     </span>`;
 }
 
+// Gene info row: source node gene -> target node gene (or NEO when absent).
+function geneTooltipRow(sourceGene, targetGene) {
+    const fmt = (g) => {
+        const val = g && String(g).trim() ? String(g) : "NEO";
+        const isNeo = val === "NEO";
+        return `<span style="color:${isNeo ? "#f59e0b" : "#7dd3fc"};font-weight:600">${escapeHtml(val)}</span>`;
+    };
+    return `
+    <div style="margin-top:6px;font-size:11px;opacity:.9;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span style="opacity:.6">gene</span>
+      ${fmt(sourceGene)}
+      <span style="opacity:.6">&rarr;</span>
+      ${fmt(targetGene)}
+    </div>`;
+}
+
 function singleEdgeTooltip(bp, color) {
     return `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
@@ -824,6 +916,7 @@ function singleEdgeTooltip(bp, color) {
     <div style="${TIP_COORD_STYLE}opacity:.95">
       ${bp.chr1}:${bp.pos1.toLocaleString()} &rarr; ${bp.chr2}:${bp.pos2.toLocaleString()}
     </div>
+    ${geneTooltipRow(bp.sourceGene, bp.targetGene)}
     <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;opacity:.85">
       <div><span style="opacity:.6">weight</span> <strong>${bp.weight}</strong></div>
       <div style="${TIP_COORD_STYLE}opacity:.6">id ${escapeHtml(bp.edgeId || "—")}</div>
@@ -832,13 +925,23 @@ function singleEdgeTooltip(bp, color) {
 }
 
 function groupTooltip(g, color) {
+    const geneInline = (m) => {
+        const s = m.sourceGene && String(m.sourceGene).trim() ? m.sourceGene : "NEO";
+        const t = m.targetGene && String(m.targetGene).trim() ? m.targetGene : "NEO";
+        const fmt = (v) =>
+            `<span style="color:${v === "NEO" ? "#f59e0b" : "#7dd3fc"}">${escapeHtml(v)}</span>`;
+        return `<div style="opacity:.7;font-size:10.5px;margin-left:12px">${fmt(s)} &rarr; ${fmt(t)}</div>`;
+    };
     const memberRows = g.members
         .slice(0, 6)
         .map(
             (m) =>
-                `<div style="display:flex;justify-content:space-between;gap:10px;opacity:.92;font-size:11.5px">
-          <span><span style="color:${color}">&bull;</span> ${escapeHtml(m.displayLabel)}</span>
-          <span style="opacity:.55;font-family:'JetBrains Mono','SF Mono',Menlo,monospace">w=${m.weight}</span>
+                `<div style="opacity:.92;font-size:11.5px">
+          <div style="display:flex;justify-content:space-between;gap:10px">
+            <span><span style="color:${color}">&bull;</span> ${escapeHtml(m.displayLabel)}</span>
+            <span style="opacity:.55;font-family:'JetBrains Mono','SF Mono',Menlo,monospace">w=${m.weight}</span>
+          </div>
+          ${geneInline(m)}
          </div>`
         )
         .join("");
@@ -863,8 +966,26 @@ function groupTooltip(g, color) {
 // --------------------------------------------------------------------------
 // Click-through: select the matching edge on the cytoscape graph
 // --------------------------------------------------------------------------
-function focusEdgeOnGraph(edgeId) {
-    if (!STATE.cy || !edgeId) return;
+export function focusEdgeOnGraph(edgeId, graphIndex = null) {
+    if (!edgeId) return;
+
+    // Cross-graph navigation: if the edge lives in a different graph than the
+    // one currently loaded, switch to that graph first, then focus the edge.
+    if (
+        graphIndex != null &&
+        graphIndex !== STATE.currentGraphIndex &&
+        STATE.graph_jsons &&
+        graphIndex >= 0 &&
+        graphIndex < STATE.graph_jsons.length
+    ) {
+        if (window.loadGraphByIndex && window.loadGraphByIndex(graphIndex, false)) {
+            // Defer focus until the new graph is rendered into cy.
+            requestAnimationFrame(() => focusEdgeOnGraph(edgeId, null));
+        }
+        return;
+    }
+
+    if (!STATE.cy) return;
     const ele = STATE.cy.getElementById(edgeId);
     if (!ele || ele.empty()) return;
 
@@ -904,7 +1025,7 @@ function hashCode(s) {
 // --------------------------------------------------------------------------
 // Modal lifecycle (Bootstrap)
 // --------------------------------------------------------------------------
-function ensureStyles() {
+export function ensureStyles() {
     if (document.getElementById("circle-plot-styles")) return;
     const style = document.createElement("style");
     style.id = "circle-plot-styles";
@@ -927,6 +1048,12 @@ function ensureStyles() {
       font-family: 'Inter','Helvetica Neue',Arial,sans-serif;
       font-weight: 700; letter-spacing: -0.01em;
       display: inline-flex; align-items: center; gap: 6px;
+      /* Override the global .modal-header { color: white } so the title is
+         readable against this modal's light header background. */
+      color: #1a1a2e;
+    }
+    [data-theme="dark"] #breakpointCirclePlotModal .modal-title {
+      color: #f1f5f9;
     }
     #breakpointCirclePlotModal .modal-title i {
       background: linear-gradient(135deg,#6366f1,#a855f7);
@@ -1066,7 +1193,7 @@ function ensureModal() {
     return modal;
 }
 
-function renderLegend(legendEl, types, activeTypes, onToggle) {
+export function renderLegend(legendEl, types, activeTypes, onToggle) {
     legendEl.innerHTML = "";
     types.forEach((t) => {
         const chip = document.createElement("span");
