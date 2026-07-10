@@ -254,6 +254,7 @@ export function invalidateGlobalAnalysisCache() {
     _geneCache = null;
     _geneCacheKey = null;
     _lastRenderSignature = null; // force the next render to redraw
+    _summarySearch = ""; // clear the summary search on new upload
 }
 
 // --------------------------------------------------------------------------
@@ -711,9 +712,14 @@ function geneNamesForNodeData(nodeData) {
  * graph data changes.
  * @returns {Promise<object|null>}
  */
-export async function annotateGenesAllGraphs() {
+export async function annotateGenesAllGraphs(onProgress, opts = {}) {
     const key = cacheKey();
-    if (_geneCache && _geneCacheKey === key) return _geneCache;
+    if (_geneCache && _geneCacheKey === key) {
+        if (onProgress) {
+            onProgress(_geneCache.graphCount, _geneCache.graphCount);
+        }
+        return _geneCache;
+    }
 
     if (!isGeneDataReady()) {
         const ok = await loadGeneData();
@@ -726,8 +732,11 @@ export async function annotateGenesAllGraphs() {
     let annotatedNodes = 0;
     let totalNodes = 0;
 
+    const chunkSize = Math.max(1, opts.chunkSize || 200);
     const jsons = STATE.graph_jsons || [];
-    for (let gi = 0; gi < jsons.length; gi++) {
+    const total = jsons.length;
+
+    for (let gi = 0; gi < total; gi++) {
         let graph;
         try {
             graph = JSON.parse(jsons[gi]);
@@ -751,7 +760,16 @@ export async function annotateGenesAllGraphs() {
             }
         }
         perGraphGenes[gi] = genesInGraph;
+
+        // Yield to the UI between chunks so annotating thousands of graphs
+        // doesn't freeze the page; report progress for the loading indicator.
+        if ((gi + 1) % chunkSize === 0) {
+            if (onProgress) onProgress(gi + 1, total);
+            // eslint-disable-next-line no-await-in-loop
+            await yieldToUI();
+        }
     }
+    if (onProgress) onProgress(total, total);
 
     // Distribution: how many genes are shared by exactly k graphs.
     const sharedDistribution = new Map(); // k -> gene count
@@ -1005,6 +1023,7 @@ const SUMMARY_COLUMNS = [
     { key: "svTypeCount", label: "SV types", sortable: true, numeric: true, align: "text-end" },
     { key: "totalWeight", label: "\u03A3 weight", sortable: true, numeric: true, align: "text-end" },
     { key: "maxPathNodes", label: "Max path", sortable: true, numeric: true, align: "text-end" },
+    { key: "genes", label: "Genes", sortable: false, numeric: false, align: "" },
 ];
 
 // Retained references so header clicks can re-sort/re-render without recomputing
@@ -1013,10 +1032,47 @@ let _lastSummaryContainer = null;
 let _lastSummaryPerGraph = null;
 let _lastSummaryAgg = null;
 
+// Free-text search applied to the summary table (matches graph ID/label and
+// gene names). Empty string = no filter.
+let _summarySearch = "";
+let _summarySearchTimer = null;
+
+/** Semicolon-joined gene list for a graph (empty string when none/unknown). */
+function graphGenesString(g) {
+    return Array.isArray(g.genes) ? g.genes.join("; ") : "";
+}
+
+/**
+ * Merge per-graph gene names (from annotateGenesAllGraphs) onto the summary
+ * table's retained records and re-render so the "Genes" column and gene search
+ * become available. Safe to call multiple times.
+ * @param {object} gene - aggregate from annotateGenesAllGraphs
+ */
+function attachGenesToSummaryTable(gene) {
+    if (!gene || !Array.isArray(gene.perGraphGenes)) return;
+    if (!_lastSummaryPerGraph) return;
+
+    for (const g of _lastSummaryPerGraph) {
+        const set = gene.perGraphGenes[g.graphIndex];
+        g.genes = set && set.size ? Array.from(set).sort() : [];
+    }
+
+    if (_lastSummaryContainer && _lastSummaryAgg) {
+        renderSummaryTable(
+            _lastSummaryContainer,
+            _lastSummaryPerGraph,
+            _lastSummaryAgg
+        );
+    }
+}
+
 /** Read the sortable value for a graph row by column key. */
 function summaryCellValue(g, key) {
     if (key === "label") {
         return (g.graphId || `Graph ${g.graphIndex + 1}`).toLowerCase();
+    }
+    if (key === "genes") {
+        return graphGenesString(g).toLowerCase();
     }
     return g[key] ?? 0;
 }
@@ -1032,10 +1088,19 @@ function renderSummaryTable(container, perGraph, agg) {
         return;
     }
 
-    // Sort the FULL dataset by the active column (so sorting affects all graphs,
-    // not just the visible slice), then virtualize to the first N rows.
+    // Free-text filter: match graph label/ID or any gene name.
+    const query = _summarySearch.trim().toLowerCase();
+    const filtered = query ?
+        perGraph.filter((g) => {
+            const label = (g.graphId || `Graph ${g.graphIndex + 1}`).toLowerCase();
+            if (label.includes(query)) return true;
+            return graphGenesString(g).toLowerCase().includes(query);
+        }) :
+        perGraph;
+
+    // Sort the FULL (filtered) dataset by the active column, then virtualize.
     const { key, dir } = _summarySort;
-    const sorted = [...perGraph].sort((a, b) => {
+    const sorted = [...filtered].sort((a, b) => {
         const va = summaryCellValue(a, key);
         const vb = summaryCellValue(b, key);
         if (va < vb) return -1 * dir;
@@ -1051,6 +1116,7 @@ function renderSummaryTable(container, perGraph, agg) {
         .map((g) => {
             const label = g.graphId || `Graph ${g.graphIndex + 1}`;
             const active = g.graphIndex === STATE.currentGraphIndex;
+            const genes = graphGenesString(g);
             return `
         <tr class="ga-summary-row${active ? " ga-active-row" : ""}"
             data-graph-index="${g.graphIndex}"
@@ -1061,17 +1127,30 @@ function renderSummaryTable(container, perGraph, agg) {
           <td class="text-end">${g.svTypeCount}</td>
           <td class="text-end">${g.totalWeight}</td>
           <td class="text-end">${g.maxPathNodes || 0}</td>
+          <td class="ga-genes-cell"><div class="ga-genes-inner" title="${escapeHtml(genes)}">${escapeHtml(genes)}</div></td>
         </tr>`;
         })
         .join("");
 
+    const searchBox = `
+        <div class="ga-summary-search input-group input-group-sm px-2 py-1">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control" id="ga-summary-search-input"
+            placeholder="Search graph ID or gene…" autocomplete="off"
+            value="${escapeHtml(_summarySearch)}" aria-label="Search graphs by ID or gene" />
+        </div>`;
+
     const truncNote = truncated ?
         `<div class="ga-table-note text-muted small px-2 py-1">
            Showing top ${SUMMARY_TABLE_MAX_ROWS.toLocaleString()} of
-           ${sorted.length.toLocaleString()} graphs (sorted). Use the filter
-           panel to narrow results.
+           ${sorted.length.toLocaleString()}${query ? " matching" : ""} graphs (sorted).
+           Use the filter panel to narrow results.
          </div>` :
-        "";
+        query ?
+            `<div class="ga-table-note text-muted small px-2 py-1">
+               ${sorted.length.toLocaleString()} of ${perGraph.length.toLocaleString()} graphs match "${escapeHtml(_summarySearch)}".
+             </div>` :
+            "";
 
     const headCells = SUMMARY_COLUMNS.map((c) => {
         const isActive = c.key === key;
@@ -1097,6 +1176,7 @@ function renderSummaryTable(container, perGraph, agg) {
     );
 
     container.innerHTML = `
+    ${searchBox}
     ${truncNote}
     <div class="table-responsive ga-table-wrap">
       <table class="table table-sm table-hover align-middle ga-summary-table mb-0">
@@ -1112,10 +1192,38 @@ function renderSummaryTable(container, perGraph, agg) {
             <td class="text-end"><strong>${agg.svTypeCounts.size}</strong></td>
             <td class="text-end"><strong>${agg.weights.reduce((a, b) => a + b, 0)}</strong></td>
             <td class="text-end" title="Longest path across all graphs"><strong>${totalMaxPath}</strong></td>
+            <td></td>
           </tr>
         </tfoot>
       </table>
     </div>`;
+
+    // Search input -> filter the table (debounced, preserves caret & focus).
+    const searchInput = container.querySelector("#ga-summary-search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            _summarySearch = searchInput.value;
+            clearTimeout(_summarySearchTimer);
+            _summarySearchTimer = setTimeout(() => {
+                if (_lastSummaryContainer && _lastSummaryPerGraph && _lastSummaryAgg) {
+                    renderSummaryTable(
+                        _lastSummaryContainer,
+                        _lastSummaryPerGraph,
+                        _lastSummaryAgg
+                    );
+                    // Restore focus + caret after the re-render.
+                    const fresh = _lastSummaryContainer.querySelector(
+                        "#ga-summary-search-input"
+                    );
+                    if (fresh) {
+                        fresh.focus();
+                        const v = fresh.value;
+                        fresh.setSelectionRange(v.length, v.length);
+                    }
+                }
+            }, 180);
+        });
+    }
 
     // Row click -> load that graph.
     container.querySelectorAll(".ga-summary-row").forEach((row) => {
@@ -1211,6 +1319,7 @@ export function exportSummaryCsv() {
         "path_count",
         "max_path_nodes",
         "chromosomes",
+        "genes",
     ];
 
     const lines = [header.join(",")];
@@ -1227,6 +1336,7 @@ export function exportSummaryCsv() {
                 csvCell(g.pathCount || 0),
                 csvCell(g.maxPathNodes || 0),
                 csvCell((g.chromosomes || []).join("|")),
+                csvCell(graphGenesString(g)),
             ].join(",")
         );
     }
@@ -2475,9 +2585,16 @@ export function resetGeneAnalysis() {
 
 /**
  * Annotate genes across all graphs and render the gene frequency + sharing
- * panels. Triggered by the "Annotate Genes" button.
+ * panels. Triggered by the "Annotate Genes" button and automatically after the
+ * dashboard renders.
+ * @param {{auto?:boolean, notify?:boolean}} [opts]
+ *   auto   - true when auto-triggered (non-overlay progress, quieter alerts)
+ *   notify - whether to show the success alert (default: !auto)
  */
-export async function renderGeneAnalysis() {
+export async function renderGeneAnalysis(opts = {}) {
+    const auto = !!opts.auto;
+    const notify = opts.notify != null ? opts.notify : !auto;
+
     const freqEl = document.getElementById("ga-gene-frequency");
     const shareEl = document.getElementById("ga-gene-sharing");
     const shareDistEl = document.getElementById("ga-gene-sharing-dist");
@@ -2485,22 +2602,41 @@ export async function renderGeneAnalysis() {
     if (!freqEl || !shareEl) return;
 
     if (!STATE.graph_jsons || STATE.graph_jsons.length === 0) {
-        window.showAlert?.("Upload a TSG/GTA file first.", "warning", 2500);
+        if (!auto) window.showAlert?.("Upload a TSG/GTA file first.", "warning", 2500);
         return;
     }
 
+    const total = STATE.graph_jsons.length;
+    const cacheWarm = _geneCache && _geneCacheKey === cacheKey();
     const loadingId = `ga-genes-${Date.now()}`;
-    window.loadingIndicator?.show(loadingId, {
-        message: "Annotating genes across all graphs...",
-        type: "spinner",
-        overlay: true,
-    });
+
+    // Only show a spinner/progress when we actually have to crunch (a warm gene
+    // cache returns instantly). Auto mode uses a non-overlay bar so the
+    // dashboard stays usable while genes annotate in the background.
+    if (!cacheWarm) {
+        window.loadingIndicator?.show(loadingId, {
+            message: auto
+                ? `Annotating genes… (${total} graphs)`
+                : "Annotating genes across all graphs...",
+            type: auto ? "bar" : "spinner",
+            overlay: !auto,
+        });
+    }
 
     try {
         await loadD3();
-        const gene = await annotateGenesAllGraphs();
+        const gene = await annotateGenesAllGraphs((done, tot) => {
+            window.loadingIndicator?.updateProgress(
+                loadingId,
+                Math.round((done / Math.max(1, tot)) * 100)
+            );
+            window.loadingIndicator?.updateMessage(
+                loadingId,
+                `Annotating genes… ${done} / ${tot}`
+            );
+        });
         if (!gene) {
-            window.showAlert?.("Failed to load gene database.", "error");
+            if (!auto) window.showAlert?.("Failed to load gene database.", "error");
             return;
         }
         renderGeneFrequency(freqEl, gene);
@@ -2508,22 +2644,28 @@ export async function renderGeneAnalysis() {
         if (shareDistEl) renderGeneSharingDistribution(shareDistEl, gene);
         if (genesPerGraphEl) renderGenesPerGraph(genesPerGraphEl, gene);
 
+        // Attach per-graph gene lists onto the summary table's records and
+        // re-render it so the "Genes" column (and gene search) populate.
+        attachGenesToSummaryTable(gene);
+
         // Register the two gene charts for size-aware re-rendering.
         if (!_resizeChartData) _resizeChartData = {};
         _resizeChartData.geneShareDist = { el: shareDistEl, data: gene };
         _resizeChartData.genesPerGraph = { el: genesPerGraphEl, data: gene };
         setupChartResizeObserver();
 
-        window.showAlert?.(
-            `Annotated ${gene.annotatedNodes}/${gene.totalNodes} nodes; ${gene.geneFrequency.size} genes found.`,
-            "success",
-            3000
-        );
+        if (notify) {
+            window.showAlert?.(
+                `Annotated ${gene.annotatedNodes}/${gene.totalNodes} nodes; ${gene.geneFrequency.size} genes found.`,
+                "success",
+                3000
+            );
+        }
     } catch (e) {
         console.error("[globalAnalysis] Gene analysis failed:", e);
-        window.showAlert?.("Gene analysis failed: " + e.message, "error");
+        if (!auto) window.showAlert?.("Gene analysis failed: " + e.message, "error");
     } finally {
-        window.loadingIndicator?.hide(loadingId);
+        if (!cacheWarm) window.loadingIndicator?.hide(loadingId);
     }
 }
 
@@ -2665,6 +2807,14 @@ export async function renderGlobalAnalysis(opts = {}) {
 
     // Record the signature of this render so an unchanged tab re-show can skip.
     _lastRenderSignature = `${cacheKey()}|${JSON.stringify(_globalFilters)}|${_summarySort.key}:${_summarySort.dir}`;
+
+    // Auto-annotate genes across all graphs and fill the gene charts. Runs after
+    // the non-gene dashboard is interactive; the annotation is async-chunked so
+    // it never freezes the UI, and is cached so tab re-shows don't recompute.
+    // Fire-and-forget: the dashboard is already usable while genes populate.
+    renderGeneAnalysis({ auto: true }).catch((e) =>
+        console.warn("[globalAnalysis] Auto gene annotation failed:", e)
+    );
 }
 
 /**

@@ -143,6 +143,32 @@
     font-size: 0.85em;
 }
 
+/* Genes column: show the full semicolon-separated list by wrapping onto
+   multiple lines. A per-cell height cap with internal scroll (on the inner
+   div, since <td> ignores max-height) keeps graphs with many genes from
+   creating a giant row while still exposing every gene. */
+.ga-summary-table .ga-genes-cell {
+    min-width: 240px;
+    max-width: 420px;
+    color: var(--bs-secondary-color, #495057);
+    font-size: 0.82rem;
+}
+
+.ga-summary-table .ga-genes-inner {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-height: 5.5em; /* ~4 lines; scrolls beyond that */
+    overflow-y: auto;
+    line-height: 1.35;
+}
+
+/* Summary table search box sits above the scrollable table (flex row). */
+.ga-summary-search {
+    flex: 0 0 auto;
+    max-width: 360px;
+}
+
 .ga-card-circle {
     grid-column: 1 / -1;
     grid-row: span 2;

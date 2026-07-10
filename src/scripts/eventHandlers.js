@@ -42,6 +42,25 @@ async function refreshGlobalAnalysisAfterUpload() {
     }
 }
 
+/**
+ * Automatically annotate the currently-loaded graph's nodes with gene names.
+ * Runs after every graph load/switch so tooltips, the info panel, and the
+ * circle plot show gene names without a manual "Gene Annotations" click.
+ * Loads the gene database lazily on first use (idempotent). Non-fatal: any
+ * failure is logged and swallowed so it never blocks graph display.
+ * @returns {Promise<void>}
+ */
+async function autoAnnotateCurrentGraph() {
+    try {
+        if (!STATE.cy) return;
+        const ok = await loadGeneData(); // idempotent; loads ~5.5MB db once
+        if (!ok) return;
+        await annotateAllNodes(STATE.cy);
+    } catch (err) {
+        console.warn("Auto gene annotation (graph view) failed:", err);
+    }
+}
+
 // Get references to the cy, info, and walks elements
 const cyContainer = document.getElementById("cy");
 const infoPanel = document.getElementById("info");
@@ -561,6 +580,8 @@ function handleFileUpload(event) {
 
                 window.loadingIndicator?.updateMessage(loadingId, "Rendering graph...");
                 loadGraphDataFromServer(jsonData);
+                window.loadingIndicator?.updateMessage(loadingId, "Annotating genes...");
+                await autoAnnotateCurrentGraph();
 
                 // Single JSON file: one graph at index 0, no IDs.
                 // Populate graph_jsons so Global Analysis can read this graph
@@ -621,6 +642,8 @@ function handleFileUpload(event) {
                 const jsonData = JSON.parse(STATE.graph_jsons[0]);
                 loadGraphDataFromServer(jsonData);
                 STATE.currentGraphIndex = 0;
+                window.loadingIndicator?.updateMessage(loadingId, "Annotating genes...");
+                await autoAnnotateCurrentGraph();
 
                 window.showAlert?.(
                     `Loaded ${graphCount} graph${graphCount > 1 ? "s" : ""} successfully!`,
@@ -692,6 +715,10 @@ export function loadGraphByIndex(index, notify = true) {
         const jsonData = JSON.parse(STATE.graph_jsons[index]);
         loadGraphDataFromServer(jsonData);
         STATE.currentGraphIndex = index;
+
+        // Auto-annotate the newly-loaded graph (fire-and-forget so navigation
+        // isn't blocked; tooltips/info update once annotation completes).
+        autoAnnotateCurrentGraph();
 
         // Keep the toolbar dropdown in sync when navigation is programmatic.
         const graphSelect = document.getElementById("graphSelect");
