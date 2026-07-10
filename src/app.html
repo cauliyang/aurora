@@ -333,6 +333,9 @@
                     </div>
                 </div>
 
+                <!-- KPI overview strip -->
+                <div id="ga-kpi-strip" class="ga-kpi-strip mb-2"></div>
+
                 <!-- Dashboard grid -->
                 <div class="ga-grid flex-grow-1 overflow-auto">
                     <div class="card ga-card ga-card-summary">
@@ -401,6 +404,28 @@
                                 title="Export as PNG"><i class="bi bi-download"></i></button>
                         </div>
                         <div class="card-body ga-chart-body" id="ga-size-dist"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-chart">
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-signpost-split me-1"></i> Path Length Distribution
+                                <small class="text-muted">(nodes per path, all graphs)</small></span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-path-len-dist" data-export-name="ga_path_length_distribution"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-path-len-dist"></div>
+                    </div>
+
+                    <div class="card ga-card ga-card-chart">
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-diagram-2 me-1"></i> Paths per Graph
+                                <small class="text-muted">(number of paths in each graph)</small></span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-paths-per-graph" data-export-name="ga_paths_per_graph"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
+                        </div>
+                        <div class="card-body ga-chart-body" id="ga-paths-per-graph"></div>
                     </div>
 
                     <div class="card ga-card ga-card-circle">

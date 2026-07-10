@@ -166,6 +166,8 @@ function applyGlobalFilters(agg) {
     const breakpoints = [];
     const svTypeCounts = new Map();
     const weights = [];
+    const allPathLengths = [];
+    const pathCounts = [];
     let totalNodes = 0;
     let totalEdges = 0;
 
@@ -196,6 +198,10 @@ function applyGlobalFilters(agg) {
             svTypeCounts.set(bp.svType, (svTypeCounts.get(bp.svType) || 0) + 1);
             weights.push(bp.weight);
         }
+        if (g.pathLengths) {
+            for (const len of g.pathLengths) allPathLengths.push(len);
+        }
+        pathCounts.push(g.pathCount || 0);
     }
 
     return {
@@ -203,6 +209,8 @@ function applyGlobalFilters(agg) {
         breakpoints,
         svTypeCounts,
         weights,
+        allPathLengths,
+        pathCounts,
         totalNodes,
         totalEdges,
         filteredCount: perGraph.length,
@@ -438,6 +446,70 @@ function longestPathNodes(nodes, edges) {
 }
 
 /**
+ * Enumerate the node-count of every source->sink path in a DAG, up to a hard
+ * cap on the number of paths (to stay safe on large/branchy graphs). Used as a
+ * fallback for the path-length distribution when a graph has no explicit "P"
+ * lines. Returns { lengths: number[], capped: boolean }.
+ * @param {Array<object>} nodes
+ * @param {Array<object>} edges
+ * @param {number} [maxPaths=1000]
+ * @returns {{lengths:number[], capped:boolean}}
+ */
+function enumeratePathNodeCounts(nodes, edges, maxPaths = 1000) {
+    if (!nodes.length) return { lengths: [], capped: false };
+
+    const indexById = new Map();
+    nodes.forEach((n, i) => indexById.set(String(n.id), i));
+
+    const adj = Array.from({ length: nodes.length }, () => []);
+    const indeg = new Array(nodes.length).fill(0);
+    for (const e of edges) {
+        const s = indexById.get(String(e.source));
+        const t = indexById.get(String(e.target));
+        if (s === undefined || t === undefined) continue;
+        adj[s].push(t);
+        indeg[t] += 1;
+    }
+
+    const outdeg = adj.map((a) => a.length);
+    const sources = [];
+    for (let i = 0; i < nodes.length; i++) {
+        if (indeg[i] === 0) sources.push(i);
+    }
+    // If there are no sources (cyclic) treat every node as a start to avoid
+    // infinite loops; the visited guard below prevents cycles.
+    const starts = sources.length ? sources : nodes.map((_, i) => i);
+
+    const lengths = [];
+    let capped = false;
+    const visited = new Array(nodes.length).fill(false);
+
+    function dfs(u, depth) {
+        if (capped) return;
+        if (lengths.length >= maxPaths) {
+            capped = true;
+            return;
+        }
+        visited[u] = true;
+        if (outdeg[u] === 0) {
+            lengths.push(depth); // reached a sink; depth = node count on path
+        } else {
+            for (const v of adj[u]) {
+                if (!visited[v]) dfs(v, depth + 1);
+                if (capped) break;
+            }
+        }
+        visited[u] = false;
+    }
+
+    for (const s of starts) {
+        if (capped) break;
+        dfs(s, 1);
+    }
+    return { lengths, capped };
+}
+
+/**
  * Process a single parsed graph into the running aggregate accumulators.
  * Extracted so the sync and async collectors share identical logic.
  */
@@ -491,18 +563,36 @@ function accumulateGraph(gi, jsonStr, acc) {
     acc.totalNodes += nodes.length;
     acc.totalEdges += edges.length;
 
-    // Max path length (in nodes). Source priority:
-    //   1. Raw "P" lines parsed at upload (STATE.graph_max_path_len)
-    //   2. possible_paths embedded in the graph JSON
-    //   3. DFS/topological longest-path fallback
+    // Path statistics. Source priority for the full list of path lengths:
+    //   1. Raw "P" lines parsed at upload (STATE.graph_path_lengths)
+    //   2. Bounded source->sink path enumeration fallback
+    // Max path length additionally falls back to possible_paths / topo DP.
+    let pathLengths =
+        (STATE.graph_path_lengths && STATE.graph_path_lengths[gi]) || null;
+    if (!pathLengths || !pathLengths.length) {
+        const enumerated = enumeratePathNodeCounts(nodes, edges);
+        pathLengths = enumerated.lengths;
+    }
+    const pathCount =
+        (STATE.graph_path_count && STATE.graph_path_count[gi] != null) ?
+            STATE.graph_path_count[gi] :
+            pathLengths.length;
+
     let maxPathNodes =
         (STATE.graph_max_path_len && STATE.graph_max_path_len[gi]) || null;
+    if (maxPathNodes == null && pathLengths.length) {
+        maxPathNodes = Math.max(...pathLengths);
+    }
     if (maxPathNodes == null) {
         maxPathNodes = maxPathFromPossiblePaths(graph);
     }
     if (maxPathNodes == null) {
         maxPathNodes = longestPathNodes(nodes, edges);
     }
+
+    // Feed the global path-length distribution and paths-per-graph accumulators.
+    for (const len of pathLengths) acc.allPathLengths.push(len);
+    acc.pathCounts.push(pathCount);
 
     acc.perGraph.push({
         graphIndex: gi,
@@ -514,6 +604,8 @@ function accumulateGraph(gi, jsonStr, acc) {
         totalWeight: graphWeightSum,
         totalJsr: graphJsrSum,
         maxPathNodes: maxPathNodes || 0,
+        pathCount,
+        pathLengths, // retained so filtered views can rebuild the distribution
     });
 }
 
@@ -523,6 +615,8 @@ function newAccumulator() {
         breakpoints: [],
         svTypeCounts: new Map(),
         weights: [],
+        allPathLengths: [], // node-count of every path across all graphs
+        pathCounts: [], // number of paths per graph
         totalNodes: 0,
         totalEdges: 0,
     };
@@ -762,7 +856,8 @@ const _chartLastSize = new WeakMap();
 
 function reRenderResizeCharts() {
     if (!_resizeChartData) return;
-    const { scatter, svbox, svtype, hist } = _resizeChartData;
+    const { scatter, svbox, svtype, hist, pathLen, pathsPerGraph } =
+        _resizeChartData;
     if (scatter && scatter.el && scatter.data) {
         renderNodesEdgesScatter(scatter.el, scatter.data);
     }
@@ -774,6 +869,12 @@ function reRenderResizeCharts() {
     }
     if (hist && hist.el && hist.data) {
         renderWeightHistogram(hist.el, hist.data);
+    }
+    if (pathLen && pathLen.el && pathLen.data) {
+        renderPathLengthDistribution(pathLen.el, pathLen.data);
+    }
+    if (pathsPerGraph && pathsPerGraph.el && pathsPerGraph.data) {
+        renderPathsPerGraph(pathsPerGraph.el, pathsPerGraph.data);
     }
 }
 
@@ -804,11 +905,78 @@ function setupChartResizeObserver() {
         "ga-weight-by-svtype",
         "ga-svtype-chart",
         "ga-weight-hist",
+        "ga-path-len-dist",
+        "ga-paths-per-graph",
     ];
     for (const id of ids) {
         const el = document.getElementById(id);
         if (el) _chartResizeObserver.observe(el);
     }
+}
+
+// --------------------------------------------------------------------------
+// KPI overview strip
+// --------------------------------------------------------------------------
+/**
+ * Render the top-of-dashboard KPI tiles from the (filtered) aggregate.
+ * @param {object} agg
+ */
+function renderKpiStrip(agg) {
+    const el = document.getElementById("ga-kpi-strip");
+    if (!el) return;
+
+    const d3 = window.d3;
+    const perGraph = agg.perGraph || [];
+    const nGraphs = perGraph.length;
+    const total = agg.totalGraphs != null ? agg.totalGraphs : nGraphs;
+
+    if (!nGraphs) {
+        el.innerHTML = "";
+        return;
+    }
+
+    const totalPaths = (agg.pathCounts || []).reduce((a, b) => a + b, 0);
+    const nodeCounts = perGraph.map((g) => g.nodeCount);
+    const medianNodes = d3 ? Math.round(d3.median(nodeCounts) || 0) : 0;
+    const pathLens = agg.allPathLengths || [];
+    const medianPathLen = d3 && pathLens.length ? d3.median(pathLens) : 0;
+    const chromSet = new Set();
+    for (const g of perGraph) {
+        (g.chromosomes || []).forEach((c) => chromSet.add(c));
+    }
+
+    const filtered = agg.filteredCount != null && agg.filteredCount !== total;
+    const graphsValue = filtered ?
+        `${nGraphs.toLocaleString()}<span class="ga-kpi-sub">/ ${total.toLocaleString()}</span>` :
+        nGraphs.toLocaleString();
+
+    const tiles = [
+        { label: "Graphs", value: graphsValue, icon: "bi-diagram-3" },
+        { label: "Nodes", value: agg.totalNodes.toLocaleString(), icon: "bi-circle" },
+        { label: "Edges", value: agg.totalEdges.toLocaleString(), icon: "bi-arrow-left-right" },
+        { label: "Paths", value: totalPaths.toLocaleString(), icon: "bi-signpost-split" },
+        { label: "Median nodes/graph", value: medianNodes.toLocaleString(), icon: "bi-rulers" },
+        {
+            label: "Median path len",
+            value: (medianPathLen || 0).toLocaleString(),
+            icon: "bi-arrows-expand",
+        },
+        { label: "SV types", value: agg.svTypeCounts.size.toLocaleString(), icon: "bi-tags" },
+        { label: "Chromosomes", value: chromSet.size.toLocaleString(), icon: "bi-bezier2" },
+    ];
+
+    el.innerHTML = tiles
+        .map(
+            (t) => `
+        <div class="ga-kpi">
+          <div class="ga-kpi-icon"><i class="bi ${t.icon}"></i></div>
+          <div class="ga-kpi-body">
+            <div class="ga-kpi-value">${t.value}</div>
+            <div class="ga-kpi-label">${t.label}</div>
+          </div>
+        </div>`
+        )
+        .join("");
 }
 
 // Column definitions for the per-graph summary table. `sortable` numeric
@@ -1023,6 +1191,7 @@ export function exportSummaryCsv() {
         "sv_types",
         "total_weight",
         "total_jsr",
+        "path_count",
         "max_path_nodes",
         "chromosomes",
     ];
@@ -1038,6 +1207,7 @@ export function exportSummaryCsv() {
                 csvCell(g.svTypeCount),
                 csvCell(g.totalWeight),
                 csvCell(g.totalJsr || 0),
+                csvCell(g.pathCount || 0),
                 csvCell(g.maxPathNodes || 0),
                 csvCell((g.chromosomes || []).join("|")),
             ].join(",")
@@ -1592,6 +1762,203 @@ function renderSizeDistribution(container, perGraph) {
 }
 
 // --------------------------------------------------------------------------
+// Generic categorical bar chart of integer-value frequencies (used by the
+// path-length and paths-per-graph distributions, whose domains are small
+// integers). Draws a labelled y-axis, x tick labels, and count labels on bars.
+// --------------------------------------------------------------------------
+function renderIntFrequencyBars(container, values, opts = {}) {
+    const d3 = window.d3;
+    container.innerHTML = "";
+
+    const {
+        xLabel = "Value",
+        yLabel = "Count",
+        baseColor = "#377eb8",
+        emptyMsg = "No data to plot.",
+        // When there are more distinct integers than this, bin them instead of
+        // drawing one bar per value (keeps very wide domains readable).
+        maxDistinct = 30,
+    } = opts;
+
+    if (!values || !values.length) {
+        container.innerHTML = `<div class="ga-empty">${emptyMsg}</div>`;
+        return;
+    }
+
+    // Count frequency per integer value.
+    const counts = new Map();
+    for (const v of values) {
+        const k = Math.round(Number(v));
+        if (!Number.isFinite(k)) continue;
+        counts.set(k, (counts.get(k) || 0) + 1);
+    }
+    let data = Array.from(counts.entries())
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => a.value - b.value);
+
+    if (!data.length) {
+        container.innerHTML = `<div class="ga-empty">${emptyMsg}</div>`;
+        return;
+    }
+
+    // If the integer domain is too wide, collapse into ~maxDistinct bins.
+    let bandLabels;
+    if (data.length > maxDistinct) {
+        const minV = data[0].value;
+        const maxV = data[data.length - 1].value;
+        const binSize = Math.ceil((maxV - minV + 1) / maxDistinct);
+        const binned = new Map();
+        for (const d of data) {
+            const b0 = minV + Math.floor((d.value - minV) / binSize) * binSize;
+            binned.set(b0, (binned.get(b0) || 0) + d.count);
+        }
+        data = Array.from(binned.entries())
+            .map(([value, count]) => ({ value, count }))
+            .sort((a, b) => a.value - b.value);
+        bandLabels = data.map((d) =>
+            binSize > 1 ? `${d.value}\u2013${d.value + binSize - 1}` : String(d.value)
+        );
+    } else {
+        bandLabels = data.map((d) => String(d.value));
+    }
+
+    const { W, H } = measureChartBox(container, 480, 320);
+    const margin = { top: 18, right: 18, bottom: 52, left: 56 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+
+    const svg = d3
+        .select(container)
+        .append("svg")
+        .attr("width", W)
+        .attr("height", H)
+        .attr("viewBox", `0 0 ${W} ${H}`)
+        .style("display", "block");
+
+    const defs = svg.append("defs");
+    const uid = `gapl-${Math.random().toString(36).slice(2, 8)}`;
+    const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const x = d3
+        .scaleBand()
+        .domain(bandLabels)
+        .range([0, innerW])
+        .padding(0.25);
+
+    const y = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, (d) => d.count)])
+        .nice()
+        .range([innerH, 0]);
+
+    // Gridlines
+    g.append("g")
+        .call(d3.axisLeft(y).ticks(5).tickSize(-innerW).tickFormat(""))
+        .call((sel) => sel.select(".domain").remove())
+        .call((sel) => sel.selectAll("line").attr("stroke", "rgba(0,0,0,0.06)"));
+
+    data.forEach((d, i) => {
+        d._fill = makeBarGradient(defs, `${uid}-${i}`, baseColor);
+        d._label = bandLabels[i];
+    });
+
+    // Show at most a reasonable number of x tick labels.
+    const labelEvery = Math.ceil(bandLabels.length / 16);
+
+    g.selectAll(".ga-bar")
+        .data(data)
+        .join("rect")
+        .attr("class", "ga-bar")
+        .attr("x", (d) => x(d._label))
+        .attr("y", (d) => y(d.count))
+        .attr("width", x.bandwidth())
+        .attr("height", (d) => innerH - y(d.count))
+        .attr("rx", 3)
+        .attr("fill", (d) => d._fill)
+        .attr("stroke", d3.color(baseColor).darker(0.5).formatHex())
+        .attr("stroke-width", 0.75)
+        .append("title")
+        .text((d) => `${xLabel} ${d._label}: ${d.count.toLocaleString()}`);
+
+    g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(x))
+        .call((sel) =>
+            sel.selectAll("text").each(function(_, i) {
+                if (i % labelEvery !== 0) this.remove();
+            })
+        )
+        .selectAll("text")
+        .style("font-size", "10px");
+
+    g.append("g").call(d3.axisLeft(y).ticks(5)).style("font-size", "10px");
+
+    // Count labels above bars (only when bars are wide enough to be readable).
+    if (data.length <= 20) {
+        g.selectAll(".ga-bar-label")
+            .data(data)
+            .join("text")
+            .attr("class", "ga-bar-label")
+            .attr("x", (d) => x(d._label) + x.bandwidth() / 2)
+            .attr("y", (d) => y(d.count) - 5)
+            .attr("text-anchor", "middle")
+            .style("font-size", "10px")
+            .style("font-weight", "600")
+            .style("fill", "var(--bs-body-color, #333)")
+            .text((d) => d.count.toLocaleString());
+    }
+
+    // Axis titles
+    svg.append("text")
+        .attr("x", margin.left + innerW / 2)
+        .attr("y", H - 6)
+        .attr("text-anchor", "middle")
+        .style("font-size", "11.5px")
+        .style("font-weight", "600")
+        .style("fill", "var(--bs-body-color, #333)")
+        .text(xLabel);
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -(margin.top + innerH / 2))
+        .attr("y", 15)
+        .attr("text-anchor", "middle")
+        .style("font-size", "11.5px")
+        .style("font-weight", "600")
+        .style("fill", "var(--bs-body-color, #333)")
+        .text(yLabel);
+}
+
+/**
+ * Distribution of path lengths (node count) across ALL paths in ALL graphs.
+ * @param {HTMLElement} container
+ * @param {number[]} allPathLengths
+ */
+function renderPathLengthDistribution(container, allPathLengths) {
+    renderIntFrequencyBars(container, allPathLengths, {
+        xLabel: "Path length (nodes)",
+        yLabel: "Paths",
+        baseColor: "#ff7f0e",
+        emptyMsg: "No path data. Upload a TSG/GTA file with path (P) lines.",
+    });
+}
+
+/**
+ * Distribution of the number of paths per graph.
+ * @param {HTMLElement} container
+ * @param {number[]} pathCounts
+ */
+function renderPathsPerGraph(container, pathCounts) {
+    renderIntFrequencyBars(container, pathCounts, {
+        xLabel: "Paths per graph",
+        yLabel: "Graphs",
+        baseColor: "#17becf",
+        emptyMsg: "No path data to plot.",
+    });
+}
+
+// --------------------------------------------------------------------------
 // Edge weight by SV type (box-and-whisker, colored by SV type).
 // --------------------------------------------------------------------------
 function renderWeightBySvType(container, breakpoints) {
@@ -2102,6 +2469,9 @@ export async function renderGlobalAnalysis() {
     const scatterEl = document.getElementById("ga-nodes-edges-scatter");
     const sizeDistEl = document.getElementById("ga-size-dist");
     const svBoxEl = document.getElementById("ga-weight-by-svtype");
+    const pathLenEl = document.getElementById("ga-path-len-dist");
+    const pathsPerGraphEl = document.getElementById("ga-paths-per-graph");
+    const kpiEl = document.getElementById("ga-kpi-strip");
 
     if (!summaryEl || !svTypeEl || !histEl || !circleEl) {
         console.warn("[globalAnalysis] Dashboard containers not found");
@@ -2118,6 +2488,9 @@ export async function renderGlobalAnalysis() {
         if (scatterEl) scatterEl.innerHTML = "";
         if (sizeDistEl) sizeDistEl.innerHTML = "";
         if (svBoxEl) svBoxEl.innerHTML = "";
+        if (pathLenEl) pathLenEl.innerHTML = "";
+        if (pathsPerGraphEl) pathsPerGraphEl.innerHTML = "";
+        if (kpiEl) kpiEl.innerHTML = "";
         return;
     }
 
@@ -2169,12 +2542,15 @@ export async function renderGlobalAnalysis() {
     _lastFilteredAgg = agg; // retained for CSV export
     updateFilterStatusUI(agg.filteredCount, agg.totalGraphs);
 
+    renderKpiStrip(agg);
     renderSummaryTable(summaryEl, agg.perGraph, agg);
     renderSvTypeFrequency(svTypeEl, agg.svTypeCounts);
     renderWeightHistogram(histEl, agg.weights);
     if (scatterEl) renderNodesEdgesScatter(scatterEl, agg.perGraph);
     if (svBoxEl) renderWeightBySvType(svBoxEl, agg.breakpoints);
     if (sizeDistEl) renderSizeDistribution(sizeDistEl, agg.perGraph);
+    if (pathLenEl) renderPathLengthDistribution(pathLenEl, agg.allPathLengths);
+    if (pathsPerGraphEl) renderPathsPerGraph(pathsPerGraphEl, agg.pathCounts);
 
     // Retain the data the resize-sensitive charts need so a ResizeObserver can
     // re-render them at the correct size once the pane's layout settles (the
@@ -2184,6 +2560,8 @@ export async function renderGlobalAnalysis() {
         svbox: { el: svBoxEl, data: agg.breakpoints },
         svtype: { el: svTypeEl, data: agg.svTypeCounts },
         hist: { el: histEl, data: agg.weights },
+        pathLen: { el: pathLenEl, data: agg.allPathLengths },
+        pathsPerGraph: { el: pathsPerGraphEl, data: agg.pathCounts },
     };
     setupChartResizeObserver();
     // Re-measure once after the current frame in case the pane just became

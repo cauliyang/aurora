@@ -482,16 +482,41 @@ function parseGraphIds(content) {
  * @param {string} content - Raw TSG/GTA file text
  * @returns {(number|null)[]} max path node-count per graph, in file order
  */
-function parseMaxPathLengths(content) {
-    const result = [];
-    if (typeof content !== "string") return result;
+/**
+ * Parse per-graph path statistics from raw TSG/GTA "P" lines.
+ *
+ * Path lines have the form:
+ *   P  <pathId>  <elem1>  <elem2>  ...
+ * where each element is a node ("TSN...") or edge ("TSE...") id with an
+ * optional orientation suffix ("+"/"-"). "P" lines belong to the most recent
+ * "G <graphId>" block. For each graph we collect:
+ *   - maxPathLen: the largest node-count across its paths (or null if none)
+ *   - pathLengths: the node-count of every path (empty array if none)
+ *   - pathCount: number of "P" lines for the graph
+ *
+ * Arrays are parallel to the WASM's parsed graph order (same file order).
+ * Graphs with no "P" lines get maxPathLen=null so Global Analysis can fall back
+ * to a computed enumeration.
+ *
+ * @param {string} content - Raw TSG/GTA file text
+ * @returns {{maxPathLen:(number|null)[], pathLengths:number[][], pathCount:number[]}}
+ */
+function parsePathStats(content) {
+    const maxPathLen = [];
+    const pathLengths = [];
+    const pathCount = [];
+    if (typeof content !== "string") {
+        return { maxPathLen, pathLengths, pathCount };
+    }
     const lines = content.split(/\r?\n/);
     let gi = -1; // current graph index (incremented on each G-line)
 
     for (const line of lines) {
         if (/^G\s/.test(line)) {
             gi += 1;
-            result[gi] = null;
+            maxPathLen[gi] = null;
+            pathLengths[gi] = [];
+            pathCount[gi] = 0;
             continue;
         }
         if (gi >= 0 && /^P\s/.test(line)) {
@@ -502,10 +527,12 @@ function parseMaxPathLengths(content) {
                 // Node elements are prefixed "TSN"; ignore orientation suffix.
                 if (parts[k] && parts[k].startsWith("TSN")) nodeCount += 1;
             }
-            if (nodeCount > (result[gi] || 0)) result[gi] = nodeCount;
+            pathLengths[gi].push(nodeCount);
+            pathCount[gi] += 1;
+            if (nodeCount > (maxPathLen[gi] || 0)) maxPathLen[gi] = nodeCount;
         }
     }
-    return result;
+    return { maxPathLen, pathLengths, pathCount };
 }
 
 function handleFileUpload(event) {
@@ -541,6 +568,8 @@ function handleFileUpload(event) {
                 STATE.graph_jsons = [content];
                 STATE.graph_ids = [];
                 STATE.graph_max_path_len = []; // computed lazily from possible_paths / DFS
+                STATE.graph_path_lengths = []; // computed lazily via enumeration
+                STATE.graph_path_count = [];
                 STATE.currentGraphIndex = 0;
 
                 // Hide graph selector for single JSON files
@@ -562,15 +591,17 @@ function handleFileUpload(event) {
                 STATE.graph_ids =
                     parsedIds.length === STATE.graph_jsons.length ? parsedIds : [];
 
-                // Recover per-graph max path length (in nodes) from raw "P"
-                // lines (also dropped by the WASM). Keep only when aligned with
-                // the parsed graph count; otherwise leave empty so Global
-                // Analysis computes it via DFS.
-                const parsedMaxPaths = parseMaxPathLengths(content);
-                STATE.graph_max_path_len =
-                    parsedMaxPaths.length === STATE.graph_jsons.length ?
-                        parsedMaxPaths :
-                        [];
+                // Recover per-graph path statistics from raw "P" lines (also
+                // dropped by the WASM): max path length, every path length, and
+                // the path count. Keep only when aligned with the parsed graph
+                // count; otherwise leave empty so Global Analysis computes them
+                // via enumeration.
+                const pathStats = parsePathStats(content);
+                const aligned =
+                    pathStats.maxPathLen.length === STATE.graph_jsons.length;
+                STATE.graph_max_path_len = aligned ? pathStats.maxPathLen : [];
+                STATE.graph_path_lengths = aligned ? pathStats.pathLengths : [];
+                STATE.graph_path_count = aligned ? pathStats.pathCount : [];
 
                 // Show graph selector if multiple graphs are available
                 const graphCount = STATE.graph_jsons.length;

@@ -30,6 +30,11 @@ export const STATE = {
     // raw "P" lines at upload. Parallel to graph_jsons; null entry = unknown
     // (Global Analysis falls back to a DFS longest-path computation).
     graph_max_path_len: [],
+    // Every path's node-count per graph (array of arrays) and the path count
+    // per graph, parsed from raw "P" lines. Parallel to graph_jsons. Empty when
+    // unavailable (Global Analysis falls back to bounded path enumeration).
+    graph_path_lengths: [],
+    graph_path_count: [],
     currentGraphIndex: 0, // index of the graph currently loaded into cy
     minEdgeWeight: 1,
     minJSR: 0, // minimum junction support reads (JSR) per edge; 0 = no JSR filter
