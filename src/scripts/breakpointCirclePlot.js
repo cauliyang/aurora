@@ -308,6 +308,72 @@ function groupBreakpoints(items) {
 }
 
 // --------------------------------------------------------------------------
+// Hit-frequency binning for the radial histogram track.
+//
+// Counts how many breakpoint ENDPOINTS fall into each genomic bin. Both ends
+// (chr1/pos1 and chr2/pos2) of every breakpoint are counted, so the track
+// reflects total endpoint density along the genome. Bins are distributed per
+// chromosome proportionally to each chromosome's arc so bins map cleanly to
+// angles; the total across the genome is ~binCountTarget.
+//
+// @param {Array} items - breakpoints ({chr1,pos1,chr2,pos2,...})
+// @param {Array} karyotype - arcs from buildHumanKaryotype (chr, length, angles)
+// @param {number} [binCountTarget=200]
+// @returns {{ bins: Array, maxCount: number }}
+//   each bin: { chr, binIndex, startPos, endPos, startAngle, endAngle, count }
+// --------------------------------------------------------------------------
+function computeHitBins(items, karyotype, binCountTarget = 200) {
+    const totalLen = karyotype.reduce((s, a) => s + a.length, 0) || 1;
+
+    // Per-chromosome bin descriptors, keyed by chr for fast endpoint lookup.
+    const byChr = new Map();
+    const bins = [];
+    for (const arc of karyotype) {
+        // Allocate bins proportional to chromosome length (min 1 per chr).
+        const nBins = Math.max(
+            1,
+            Math.round((arc.length / totalLen) * binCountTarget)
+        );
+        const binLenBp = arc.length / nBins;
+        const angleSpan = arc.endAngle - arc.startAngle;
+        const chrBins = [];
+        for (let i = 0; i < nBins; i++) {
+            const bin = {
+                chr: arc.chr,
+                binIndex: i,
+                startPos: Math.round(i * binLenBp),
+                endPos: Math.round((i + 1) * binLenBp),
+                startAngle: arc.startAngle + (i / nBins) * angleSpan,
+                endAngle: arc.startAngle + ((i + 1) / nBins) * angleSpan,
+                count: 0,
+            };
+            chrBins.push(bin);
+            bins.push(bin);
+        }
+        byChr.set(arc.chr, { arc, nBins, binLenBp, chrBins });
+    }
+
+    const hit = (chr, pos) => {
+        const entry = byChr.get(chr);
+        if (!entry) return;
+        let idx = Math.floor(pos / entry.binLenBp);
+        if (idx < 0) idx = 0;
+        if (idx >= entry.nBins) idx = entry.nBins - 1;
+        entry.chrBins[idx].count += 1;
+    };
+
+    for (const bp of items) {
+        hit(bp.chr1, bp.pos1);
+        hit(bp.chr2, bp.pos2);
+    }
+
+    let maxCount = 0;
+    for (const b of bins) if (b.count > maxCount) maxCount = b.count;
+
+    return { bins, maxCount };
+}
+
+// --------------------------------------------------------------------------
 // Karyotype: always full hg38, true-proportional with min-arc clamp
 // --------------------------------------------------------------------------
 function buildHumanKaryotype(breakpoints) {
@@ -396,7 +462,15 @@ export function renderCirclePlot(container, items, opts = {}) {
     const accentRadius = innerRadius - 4;     // thin secondary inner ring
     const tickRadius = outerRadius + 6;
     const labelRadius = outerRadius + 22;
-    const ribbonRadius = accentRadius - 6;
+
+    // Radial hit-frequency histogram track sits just inside the chromosome ring
+    // and grows INWARD. Reserve a band, then push the ribbons further inward so
+    // they don't collide with the track. Scaled to the plot size.
+    const showHitTrack = opts.showHitTrack !== false; // default on
+    const hitTrackHeight = showHitTrack ? Math.max(16, size * 0.05) : 0;
+    const hitTrackBase = accentRadius - 3;                 // outer edge of bars
+    const hitTrackMin = hitTrackBase - hitTrackHeight;     // fully-grown bar tip
+    const ribbonRadius = (showHitTrack ? hitTrackMin : accentRadius) - 6;
 
     const svg = d3
         .select(container)
@@ -597,6 +671,60 @@ export function renderCirclePlot(container, items, opts = {}) {
     function hideTip() {
         if (_tipHideTimer) clearTimeout(_tipHideTimer);
         _tipHideTimer = setTimeout(() => hideTipNow(tip), 260);
+    }
+
+    // ----- Hit-frequency histogram track (radial, inward bars) -----
+    // Counts breakpoint endpoints per genomic bin and draws a density track
+    // just inside the chromosome ring. Reflects total endpoint frequency across
+    // whatever items are shown (single graph or all graphs in Global Analysis).
+    if (showHitTrack) {
+        const { bins: hitBins, maxCount: maxHit } = computeHitBins(
+            items,
+            karyotype
+        );
+
+        if (maxHit > 0) {
+            const hitG = svg.append("g").attr("class", "hit-track");
+
+            // Faint baseline ring at the track's outer edge for a "track" feel.
+            hitG.append("circle")
+                .attr("class", "hit-track-baseline")
+                .attr("r", hitTrackBase)
+                .attr("fill", "none")
+                .attr("stroke", "rgba(0,0,0,0.10)")
+                .attr("stroke-width", 0.75);
+
+            const heightScale = d3
+                .scaleLinear()
+                .domain([0, maxHit])
+                .range([0, hitTrackHeight])
+                .clamp(true);
+
+            const hitArc = d3.arc()
+                .startAngle((d) => d.startAngle)
+                .endAngle((d) => d.endAngle)
+                .innerRadius((d) => hitTrackBase - heightScale(d.count))
+                .outerRadius(hitTrackBase)
+                .padAngle(0)
+                .cornerRadius(0.5);
+
+            hitG.selectAll("path.hit-bar")
+                .data(hitBins.filter((b) => b.count > 0))
+                .join("path")
+                .attr("class", "hit-bar")
+                .attr("d", hitArc)
+                .attr("fill", (d) => chrColor(d.chr))
+                .attr("fill-opacity", 0.85)
+                .attr("stroke", "none")
+                .on("mousemove", (event, d) => {
+                    showTip(
+                        `<div style="font-weight:700;margin-bottom:2px;">${d.chr}:${d.startPos.toLocaleString()}\u2013${d.endPos.toLocaleString()}</div>` +
+                        `<div><strong>${d.count.toLocaleString()}</strong> breakpoint endpoint${d.count === 1 ? "" : "s"}</div>`,
+                        event
+                    );
+                })
+                .on("mouseleave", hideTip);
+        }
     }
 
     // ----- Weight scales -----
@@ -1151,6 +1279,8 @@ export function ensureStyles() {
     .chr-label { pointer-events: none; }
     .ribbon-count-badge text { user-select: none; }
     .ribbons path { transition: stroke-width 160ms cubic-bezier(.4,0,.2,1); }
+    .hit-track .hit-bar { cursor: crosshair; transition: fill-opacity 140ms ease; }
+    .hit-track .hit-bar:hover { fill-opacity: 1; }
   `;
     document.head.appendChild(style);
 }
