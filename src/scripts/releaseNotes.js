@@ -5,27 +5,16 @@
 
 // Get release notes from the latest version in the CHANGELOG
 const RELEASE_NOTES = {
-  version: "1.1.0",
-  date: "2025-04-08",
+  version: "1.3.0",
+  date: "2026-06-25",
   features: [
-    "Node ranking by property, degree, and centrality",
-    "Clear highlights button functionality",
-    "Enhanced tooltip functionality with improved styling",
-    "Improved walks panel with advanced search functionality",
-    "Gene annotation functionality and enhanced graph data structure",
-    "Global alert utility for system notifications",
-    "Bootstrap integration for improved styling",
-    "Enhanced gene file upload functionality and handling",
-    "Support for raw text file transformation",
-    "Improved JSON editor with mode selection and keyboard shortcuts",
-    "Aurora IDs file upload functionality and enhanced walk filtering",
+    "Global Analysis: cross-graph dashboard with summary table, SV-type frequency, weight distribution, and an all-edges circle plot — linked to the single-graph view",
+    "Graph selector now shows graph IDs for multi-graph TSG files",
+    "Breakpoint Circle Plot: hg38 karyotype with SV-type coloring, gene annotations in tooltips, and selectable tooltip text",
   ],
   fixes: [
-    "Improved highlightNode function to handle existing highlights and node not found errors",
-    "Updated label data attributes for consistency",
-    "Enhanced walk sorting logic",
-    "Sorted overlapping genes by overlap percentage",
-    "Various UI and styling improvements",
+    "Circle plot: fixed invisible chords and unreadable header when multiple plots are shown",
+    "Global Analysis: row click now loads and centers the selected graph",
   ],
 };
 
@@ -71,10 +60,10 @@ function showReleaseNotes() {
     modal.innerHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
+                    <div class="modal-header text-white" style="background: var(--aurora-gradient-accent)">
                         <h5 class="modal-title" id="releaseNotesModalLabel">
                             <i class="bi bi-lightning-charge-fill me-2"></i>
-                            Aurora ${RELEASE_NOTES.version} - Release Notes
+                            GTAViz ${RELEASE_NOTES.version} - Release Notes
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

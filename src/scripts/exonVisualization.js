@@ -404,12 +404,15 @@ function renderExonVisualization(exons, containerElement, parentContainer, chrom
         }
     }
 
-    // Add resize listener
+    // Add resize listener (disconnect any previous observer first)
+    if (parentContainer._exonResizeObserver) {
+        parentContainer._exonResizeObserver.disconnect();
+    }
     const resizeObserver = new ResizeObserver(() => {
         resizeVisualization();
     });
-
     resizeObserver.observe(parentContainer);
+    parentContainer._exonResizeObserver = resizeObserver;
 
     // Return info about the visualization
     return {
@@ -450,7 +453,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
           <div class="modal-header">
             <h5 class="modal-title" id="exonVisualizationModalLabel">${title}</h5>
             <div class="ms-auto">
-              <button type="button" id="exportExonSvgBtn" class="btn btn-sm btn-outline-success me-2" title="Export as SVG">
+              <button type="button" id="exportExonSvgBtn" class="btn btn-sm btn-primary export-exon-svg-btn me-2" title="Export as SVG">
                 <i class="bi bi-download me-1"></i> Export SVG
               </button>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -485,12 +488,12 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                     position: relative;
                     height: 350px;
                     width: 100%;
-                    background: #f9f9f9;
+                    background: var(--bg-secondary);
                 }
                 .exon-visualization-container {
                     height: 100%;
                     width: 100%;
-                    background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+                    background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
                 }
                 .exon-tooltip {
                     background-color: rgba(255, 255, 255, 0.95);
@@ -501,14 +504,14 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                     z-index: 1000;
                 }
                 .exon-tooltip h6 {
-                    border-bottom: 1px solid #eee;
+                    border-bottom: 1px solid var(--border-color-light);
                     padding-bottom: 5px;
                     margin-bottom: 5px;
-                    color: #333;
+                    color: var(--text-primary);
                     font-size: 16px;
                 }
                 .exon-svg {
-                    background: linear-gradient(to bottom, #ffffff, #f9f9f9);
+                    background: linear-gradient(to bottom, var(--bg-primary), var(--bg-secondary));
                 }
                 .stat-card {
                     border-radius: 8px;
@@ -525,7 +528,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                 }
                 .chromosome-info {
                     font-size: 14px;
-                    color: #555;
+                    color: var(--text-secondary);
                     font-style: italic;
                 }
                 .text-header {
@@ -549,6 +552,58 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
                     font-weight: bolder;
                     text-shadow: 0px 1px 3px rgba(0,0,0,0.9);
                 }
+                
+                /* Enhanced Export SVG Button */
+                .export-exon-svg-btn {
+                    background: linear-gradient(135deg, var(--aurora-primary) 0%, var(--aurora-secondary) 100%) !important;
+                    border: none !important;
+                    color: white !important;
+                    font-weight: 700 !important;
+                    padding: 0.5rem 1.25rem !important;
+                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+                    transition: all 0.3s ease !important;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+                    letter-spacing: 0.5px;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .export-exon-svg-btn::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                    transition: left 0.5s ease;
+                }
+                
+                .export-exon-svg-btn:hover::before {
+                    left: 100%;
+                }
+                
+                .export-exon-svg-btn:hover {
+                    background: linear-gradient(135deg, var(--aurora-primary-dark) 0%, var(--aurora-secondary-dark) 100%) !important;
+                    transform: translateY(-2px) scale(1.05) !important;
+                    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.6) !important;
+                }
+                
+                .export-exon-svg-btn:active {
+                    transform: translateY(0) scale(1) !important;
+                    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4) !important;
+                }
+                
+                .export-exon-svg-btn i {
+                    margin-right: 0.5rem;
+                    font-size: 1rem;
+                    animation: download-bounce 2s ease-in-out infinite;
+                }
+                
+                @keyframes download-bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-3px); }
+                }
             `;
             document.head.appendChild(style);
         }
@@ -560,7 +615,16 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
     // Create Bootstrap modal instance
     const modalInstance = new bootstrap.Modal(modal);
 
-    // When modal is shown, render the visualization
+    // Clean up ResizeObserver when modal is hidden
+    modal.addEventListener('hidden.bs.modal', () => {
+        const container = document.getElementById('exonVisualizationContainer');
+        if (container && container._exonResizeObserver) {
+            container._exonResizeObserver.disconnect();
+            container._exonResizeObserver = null;
+        }
+    }, { once: true });
+
+    // When modal is shown, render the visualization (use { once: true } to avoid stacking)
     modal.addEventListener('shown.bs.modal', () => {
         const container = document.getElementById('exonVisualizationContainer');
         const statsContainer = document.getElementById('exonStatsContainer');
@@ -568,10 +632,12 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
         // Create the visualization
         const result = createExonVisualization(exonsStr, container, chromosomeInfo);
 
-        // Setup SVG export button
+        // Setup SVG export button (replace to remove old listeners)
         const exportSvgBtn = document.getElementById('exportExonSvgBtn');
         if (exportSvgBtn) {
-            exportSvgBtn.addEventListener('click', () => {
+            const newBtn = exportSvgBtn.cloneNode(true);
+            exportSvgBtn.parentNode.replaceChild(newBtn, exportSvgBtn);
+            newBtn.addEventListener('click', () => {
                 const filenameBase = chromosomeInfo ?
                     `exon_structure_chr${chromosomeInfo.chrom}_${new Date().toISOString().slice(0, 10)}` :
                     `exon_structure_${new Date().toISOString().slice(0, 10)}`;
@@ -654,7 +720,7 @@ export function showExonVisualizationModal(exonsStr, title = "Node Structure", c
         </div>
       `;
         }
-    });
+    }, { once: true });
 
     // Show the modal
     modalInstance.show();
@@ -812,10 +878,10 @@ function showExportNotification(type, message) {
                 animation: fadeInOut 3s forwards;
             }
             .export-notification.success {
-                background-color: #28a745;
+                background-color: var(--success);
             }
             .export-notification.error {
-                background-color: #dc3545;
+                background-color: var(--error);
             }
             @keyframes fadeInOut {
                 0% { opacity: 0; transform: translateY(20px); }

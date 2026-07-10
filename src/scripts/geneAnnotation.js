@@ -65,9 +65,6 @@ function buildGeneIndex(genes) {
     }
     genePrefixMaxEnd.set(chrom, pme);
   }
-  console.log(
-    `Built gene index: ${geneIndex.size} chromosomes, ${genes.length} genes`
-  );
 }
 
 /**
@@ -220,13 +217,11 @@ class Gene {
  * @returns {Array<Gene>} - Array of parsed genes
  */
 function parseGeneData(text) {
-  console.log(`Parsing gene data (${text.length} characters)...`);
   const genes = [];
 
   try {
     // Split by newlines and process each line
     const lines = text.split(/\r?\n/);
-    console.log(`Processing ${lines.length} lines from gene data`);
 
     // Find first line that looks like valid data or header
     let headerFound = false;
@@ -254,7 +249,6 @@ function parseGeneData(text) {
             f.toLowerCase().includes("chromosome")
         )
       ) {
-        console.log("Found header line:", fields);
         headerFound = true;
         continue;
       }
@@ -308,12 +302,8 @@ function parseGeneData(text) {
         new Gene(geneId, chromosome, startNum, endNum, strand, geneName, exons)
       );
 
-      if (genes.length % 1000 === 0) {
-        console.log(`Parsed ${genes.length} genes so far...`);
-      }
-    }
 
-    console.log(`Successfully parsed ${genes.length} genes`);
+    }
 
     // Build the chromosome index for efficient lookups
     if (genes.length > 0) {
@@ -331,17 +321,14 @@ function parseGeneData(text) {
  */
 export async function loadGeneData() {
   if (isLoading) {
-    console.log("Gene data loading already in progress...");
     return false;
   }
 
   if (isGeneDataLoaded && geneDatabase.length > 0) {
-    console.log("Gene data already loaded with", geneDatabase.length, "genes");
     return true;
   }
 
   isLoading = true;
-  console.log("Starting gene data loading process...");
 
   try {
     // Show loading indicator
@@ -351,7 +338,6 @@ export async function loadGeneData() {
     if (!assetLoadingAttempted) {
       assetLoadingAttempted = true;
       try {
-        console.log(`Attempting to load gene data from ${geneDataUrl}`);
         const assetResponse = await fetch(geneDataUrl);
 
         if (assetResponse.ok) {
@@ -359,7 +345,6 @@ export async function loadGeneData() {
           if (geneText && geneText.length > 0) {
             const genes = parseGeneData(geneText);
             if (genes && genes.length > 0) {
-              console.log(`Loaded ${genes.length} genes from asset file`);
               geneDatabase = genes;
               isGeneDataLoaded = true;
               updateAnnotationStatus(
@@ -382,7 +367,6 @@ export async function loadGeneData() {
 
     // Priority 3: Use fallback data
     if (geneDatabase.length === 0) {
-      console.log("Using fallback gene data");
       geneDatabase = getFallbackGeneData();
       isGeneDataLoaded = true;
       updateAnnotationStatus(
@@ -610,6 +594,78 @@ export function annotateNode(node) {
 }
 
 /**
+ * Annotate a plain node-data object (NOT a live Cytoscape node) with gene
+ * information, reusing the same exon-overlap logic as annotateNode. Used by
+ * the Global Analysis dashboard, which works on raw parsed-JSON nodes for
+ * graphs that are not currently loaded into Cytoscape.
+ *
+ * @param {Object} nodeData - Raw node data ({ chrom, ref_start, ref_end, strand, exons, ... })
+ * @returns {Array<Object>} - Array of gene annotation objects (possibly empty)
+ */
+export function annotateNodeData(nodeData) {
+  if (!nodeData || !isGeneDataLoaded) return [];
+
+  const chrom = nodeData.chrom;
+  const start = parseInt(nodeData.ref_start);
+  const end = parseInt(nodeData.ref_end);
+  const strand = nodeData.strand || "+";
+
+  if (!chrom || isNaN(start) || isNaN(end)) return [];
+
+  const nodeExons = parseExonString(nodeData.exons);
+  const hasExonData = nodeExons.length > 0;
+
+  const candidateGenes = findOverlappingGenes(chrom, start, end, strand);
+
+  let overlappingGenes;
+  if (hasExonData) {
+    overlappingGenes = candidateGenes.filter((gene) =>
+      gene.overlapsExons(nodeExons)
+    );
+  } else {
+    overlappingGenes = candidateGenes;
+  }
+
+  if (overlappingGenes.length === 0) return [];
+
+  if (hasExonData) {
+    overlappingGenes.sort(
+      (a, b) =>
+        b.calculateExonOverlapPercentage(nodeExons) -
+        a.calculateExonOverlapPercentage(nodeExons)
+    );
+  } else {
+    overlappingGenes.sort(
+      (a, b) =>
+        b.calculateOverlapPercentage(start, end) -
+        a.calculateOverlapPercentage(start, end)
+    );
+  }
+
+  return overlappingGenes.map((gene) => {
+    const overlapPct = hasExonData
+      ? gene.calculateExonOverlapPercentage(nodeExons)
+      : gene.calculateOverlapPercentage(start, end);
+    return {
+      geneId: gene.geneId,
+      geneName: gene.geneName,
+      strand: gene.strand,
+      start: gene.start,
+      end: gene.end,
+      exonCount: gene.exons.length,
+      overlapPercentage: overlapPct.toFixed(1),
+    };
+  });
+}
+
+/**
+ * @returns {boolean} Whether the gene database has been loaded.
+ */
+export function isGeneDataReady() {
+  return isGeneDataLoaded && geneDatabase.length > 0;
+}
+
+/**
  * Annotate all nodes in a graph with gene information
  * @param {Object} cy - Cytoscape instance
  * @returns {Promise<number>} - Number of nodes annotated
@@ -654,9 +710,6 @@ export async function annotateAllNodes(cy) {
 
   // Update node styles to show gene names if they've been annotated
   if (annotatedCount > 0) {
-    console.log(
-      `Annotated ${annotatedCount} nodes out of ${nodesWithCoords} with genomic coordinates`
-    );
     updateAnnotationStatus(
       `Annotated ${annotatedCount} nodes with gene names`,
       3000
@@ -813,8 +866,6 @@ function updateAnnotationStatus(message, timeout = 0, isError = false) {
     window.showAlert(message, alertType, timeout);
   } else {
     // Fallback if showAlert is not available
-    console.log(`[${alertType}] ${message}`);
-
     let statusDiv = document.getElementById("annotationStatus");
     if (!statusDiv) {
       statusDiv = document.createElement("div");
@@ -884,7 +935,6 @@ function addGeneAnnotationStyles() {
   `;
 
   document.head.appendChild(style);
-  console.log("Added fallback gene annotation styles");
 }
 
 /**
@@ -951,13 +1001,7 @@ export function initGeneAnnotation() {
 
   // Pre-load gene data in the background for faster annotation later
   setTimeout(() => {
-    console.log("Pre-loading gene data...");
     loadGeneData()
-      .then((success) => {
-        if (success) {
-          console.log("Gene data pre-loaded successfully");
-        }
-      })
       .catch((err) => {
         console.warn("Gene pre-loading failed:", err);
       });
@@ -968,23 +1012,18 @@ export function initGeneAnnotation() {
  * Set up event listeners for the annotation buttons in the modal
  */
 function setupGeneAnnotationListeners() {
-  console.log("Setting up gene annotation event listeners");
-
   // Annotate all nodes button
   const annotateAllBtn = document.getElementById("annotateAllNodesBtn");
   if (annotateAllBtn) {
-    console.log("Found annotateAllNodesBtn, adding event listener");
-
     // Remove any existing listener to avoid duplicates
     annotateAllBtn.replaceWith(annotateAllBtn.cloneNode(true));
     const newAnnotateAllBtn = document.getElementById("annotateAllNodesBtn");
 
     // Add fresh event listener
     newAnnotateAllBtn.addEventListener("click", async () => {
-      console.log("Annotate all nodes button clicked");
       newAnnotateAllBtn.disabled = true;
       newAnnotateAllBtn.innerHTML =
-        '<i class="fas fa-spinner fa-spin me-1"></i> Annotating...';
+        '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Annotating...';
 
       try {
         if (!isGeneDataLoaded) {
@@ -1036,14 +1075,8 @@ function setupGeneAnnotationListeners() {
   const uploadBtn = document.getElementById("uploadGeneBtn");
 
   if (fileInput && uploadBtn) {
-    console.log("Setting up gene file upload listeners");
-
     // Handle file selection
     fileInput.addEventListener("change", function () {
-      console.log(
-        "File selected:",
-        this.files.length > 0 ? this.files[0].name : "none"
-      );
       uploadBtn.disabled = this.files.length === 0;
     });
 
@@ -1054,7 +1087,6 @@ function setupGeneAnnotationListeners() {
         return;
       }
 
-      console.log("Processing gene file upload");
       const file = fileInput.files[0];
       const progressBar = document.getElementById("geneUploadProgress");
       const progressIndicator = progressBar?.querySelector(".progress-bar");
@@ -1126,6 +1158,6 @@ function setupGeneAnnotationListeners() {
   // Regular button in toolbar (annotation button)
   const geneAnnotationBtn = document.getElementById("geneAnnotationBtn");
   if (geneAnnotationBtn) {
-    console.log("Found gene annotation button");
+    // Gene annotation button found
   }
 }

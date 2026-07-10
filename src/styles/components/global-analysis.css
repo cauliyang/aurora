@@ -1,0 +1,487 @@
+/* global-analysis.css
+   Styling for the cross-graph Global Analysis dashboard (app.html).
+   Uses Bootstrap variables / the Aurora modern-theme custom properties where
+   available so it adapts to light/dark themes. */
+
+/* ---- Tab content sizing ---------------------------------------------- */
+#viewTabContent {
+    min-height: 0; /* allow flex child to shrink and scroll */
+}
+
+.ga-dashboard {
+    min-height: 0;
+}
+
+.ga-toolbar h5 {
+    font-size: 1.05rem;
+}
+
+/* ---- KPI overview strip ---------------------------------------------- */
+.ga-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.6rem;
+}
+
+.ga-kpi-strip:empty {
+    display: none;
+}
+
+.ga-kpi {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    background: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: var(--radius-md, 0.5rem);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.ga-kpi-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    background: var(--bs-primary-bg-subtle, #cfe2ff);
+    color: var(--bs-primary, #0d6efd);
+    font-size: 1rem;
+}
+
+.ga-kpi-body {
+    min-width: 0;
+}
+
+.ga-kpi-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--bs-body-color, #212529);
+}
+
+.ga-kpi-sub {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--bs-secondary-color, #6c757d);
+    margin-left: 0.25rem;
+}
+
+.ga-kpi-label {
+    font-size: 0.72rem;
+    color: var(--bs-secondary-color, #6c757d);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---- Dashboard grid -------------------------------------------------- */
+.ga-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: min-content;
+    align-items: start; /* don't stretch items to the row height */
+    gap: 1rem;
+    padding-right: 0.25rem;
+}
+
+/* Every card is a grid item that must NOT be stretched by the grid; its own
+   fixed/min height governs its size so content never overflows into the row
+   below (which was causing the summary table to overlap the charts). */
+.ga-grid > .ga-card {
+    align-self: start;
+}
+
+/* Summary table spans full width on top; circle plot spans full width and is
+   taller. SV-type and weight charts sit side by side. */
+.ga-card-summary {
+    grid-column: 1 / -1;
+    height: 540px; /* fixed so its internal scroll region is well defined */
+}
+
+/* The summary card body holds the (scrollable) table; it must not add its own
+   scroll on top of the inner wrap. */
+.ga-card.ga-card-summary > .card-body {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}
+
+/* Keep the table header/footer visible while the rows scroll inside the card. */
+.ga-card-summary .ga-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.ga-summary-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bs-body-bg, #fff);
+}
+
+.ga-summary-table th.ga-sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.ga-summary-table th.ga-sortable:hover {
+    background: var(--bs-tertiary-bg, #f1f3f5);
+}
+
+.ga-summary-table th.ga-sort-active {
+    color: var(--bs-primary, #0d6efd);
+}
+
+.ga-summary-table .ga-sort-caret {
+    opacity: 0.35;
+    font-size: 0.85em;
+}
+
+.ga-card-circle {
+    grid-column: 1 / -1;
+    grid-row: span 2;
+    min-height: 560px;
+}
+
+.ga-card-genefreq,
+.ga-card-geneshare {
+    grid-column: 1 / -1;
+}
+
+.ga-card-genefreq {
+    min-height: 460px;
+}
+
+/* Chart cards get a fixed height so the SVG inside has a definite size and the
+   full figure (axes, labels) renders without clipping. Combined with the grid's
+   align-items:start, the grid never stretches or collapses them. This covers the
+   plain single-chart cards (SV-type frequency, weight distribution) and the
+   scatter / box-plot cards. */
+.ga-card-chart,
+.ga-card-scatter,
+.ga-card-svbox {
+    height: 440px;
+}
+
+.ga-card-sizedist {
+    grid-column: 1 / -1;
+    min-height: 280px;
+}
+
+/* Side-by-side histograms inside the size-distribution card */
+.ga-sizedist-wrap {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .ga-sizedist-wrap {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ga-sizedist-cell {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.ga-sizedist-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.25rem;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.ga-scatter-pt {
+    transition: r 0.12s ease, fill-opacity 0.12s ease;
+}
+
+/* Small per-card PNG export buttons in chart headers. */
+.ga-png-btn {
+    padding: 0.1rem 0.4rem;
+    line-height: 1;
+    font-size: 0.8rem;
+    flex: 0 0 auto;
+}
+
+.ga-card .card-header span {
+    min-width: 0;
+}
+
+@media (max-width: 992px) {
+    .ga-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- Cards ----------------------------------------------------------- */
+.ga-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-md, 0.5rem);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+}
+
+.ga-card .card-header {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.ga-card .card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+}
+
+/* The scatter/box-plot chart bodies fill the remaining card height (card is a
+   fixed 420px, header ~40px). flex:1 1 auto + min-height:0 lets the body take
+   exactly the leftover space; overflow:hidden + no padding means the measured
+   box equals the drawn SVG box, so the bottom x-axis is never clipped.
+   Higher specificity (.ga-card.ga-card-scatter) guarantees this wins over the
+   generic .ga-card .card-body rule regardless of source order. */
+.ga-card.ga-card-chart > .card-body,
+.ga-card.ga-card-scatter > .card-body,
+.ga-card.ga-card-svbox > .card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.ga-chart-body {
+    position: relative;
+    min-height: 240px;
+    padding: 0.5rem;
+}
+
+.ga-circle-body {
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Legend in the circle-plot card header: wrap chips, cap height with scroll. */
+.ga-circle-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+    max-height: 64px;
+    overflow-y: auto;
+    justify-content: flex-end;
+}
+
+.ga-chart-body svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Gene frequency chart grows with the number of genes; let it use its natural
+   height (set on the <svg> element) and scroll within the card body. */
+#ga-gene-frequency {
+    overflow-y: auto;
+}
+
+#ga-gene-frequency svg {
+    height: auto;
+}
+
+/* Chart bodies: the card body has a definite height (fixed-height card minus
+   header), so the SVG fills it exactly and its viewBox — measured from the same
+   box — maps 1:1. The full figure (incl. bottom x-axis) always fits inside. */
+#ga-svtype-chart,
+#ga-weight-hist,
+#ga-nodes-edges-scatter,
+#ga-weight-by-svtype {
+    overflow: hidden;
+    min-height: 0;
+}
+
+#ga-svtype-chart svg,
+#ga-weight-hist svg,
+#ga-nodes-edges-scatter svg,
+#ga-weight-by-svtype svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---- Empty state ----------------------------------------------------- */
+.ga-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 120px;
+    color: var(--bs-secondary-color, #6c757d);
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* ---- Global filter panel --------------------------------------------- */
+.ga-filter-card {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.ga-filter-input {
+    width: 8.5rem;
+    max-width: 100%;
+}
+
+.ga-filter-card .form-label {
+    color: var(--bs-secondary-color, #6c757d);
+    white-space: nowrap;
+}
+
+/* ---- Table truncation note ------------------------------------------- */
+.ga-table-note {
+    font-style: italic;
+    border-bottom: 1px dashed var(--bs-border-color, #dee2e6);
+}
+
+/* ---- Deferred (on-demand) circle plot placeholder -------------------- */
+.ga-circle-deferred {
+    font-style: normal;
+}
+
+/* ---- Summary table --------------------------------------------------- */
+.ga-summary-table {
+    font-size: 0.85rem;
+}
+
+.ga-summary-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.ga-summary-row:hover {
+    background-color: var(--bs-tertiary-bg, rgba(13, 110, 253, 0.08));
+}
+
+.ga-active-row {
+    background-color: rgba(13, 110, 253, 0.16) !important;
+    box-shadow: inset 3px 0 0 var(--aurora-primary, #0d6efd);
+}
+
+.ga-total-row td {
+    border-top: 2px solid var(--bs-border-color, #dee2e6);
+}
+
+/* ---- Bars ------------------------------------------------------------ */
+.ga-bar {
+    transition: opacity 0.15s ease, stroke-width 0.15s ease;
+}
+
+.ga-bar:hover {
+    opacity: 0.85;
+}
+
+.ga-bar-active {
+    stroke: var(--aurora-primary, #0d6efd);
+    stroke-width: 2.5px;
+}
+
+.ga-svbar {
+    cursor: default;
+}
+
+/* ---- Gene sharing panel ---------------------------------------------- */
+.ga-share-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.ga-share-stat {
+    flex: 1 1 120px;
+    text-align: center;
+    padding: 0.6rem 0.4rem;
+    border-radius: var(--radius-md, 0.5rem);
+    background: var(--bs-tertiary-bg, rgba(13, 110, 253, 0.06));
+}
+
+.ga-share-num {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--aurora-primary, #0d6efd);
+    line-height: 1.1;
+}
+
+.ga-share-lbl {
+    font-size: 0.72rem;
+    color: var(--bs-secondary-color, #6c757d);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.ga-share-grid {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 2fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .ga-share-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ga-share-subtitle {
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: 0.4rem;
+}
+
+.ga-share-table {
+    font-size: 0.82rem;
+}
+
+.ga-gene-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.ga-gene-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: var(--bs-tertiary-bg, rgba(13, 110, 253, 0.08));
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.ga-gene-chip-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--aurora-primary, #0d6efd);
+    border-radius: 999px;
+    padding: 1px 6px;
+}
+
+.ga-gene-label {
+    font-variant-numeric: tabular-nums;
+}

@@ -9,21 +9,22 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - run: node --version
-      - name: Cache node modules
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+          node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -34,9 +35,30 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: yangyangli.top
+      - name: Deploy to gh-pages
+        run: |
+          git clone --depth 1 -b gh-pages \
+            "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+            gh-pages-deploy
+
+          cd gh-pages-deploy
+
+          # Remove all root-level files and dirs, but preserve pr-* preview directories
+          find . -maxdepth 1 ! -name '.' ! -name '.git' \
+            -exec sh -c 'for item; do
+              case "$(basename "$item")" in pr-*) ;; *) rm -rf "$item" ;; esac
+            done' _ {} +
+
+          # Copy fresh build output
+          cp -r ../dist/* .
+
+          # Ensure CNAME and .nojekyll exist
+          echo "yangyangli.top" > CNAME
+          touch .nojekyll
+
+          # Commit and push if there are changes
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --quiet --staged || git commit -m "deploy: ${GITHUB_SHA::7}"
+          git push
