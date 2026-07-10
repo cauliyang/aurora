@@ -123,22 +123,26 @@ h3 {
 }
 
 /* ---- Graph ID fuzzy search (toolbar) --------------------------------- */
+/* The wrap is the input-group itself; relative positioning anchors the
+   absolute results dropdown beneath the search input. */
 .graph-search-wrap {
     position: relative;
-    display: inline-block;
 }
 
 #graphSearchInput {
     min-width: 150px;
+    /* Align with the rest of the input-group (avoid toolbar-select width:auto
+       quirks that shift it out of line with the Graph dropdown). */
+    flex: 1 1 auto;
 }
 
 .graph-search-results {
-    position: absolute;
-    top: calc(100% + 2px);
-    left: 0;
-    right: 0;
+    /* Fixed positioning (coords set in JS) so the dropdown escapes the
+       toolbar's overflow:auto clipping. */
+    position: fixed;
     z-index: 1080;
-    min-width: 220px;
+    min-width: 240px;
+    max-width: 360px;
     max-height: 260px;
     overflow-y: auto;
     background: var(--bs-body-bg, #fff);

@@ -718,6 +718,7 @@ function setupGraphSelector(graphCount) {
     graphSelect.parentNode.replaceChild(freshSelect, graphSelect);
     freshSelect.addEventListener("change", function() {
         const selectedIndex = parseInt(this.value);
+        if (Number.isNaN(selectedIndex)) return; // "No matching graph" placeholder
         loadGraphByIndex(selectedIndex);
     });
 
@@ -800,6 +801,63 @@ function setupGraphSearch(graphCount) {
 
     let currentMatches = [];
 
+    /**
+     * Rebuild the native <select> option list to only include graphs whose
+     * label matches the search text (fuzzy). An empty query restores every
+     * option. The current selection is preserved when it still matches;
+     * otherwise the selected value is left unchanged (no graph is loaded here —
+     * loading happens on explicit selection/Enter/result click).
+     * @param {string} query
+     */
+    function filterSelectOptions(query) {
+        const sel = document.getElementById("graphSelect");
+        if (!sel) return;
+
+        const q = (query || "").trim();
+        // Compute the set of matching indices (all when query is empty).
+        let matched;
+        if (!q) {
+            matched = items.map((it) => it.index);
+        } else {
+            matched = items
+                .map((it) => ({ index: it.index, score: fuzzyScore(q, it.label) }))
+                .filter((it) => it.score >= 0)
+                .sort((a, b) => b.score - a.score)
+                .map((it) => it.index);
+        }
+
+        const prevValue = sel.value;
+        sel.innerHTML = "";
+
+        if (!matched.length) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "No matching graph";
+            opt.disabled = true;
+            opt.selected = true;
+            sel.appendChild(opt);
+            return;
+        }
+
+        for (const idx of matched) {
+            const option = document.createElement("option");
+            option.value = idx;
+            option.textContent = getGraphLabel(idx);
+            option.title = `Graph ${idx + 1}${STATE.graph_ids[idx] ? ` (${STATE.graph_ids[idx]})` : ""}`;
+            sel.appendChild(option);
+        }
+
+        // Keep the previously selected graph selected if it still matches;
+        // otherwise fall back to the currently loaded graph or the top match.
+        if (matched.includes(Number(prevValue))) {
+            sel.value = prevValue;
+        } else if (matched.includes(STATE.currentGraphIndex)) {
+            sel.value = String(STATE.currentGraphIndex);
+        } else {
+            sel.value = String(matched[0]);
+        }
+    }
+
     // Position the fixed dropdown directly under the search input so it isn't
     // clipped by the toolbar's overflow:auto.
     function positionResults() {
@@ -856,12 +914,17 @@ function setupGraphSearch(graphCount) {
         loadGraphByIndex(idx);
         freshInput.value = "";
         results.classList.add("d-none");
+        // Restore the full option list now that the search is cleared, then
+        // reflect the loaded graph as the current selection.
+        filterSelectOptions("");
         const sel = document.getElementById("graphSelect");
         if (sel) sel.value = String(idx);
     }
 
     freshInput.addEventListener("input", () => {
+        // Filter both the fuzzy results dropdown AND the native <select> list.
         renderResults(computeMatches(freshInput.value));
+        filterSelectOptions(freshInput.value);
     });
 
     freshInput.addEventListener("focus", () => {
@@ -874,6 +937,9 @@ function setupGraphSearch(graphCount) {
             if (currentMatches.length) selectMatch(currentMatches[0].index);
         } else if (e.key === "Escape") {
             results.classList.add("d-none");
+            // Clear the search and restore the full dropdown list.
+            freshInput.value = "";
+            filterSelectOptions("");
             freshInput.blur();
         }
     });
