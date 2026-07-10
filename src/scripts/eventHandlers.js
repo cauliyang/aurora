@@ -1049,7 +1049,7 @@ if (gaRefreshBtn) {
         try {
             const m = await getGlobalAnalysis();
             m.invalidateGlobalAnalysisCache?.();
-            await m.renderGlobalAnalysis();
+            await m.renderGlobalAnalysis({ force: true });
         } catch (err) {
             console.error("Failed to refresh global analysis:", err);
             window.showAlert?.(

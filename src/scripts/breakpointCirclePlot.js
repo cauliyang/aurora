@@ -443,6 +443,17 @@ export function renderCirclePlot(container, items, opts = {}) {
     const expand = !!opts.expand;
     const activeTypes = opts.activeTypes || new Set(items.map((b) => b.svType));
 
+    // Performance gates driven by how many ribbons will be drawn. Above these
+    // counts we skip the expensive per-ribbon entry animation (which calls
+    // getTotalLength() and forces a layout reflow per path) and the per-ribbon
+    // SVG gradient (falling back to a flat stroke color), so large plots draw
+    // quickly. Small plots keep the polished animation + gradients.
+    const ribbonCount = expand ? items.length : groupsAll.length;
+    const ANIMATE_MAX = 150; // animate entry only below this many ribbons
+    const GRADIENT_MAX = 400; // per-ribbon gradients only below this many ribbons
+    const useAnimation = ribbonCount <= ANIMATE_MAX;
+    const useGradients = ribbonCount <= GRADIENT_MAX;
+
     const karyotype = buildHumanKaryotype(items);
     const chrArcs = new Map(karyotype.map((a) => [a.chr, a]));
 
@@ -763,9 +774,13 @@ export function renderCirclePlot(container, items, opts = {}) {
         };
     }
 
-    // Build per-ribbon directional gradients in defs (source -> darker target)
+    // Build per-ribbon directional gradients in defs (source -> darker target).
+    // For dense plots (ribbonCount > GRADIENT_MAX) we skip gradients entirely
+    // and return a flat stroke color — thousands of gradient nodes are a major
+    // render cost and are visually indistinct when ribbons overlap heavily.
     let gradSeq = 0;
     function makeChordGradient(p1, p2, color) {
+        if (!useGradients) return color;
         const id = `${uid}-chord-grad-${gradSeq++}`;
         const dark = d3.color(color).darker(0.7).formatHex();
         const light = d3.color(color).brighter(0.15).formatHex();
@@ -783,7 +798,11 @@ export function renderCirclePlot(container, items, opts = {}) {
     }
 
     // Helper: animate a ribbon's stroke-dash for an "entry" reveal effect.
+    // Skipped for dense plots (ribbonCount > ANIMATE_MAX): getTotalLength()
+    // forces a layout reflow per path and the staggered transitions are the
+    // dominant cost when there are many ribbons.
     function animateEntry(pathSel, idx) {
+        if (!useAnimation) return;
         const node = pathSel.node();
         if (!node || !node.getTotalLength) return;
         const total = node.getTotalLength();

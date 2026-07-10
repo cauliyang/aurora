@@ -62,8 +62,14 @@ const _summarySort = { key: "edgeCount", dir: -1 };
 // Last filtered aggregate (after applyGlobalFilters), retained so the CSV
 // export can serialize the full filtered dataset (not just visible rows).
 let _lastFilteredAgg = null;
+
+// Signature of the last full dashboard render (data cache key + active filters).
+// Used to skip a redundant re-render when the tab is re-shown but nothing
+// changed — switching Graph View <-> Global Analysis repeatedly was re-drawing
+// every chart each time even though the underlying data was identical.
+let _lastRenderSignature = null;
+
 const SCATTER_MAX_POINTS = 2000; // circles drawn in the nodes-vs-edges scatter
-const CIRCLE_PLOT_AUTO_MAX = 1500; // above this, circle plot is deferred behind a button
 
 // --------------------------------------------------------------------------
 // Global-analysis graph filters (Phase C). Filters which graphs are INCLUDED
@@ -247,6 +253,7 @@ export function invalidateGlobalAnalysisCache() {
     _cacheKey = null;
     _geneCache = null;
     _geneCacheKey = null;
+    _lastRenderSignature = null; // force the next render to redraw
 }
 
 // --------------------------------------------------------------------------
@@ -2461,7 +2468,7 @@ export async function renderGeneAnalysis() {
  * Lazy: should be called when the Global Analysis tab is shown (containers
  * must be visible so D3 can size SVGs correctly).
  */
-export async function renderGlobalAnalysis() {
+export async function renderGlobalAnalysis(opts = {}) {
     const summaryEl = document.getElementById("ga-summary-table");
     const svTypeEl = document.getElementById("ga-svtype-chart");
     const histEl = document.getElementById("ga-weight-hist");
@@ -2476,6 +2483,21 @@ export async function renderGlobalAnalysis() {
     if (!summaryEl || !svTypeEl || !histEl || !circleEl) {
         console.warn("[globalAnalysis] Dashboard containers not found");
         return;
+    }
+
+    // Skip a redundant full re-render when the tab is re-shown but nothing has
+    // changed (same data + same filters) and the dashboard is still populated.
+    // This makes repeated Graph View <-> Global Analysis switches instant.
+    if (!opts.force) {
+        const sig = `${cacheKey()}|${JSON.stringify(_globalFilters)}|${_summarySort.key}:${_summarySort.dir}`;
+        if (
+            _lastRenderSignature === sig &&
+            STATE.graph_jsons &&
+            STATE.graph_jsons.length > 0 &&
+            summaryEl.querySelector(".ga-summary-table, .ga-empty")
+        ) {
+            return; // already rendered with identical inputs
+        }
     }
 
     if (!STATE.graph_jsons || STATE.graph_jsons.length === 0) {
@@ -2568,14 +2590,14 @@ export async function renderGlobalAnalysis() {
     // visible (tab transition) and the initial measurement was undersized.
     requestAnimationFrame(() => reRenderResizeCharts());
 
-    // Circle plot is the single heaviest render (all edges from all graphs).
-    // For large datasets defer it behind an explicit button so the dashboard
-    // becomes interactive immediately.
-    if (agg.breakpoints.length > CIRCLE_PLOT_AUTO_MAX) {
-        renderCirclePlotDeferred(circleEl, agg.breakpoints);
-    } else {
-        await renderGlobalCirclePlot(circleEl, agg.breakpoints);
-    }
+    // Circle plot is the single heaviest render (all edges from all graphs), so
+    // it is ALWAYS deferred behind an explicit "Render circle plot" button. This
+    // keeps the initial dashboard instant regardless of file size; the user
+    // draws the circle plot on demand. (Tiny files draw instantly on click.)
+    renderCirclePlotDeferred(circleEl, agg.breakpoints);
+
+    // Record the signature of this render so an unchanged tab re-show can skip.
+    _lastRenderSignature = `${cacheKey()}|${JSON.stringify(_globalFilters)}|${_summarySort.key}:${_summarySort.dir}`;
 }
 
 /**
@@ -2587,13 +2609,21 @@ export async function renderGlobalAnalysis() {
 function renderCirclePlotDeferred(container, breakpoints) {
     // Hide the PNG export button until the plot is actually rendered.
     toggleCirclePngBtn(false);
+
+    if (!breakpoints || !breakpoints.length) {
+        container.innerHTML =
+            '<div class="ga-empty">No breakpoints across graphs to plot.</div>';
+        return;
+    }
+
     container.innerHTML = `
       <div class="ga-empty ga-circle-deferred">
         <i class="bi bi-circle-half me-2"></i>
-        ${breakpoints.length.toLocaleString()} edges across all graphs —
-        rendering this circle plot may take a moment.
+        ${breakpoints.length.toLocaleString()} edges across all graphs.
+        The breakpoint circle plot is the heaviest chart, so it is drawn on
+        demand to keep the dashboard responsive.
         <div class="mt-2">
-          <button type="button" class="btn btn-sm btn-outline-primary" id="ga-render-circle-btn">
+          <button type="button" class="btn btn-sm btn-primary" id="ga-render-circle-btn">
             <i class="bi bi-play-fill me-1"></i> Render circle plot
           </button>
         </div>
