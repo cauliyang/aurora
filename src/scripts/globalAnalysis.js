@@ -863,8 +863,10 @@ const _chartLastSize = new WeakMap();
 
 function reRenderResizeCharts() {
     if (!_resizeChartData) return;
-    const { scatter, svbox, svtype, hist, pathLen, pathsPerGraph } =
-        _resizeChartData;
+    const {
+        scatter, svbox, svtype, hist, pathLen, pathsPerGraph,
+        geneShareDist, genesPerGraph,
+    } = _resizeChartData;
     if (scatter && scatter.el && scatter.data) {
         renderNodesEdgesScatter(scatter.el, scatter.data);
     }
@@ -882,6 +884,12 @@ function reRenderResizeCharts() {
     }
     if (pathsPerGraph && pathsPerGraph.el && pathsPerGraph.data) {
         renderPathsPerGraph(pathsPerGraph.el, pathsPerGraph.data);
+    }
+    if (geneShareDist && geneShareDist.el && geneShareDist.data) {
+        renderGeneSharingDistribution(geneShareDist.el, geneShareDist.data);
+    }
+    if (genesPerGraph && genesPerGraph.el && genesPerGraph.data) {
+        renderGenesPerGraph(genesPerGraph.el, genesPerGraph.data);
     }
 }
 
@@ -914,6 +922,8 @@ function setupChartResizeObserver() {
         "ga-weight-hist",
         "ga-path-len-dist",
         "ga-paths-per-graph",
+        "ga-gene-sharing-dist",
+        "ga-genes-per-graph",
     ];
     for (const id of ids) {
         const el = document.getElementById(id);
@@ -2402,18 +2412,64 @@ function renderGeneSharing(container, gene) {
 }
 
 /**
+ * Gene sharing distribution as a bar chart: how many genes are shared by
+ * exactly k graphs (recurrence). Complements the sharing table/chips.
+ * @param {HTMLElement} container
+ * @param {object} gene - aggregate from annotateGenesAllGraphs
+ */
+function renderGeneSharingDistribution(container, gene) {
+    const values = Array.from(gene.geneGraphs.values()).map((s) => s.size);
+    renderIntFrequencyBars(container, values, {
+        xLabel: "Shared by (graphs)",
+        yLabel: "Genes",
+        baseColor: "#6a3d9a",
+        emptyMsg: "No genes annotated.",
+    });
+}
+
+/**
+ * Distribution of the number of annotated genes per graph.
+ * @param {HTMLElement} container
+ * @param {object} gene - aggregate from annotateGenesAllGraphs
+ */
+function renderGenesPerGraph(container, gene) {
+    const values = (gene.perGraphGenes || []).map((s) => (s ? s.size : 0));
+    renderIntFrequencyBars(container, values, {
+        xLabel: "Genes per graph",
+        yLabel: "Graphs",
+        baseColor: "#33a02c",
+        emptyMsg: "No genes annotated.",
+    });
+}
+
+/**
  * Reset the gene analysis panels to their initial empty state. Called after a
  * new file is uploaded, since gene annotation must be explicitly re-triggered.
  */
 export function resetGeneAnalysis() {
     const freqEl = document.getElementById("ga-gene-frequency");
     const shareEl = document.getElementById("ga-gene-sharing");
+    const shareDistEl = document.getElementById("ga-gene-sharing-dist");
+    const genesPerGraphEl = document.getElementById("ga-genes-per-graph");
     const hint =
         '<div class="ga-empty"><i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to compute gene annotations.</div>';
     if (freqEl) freqEl.innerHTML = hint;
     if (shareEl) {
         shareEl.innerHTML =
             '<div class="ga-empty"><i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to see how genes are shared across graphs.</div>';
+    }
+    if (shareDistEl) {
+        shareDistEl.innerHTML =
+            '<div class="ga-empty"><i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to see the gene sharing distribution.</div>';
+    }
+    if (genesPerGraphEl) {
+        genesPerGraphEl.innerHTML =
+            '<div class="ga-empty"><i class="bi bi-info-circle me-2"></i>Click "Annotate Genes" to see genes per graph.</div>';
+    }
+    // Drop retained gene-chart resize data so a resize doesn't redraw stale data.
+    if (_resizeChartData) {
+        delete _resizeChartData.geneShareDist;
+        delete _resizeChartData.genesPerGraph;
     }
 }
 
@@ -2424,6 +2480,8 @@ export function resetGeneAnalysis() {
 export async function renderGeneAnalysis() {
     const freqEl = document.getElementById("ga-gene-frequency");
     const shareEl = document.getElementById("ga-gene-sharing");
+    const shareDistEl = document.getElementById("ga-gene-sharing-dist");
+    const genesPerGraphEl = document.getElementById("ga-genes-per-graph");
     if (!freqEl || !shareEl) return;
 
     if (!STATE.graph_jsons || STATE.graph_jsons.length === 0) {
@@ -2447,6 +2505,15 @@ export async function renderGeneAnalysis() {
         }
         renderGeneFrequency(freqEl, gene);
         renderGeneSharing(shareEl, gene);
+        if (shareDistEl) renderGeneSharingDistribution(shareDistEl, gene);
+        if (genesPerGraphEl) renderGenesPerGraph(genesPerGraphEl, gene);
+
+        // Register the two gene charts for size-aware re-rendering.
+        if (!_resizeChartData) _resizeChartData = {};
+        _resizeChartData.geneShareDist = { el: shareDistEl, data: gene };
+        _resizeChartData.genesPerGraph = { el: genesPerGraphEl, data: gene };
+        setupChartResizeObserver();
+
         window.showAlert?.(
             `Annotated ${gene.annotatedNodes}/${gene.totalNodes} nodes; ${gene.geneFrequency.size} genes found.`,
             "success",
