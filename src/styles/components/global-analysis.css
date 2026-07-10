@@ -20,15 +20,66 @@
 .ga-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(260px, auto);
+    grid-auto-rows: min-content;
+    align-items: start; /* don't stretch items to the row height */
     gap: 1rem;
     padding-right: 0.25rem;
+}
+
+/* Every card is a grid item that must NOT be stretched by the grid; its own
+   fixed/min height governs its size so content never overflows into the row
+   below (which was causing the summary table to overlap the charts). */
+.ga-grid > .ga-card {
+    align-self: start;
 }
 
 /* Summary table spans full width on top; circle plot spans full width and is
    taller. SV-type and weight charts sit side by side. */
 .ga-card-summary {
     grid-column: 1 / -1;
+    height: 540px; /* fixed so its internal scroll region is well defined */
+}
+
+/* The summary card body holds the (scrollable) table; it must not add its own
+   scroll on top of the inner wrap. */
+.ga-card.ga-card-summary > .card-body {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}
+
+/* Keep the table header/footer visible while the rows scroll inside the card. */
+.ga-card-summary .ga-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.ga-summary-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bs-body-bg, #fff);
+}
+
+.ga-summary-table th.ga-sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.ga-summary-table th.ga-sortable:hover {
+    background: var(--bs-tertiary-bg, #f1f3f5);
+}
+
+.ga-summary-table th.ga-sort-active {
+    color: var(--bs-primary, #0d6efd);
+}
+
+.ga-summary-table .ga-sort-caret {
+    opacity: 0.35;
+    font-size: 0.85em;
 }
 
 .ga-card-circle {
@@ -46,10 +97,15 @@
     min-height: 460px;
 }
 
-/* New analytical figures */
+/* Chart cards get a fixed height so the SVG inside has a definite size and the
+   full figure (axes, labels) renders without clipping. Combined with the grid's
+   align-items:start, the grid never stretches or collapses them. This covers the
+   plain single-chart cards (SV-type frequency, weight distribution) and the
+   scatter / box-plot cards. */
+.ga-card-chart,
 .ga-card-scatter,
 .ga-card-svbox {
-    min-height: 360px;
+    height: 440px;
 }
 
 .ga-card-sizedist {
@@ -89,6 +145,18 @@
     transition: r 0.12s ease, fill-opacity 0.12s ease;
 }
 
+/* Small per-card PNG export buttons in chart headers. */
+.ga-png-btn {
+    padding: 0.1rem 0.4rem;
+    line-height: 1;
+    font-size: 0.8rem;
+    flex: 0 0 auto;
+}
+
+.ga-card .card-header span {
+    min-width: 0;
+}
+
 @media (max-width: 992px) {
     .ga-grid {
         grid-template-columns: 1fr;
@@ -113,6 +181,21 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow: auto;
+}
+
+/* The scatter/box-plot chart bodies fill the remaining card height (card is a
+   fixed 420px, header ~40px). flex:1 1 auto + min-height:0 lets the body take
+   exactly the leftover space; overflow:hidden + no padding means the measured
+   box equals the drawn SVG box, so the bottom x-axis is never clipped.
+   Higher specificity (.ga-card.ga-card-scatter) guarantees this wins over the
+   generic .ga-card .card-body rule regardless of source order. */
+.ga-card.ga-card-chart > .card-body,
+.ga-card.ga-card-scatter > .card-body,
+.ga-card.ga-card-svbox > .card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .ga-chart-body {
@@ -155,9 +238,30 @@
     height: auto;
 }
 
+/* Chart bodies: the card body has a definite height (fixed-height card minus
+   header), so the SVG fills it exactly and its viewBox — measured from the same
+   box — maps 1:1. The full figure (incl. bottom x-axis) always fits inside. */
+#ga-svtype-chart,
+#ga-weight-hist,
+#ga-nodes-edges-scatter,
+#ga-weight-by-svtype {
+    overflow: hidden;
+    min-height: 0;
+}
+
+#ga-svtype-chart svg,
+#ga-weight-hist svg,
+#ga-nodes-edges-scatter svg,
+#ga-weight-by-svtype svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 /* ---- Empty state ----------------------------------------------------- */
 .ga-empty {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -166,6 +270,33 @@
     font-style: italic;
     text-align: center;
     padding: 1rem;
+}
+
+/* ---- Global filter panel --------------------------------------------- */
+.ga-filter-card {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.ga-filter-input {
+    width: 8.5rem;
+    max-width: 100%;
+}
+
+.ga-filter-card .form-label {
+    color: var(--bs-secondary-color, #6c757d);
+    white-space: nowrap;
+}
+
+/* ---- Table truncation note ------------------------------------------- */
+.ga-table-note {
+    font-style: italic;
+    border-bottom: 1px dashed var(--bs-border-color, #dee2e6);
+}
+
+/* ---- Deferred (on-demand) circle plot placeholder -------------------- */
+.ga-circle-deferred {
+    font-style: normal;
 }
 
 /* ---- Summary table --------------------------------------------------- */

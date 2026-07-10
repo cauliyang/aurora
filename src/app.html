@@ -95,7 +95,7 @@
                             aria-label="Upload JSON or TSG file">
                             <i class="bi bi-upload"></i>
                         </button>
-                        <input type="file" accept=".json,.tsg" class="d-none" id="uploadInput" />
+                        <input type="file" accept=".json,.tsg,.gta" class="d-none" id="uploadInput" />
                         <button id="captureGraph" class="btn btn-outline-primary" title="Export graph"
                             aria-label="Export graph">
                             <i class="bi bi-camera"></i>
@@ -147,17 +147,15 @@
 
                     <!-- Graph selector (hidden by default, shown for multi-graph TSG files) -->
                     <div id="graphSelectorContainer" class="d-none me-2 mb-2">
-                        <div class="input-group toolbar-input-group">
+                        <div class="input-group toolbar-input-group graph-search-wrap">
                             <span class="input-group-text">Graph</span>
                             <select id="graphSelect" class="form-select toolbar-select" aria-label="Select graph">
                                 <option value="0">Graph 1</option>
                             </select>
-                            <div class="graph-search-wrap">
-                                <input type="text" id="graphSearchInput" class="form-control toolbar-select"
-                                    placeholder="Search graph ID…" autocomplete="off" spellcheck="false"
-                                    aria-label="Search graph by ID" />
-                                <div id="graphSearchResults" class="graph-search-results d-none"></div>
-                            </div>
+                            <input type="text" id="graphSearchInput" class="form-control toolbar-select"
+                                placeholder="Search graph ID…" autocomplete="off" spellcheck="false"
+                                aria-label="Search graph by ID" />
+                            <div id="graphSearchResults" class="graph-search-results d-none"></div>
                         </div>
                     </div>
 
@@ -166,6 +164,9 @@
                         <span class="input-group-text">MinEdge</span>
                         <input type="number" id="minEdgeWeight" class="form-control toolbar-number-input"
                             placeholder="weight" value="1" min="1" />
+                        <span class="input-group-text">MinJSR</span>
+                        <input type="number" id="minJSR" class="form-control toolbar-number-input"
+                            placeholder="jsr" value="0" min="0" title="Minimum junction support reads (JSR) per edge" />
                         <span class="input-group-text">MinDepth</span>
                         <input type="number" id="MinDepth" class="form-control toolbar-number-input"
                             placeholder="depth" value="2" min="2" />
@@ -268,6 +269,13 @@
                         <i class="bi bi-bar-chart-line me-1"></i> Global Analysis
                         <small class="text-muted">— all graphs in the uploaded file</small>
                     </h5>
+                    <button id="ga-filter-toggle-btn" class="btn btn-sm btn-outline-secondary"
+                        type="button" title="Filter which graphs are included"
+                        data-bs-toggle="collapse" data-bs-target="#ga-filter-panel"
+                        aria-expanded="false" aria-controls="ga-filter-panel">
+                        <i class="bi bi-funnel me-1"></i> Filters
+                        <span id="ga-filter-count" class="badge bg-secondary ms-1 d-none"></span>
+                    </button>
                     <button id="ga-annotate-genes-btn" class="btn btn-sm btn-outline-success"
                         type="button" title="Annotate gene for every node across all graphs">
                         <i class="fas fa-dna me-1"></i> Annotate Genes
@@ -278,11 +286,63 @@
                     </button>
                 </div>
 
+                <!-- Global filter panel: filter WHICH graphs are included -->
+                <div class="collapse mb-2" id="ga-filter-panel">
+                    <div class="card card-body ga-filter-card py-2">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-auto">
+                                <label class="form-label small mb-0" for="ga-filter-min-nodes">Min nodes</label>
+                                <input type="number" min="0" value="0" id="ga-filter-min-nodes"
+                                    class="form-control form-control-sm ga-filter-input" />
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small mb-0" for="ga-filter-min-edges">Min edges</label>
+                                <input type="number" min="0" value="0" id="ga-filter-min-edges"
+                                    class="form-control form-control-sm ga-filter-input" />
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small mb-0" for="ga-filter-min-weight">Min &Sigma; weight</label>
+                                <input type="number" min="0" value="0" id="ga-filter-min-weight"
+                                    class="form-control form-control-sm ga-filter-input" />
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small mb-0" for="ga-filter-min-jsr">Min &Sigma; JSR</label>
+                                <input type="number" min="0" value="0" id="ga-filter-min-jsr"
+                                    class="form-control form-control-sm ga-filter-input" />
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small mb-0" for="ga-filter-svtype">SV type</label>
+                                <input type="text" placeholder="e.g. INV" id="ga-filter-svtype"
+                                    class="form-control form-control-sm ga-filter-input" />
+                            </div>
+                            <div class="col-auto">
+                                <label class="form-label small mb-0" for="ga-filter-chrom">Chromosome</label>
+                                <input type="text" placeholder="e.g. chr1" id="ga-filter-chrom"
+                                    class="form-control form-control-sm ga-filter-input" />
+                            </div>
+                            <div class="col-auto d-flex gap-2">
+                                <button type="button" id="ga-filter-apply-btn"
+                                    class="btn btn-sm btn-primary">Apply</button>
+                                <button type="button" id="ga-filter-clear-btn"
+                                    class="btn btn-sm btn-outline-secondary">Clear</button>
+                            </div>
+                            <div class="col-12">
+                                <small class="text-muted" id="ga-filter-status"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Dashboard grid -->
                 <div class="ga-grid flex-grow-1 overflow-auto">
                     <div class="card ga-card ga-card-summary">
-                        <div class="card-header">
-                            <i class="bi bi-table me-1"></i> Per-graph Summary
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-table me-1"></i> Per-graph Summary</span>
+                            <button id="ga-export-csv-btn" type="button"
+                                class="btn btn-sm btn-outline-secondary ms-auto"
+                                title="Export the per-graph summary table as CSV">
+                                <i class="bi bi-filetype-csv me-1"></i> Export CSV
+                            </button>
                         </div>
                         <div class="card-body" id="ga-summary-table">
                             <div class="ga-empty">
@@ -291,39 +351,54 @@
                         </div>
                     </div>
 
-                    <div class="card ga-card">
-                        <div class="card-header">
-                            <i class="bi bi-bar-chart me-1"></i> Edge Variation (SV) Type Frequency
+                    <div class="card ga-card ga-card-chart">
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-bar-chart me-1"></i> Edge Variation (SV) Type Frequency</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-svtype-chart" data-export-name="ga_svtype_frequency"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
                         </div>
                         <div class="card-body ga-chart-body" id="ga-svtype-chart"></div>
                     </div>
 
-                    <div class="card ga-card">
-                        <div class="card-header">
-                            <i class="bi bi-graph-up me-1"></i> Edge Weight Distribution
+                    <div class="card ga-card ga-card-chart">
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-graph-up me-1"></i> Edge Weight Distribution</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-weight-hist" data-export-name="ga_weight_distribution"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
                         </div>
                         <div class="card-body ga-chart-body" id="ga-weight-hist"></div>
                     </div>
 
                     <div class="card ga-card ga-card-scatter">
-                        <div class="card-header">
-                            <i class="bi bi-bounding-box-circles me-1"></i> Nodes vs Edges per Graph
-                            <small class="text-muted">(click a point to open that graph)</small>
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-bounding-box-circles me-1"></i> Nodes vs Edges per Graph
+                                <small class="text-muted">(click a point to open that graph)</small></span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-nodes-edges-scatter" data-export-name="ga_nodes_vs_edges"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
                         </div>
                         <div class="card-body ga-chart-body" id="ga-nodes-edges-scatter"></div>
                     </div>
 
                     <div class="card ga-card ga-card-svbox">
-                        <div class="card-header">
-                            <i class="bi bi-box me-1"></i> Edge Weight by SV Type
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-box me-1"></i> Edge Weight by SV Type</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-weight-by-svtype" data-export-name="ga_weight_by_svtype"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
                         </div>
                         <div class="card-body ga-chart-body" id="ga-weight-by-svtype"></div>
                     </div>
 
                     <div class="card ga-card ga-card-sizedist">
-                        <div class="card-header">
-                            <i class="bi bi-bar-chart-steps me-1"></i> Graph Size Distribution
-                            <small class="text-muted">(nodes &amp; edges per graph)</small>
+                        <div class="card-header d-flex align-items-center">
+                            <span><i class="bi bi-bar-chart-steps me-1"></i> Graph Size Distribution
+                                <small class="text-muted">(nodes &amp; edges per graph)</small></span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ga-png-btn ms-auto"
+                                data-export-chart="ga-size-dist" data-export-name="ga_graph_size_distribution"
+                                title="Export as PNG"><i class="bi bi-download"></i></button>
                         </div>
                         <div class="card-body ga-chart-body" id="ga-size-dist"></div>
                     </div>
@@ -336,6 +411,10 @@
                             </span>
                             <div class="ms-auto d-flex align-items-center gap-2">
                                 <div id="ga-circle-legend" class="ga-circle-legend"></div>
+                                <button id="ga-circle-png-btn" type="button"
+                                    class="btn btn-sm btn-outline-secondary ga-png-btn d-none"
+                                    data-export-chart="ga-circle-plot" data-export-name="ga_breakpoint_circle_plot"
+                                    title="Export as PNG"><i class="bi bi-download"></i></button>
                                 <button id="ga-circle-expand-btn" type="button"
                                     class="btn btn-sm btn-outline-secondary" title="Toggle grouped / expanded ribbons">
                                     <i class="bi bi-arrows-collapse me-1"></i> Grouped

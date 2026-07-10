@@ -465,6 +465,49 @@ function parseGraphIds(content) {
     return ids;
 }
 
+/**
+ * Parse the maximum path length (in nodes) per graph from raw TSG/GTA "P" lines.
+ *
+ * Path lines have the form:
+ *   P  <pathId>  <elem1>  <elem2>  ...
+ * where each element is a node ("TSN...") or edge ("TSE...") id with an
+ * optional orientation suffix ("+"/"-"). "P" lines belong to the most recent
+ * "G <graphId>" block, so we accumulate the per-graph maximum node-count as we
+ * scan the file in order. The returned array is parallel to the WASM's parsed
+ * graph order (same file order).
+ *
+ * A graph with no "P" lines gets a null entry so Global Analysis can fall back
+ * to a computed longest path.
+ *
+ * @param {string} content - Raw TSG/GTA file text
+ * @returns {(number|null)[]} max path node-count per graph, in file order
+ */
+function parseMaxPathLengths(content) {
+    const result = [];
+    if (typeof content !== "string") return result;
+    const lines = content.split(/\r?\n/);
+    let gi = -1; // current graph index (incremented on each G-line)
+
+    for (const line of lines) {
+        if (/^G\s/.test(line)) {
+            gi += 1;
+            result[gi] = null;
+            continue;
+        }
+        if (gi >= 0 && /^P\s/.test(line)) {
+            const parts = line.split(/\s+/);
+            // parts[0] = "P", parts[1] = path id, parts[2..] = elements
+            let nodeCount = 0;
+            for (let k = 2; k < parts.length; k++) {
+                // Node elements are prefixed "TSN"; ignore orientation suffix.
+                if (parts[k] && parts[k].startsWith("TSN")) nodeCount += 1;
+            }
+            if (nodeCount > (result[gi] || 0)) result[gi] = nodeCount;
+        }
+    }
+    return result;
+}
+
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -497,25 +540,37 @@ function handleFileUpload(event) {
                 // (content is already the JSON string in the format expected).
                 STATE.graph_jsons = [content];
                 STATE.graph_ids = [];
+                STATE.graph_max_path_len = []; // computed lazily from possible_paths / DFS
                 STATE.currentGraphIndex = 0;
 
                 // Hide graph selector for single JSON files
                 document.getElementById("graphSelectorContainer").classList.add("d-none");
 
-                window.loadingIndicator?.hide(loadingId);
                 window.showAlert?.("Graph loaded successfully!", "success", 2000);
-            } else if (fileExtension === "tsg") {
-                window.loadingIndicator?.updateMessage(loadingId, "Parsing TSG file...");
-                // Handle TSG file
+            } else if (fileExtension === "tsg" || fileExtension === "gta") {
+                // TSG and GTA share the same text format and are parsed by the
+                // same WASM entry point.
+                const fmt = fileExtension.toUpperCase();
+                window.loadingIndicator?.updateMessage(loadingId, `Parsing ${fmt} file...`);
                 // wait for the result from promise
                 STATE.graph_jsons = await window.parse_tsgFile(content);
 
-                // Recover graph IDs from the raw TSG "G" lines (WASM drops them).
+                // Recover graph IDs from the raw "G" lines (WASM drops them).
                 // Only keep them if the count matches the parsed graph count, so
                 // the selector labels stay aligned with the actual graphs.
                 const parsedIds = parseGraphIds(content);
                 STATE.graph_ids =
                     parsedIds.length === STATE.graph_jsons.length ? parsedIds : [];
+
+                // Recover per-graph max path length (in nodes) from raw "P"
+                // lines (also dropped by the WASM). Keep only when aligned with
+                // the parsed graph count; otherwise leave empty so Global
+                // Analysis computes it via DFS.
+                const parsedMaxPaths = parseMaxPathLengths(content);
+                STATE.graph_max_path_len =
+                    parsedMaxPaths.length === STATE.graph_jsons.length ?
+                        parsedMaxPaths :
+                        [];
 
                 // Show graph selector if multiple graphs are available
                 const graphCount = STATE.graph_jsons.length;
@@ -536,11 +591,14 @@ function handleFileUpload(event) {
                 loadGraphDataFromServer(jsonData);
                 STATE.currentGraphIndex = 0;
 
-                window.loadingIndicator?.hide(loadingId);
                 window.showAlert?.(
                     `Loaded ${graphCount} graph${graphCount > 1 ? "s" : ""} successfully!`,
                     "success",
                     2000
+                );
+            } else {
+                throw new Error(
+                    `Unsupported file type ".${fileExtension}". Please upload a .json, .tsg, or .gta file.`
                 );
             }
 
@@ -550,8 +608,11 @@ function handleFileUpload(event) {
             refreshGlobalAnalysisAfterUpload();
         } catch (error) {
             console.error("Error processing file:", error);
-            window.loadingIndicator?.hide(loadingId);
             window.showAlert?.("Error processing file: " + error.message, "error");
+        } finally {
+            // Always hide the loading indicator, regardless of which branch ran
+            // (or whether an error/unsupported-extension short-circuited it).
+            window.loadingIndicator?.hide(loadingId);
         }
     };
 
@@ -739,6 +800,15 @@ function setupGraphSearch(graphCount) {
 
     let currentMatches = [];
 
+    // Position the fixed dropdown directly under the search input so it isn't
+    // clipped by the toolbar's overflow:auto.
+    function positionResults() {
+        const r = freshInput.getBoundingClientRect();
+        results.style.top = `${r.bottom + 2}px`;
+        results.style.left = `${r.left}px`;
+        results.style.minWidth = `${Math.max(r.width, 240)}px`;
+    }
+
     function computeMatches(query) {
         if (!query.trim()) {
             // Empty query → show all graphs (capped).
@@ -753,6 +823,7 @@ function setupGraphSearch(graphCount) {
 
     function renderResults(matches) {
         currentMatches = matches;
+        positionResults();
         if (!matches.length) {
             results.innerHTML =
                 '<div class="graph-search-empty">No matching graph</div>';
@@ -888,6 +959,111 @@ if (gaRefreshBtn) {
                 "Failed to refresh global analysis: " + (err?.message || err),
                 "error"
             );
+        }
+    });
+}
+
+// Global Analysis: export the per-graph summary table as CSV.
+const gaExportCsvBtn = document.getElementById("ga-export-csv-btn");
+if (gaExportCsvBtn) {
+    gaExportCsvBtn.addEventListener("click", async() => {
+        try {
+            const m = await getGlobalAnalysis();
+            m.exportSummaryCsv?.();
+        } catch (err) {
+            console.error("Failed to export CSV:", err);
+            window.showAlert?.("Failed to export CSV: " + (err?.message || err), "error");
+        }
+    });
+}
+
+// Global Analysis: per-card PNG export buttons (delegated). Each button carries
+// data-export-chart (container id) and data-export-name (filename base).
+const gaPane = document.getElementById("globalAnalysisPane");
+if (gaPane) {
+    gaPane.addEventListener("click", async(event) => {
+        const btn = event.target.closest(".ga-png-btn");
+        if (!btn) return;
+        event.preventDefault();
+        const containerId = btn.getAttribute("data-export-chart");
+        const name = btn.getAttribute("data-export-name") || "ga_figure";
+        if (!containerId) return;
+        try {
+            const m = await getGlobalAnalysis();
+            m.exportChartPng?.(containerId, name);
+        } catch (err) {
+            console.error("Failed to export figure PNG:", err);
+            window.showAlert?.("Failed to export figure: " + (err?.message || err), "error");
+        }
+    });
+}
+
+// Global Analysis: parameters panel — filter WHICH graphs are included.
+const gaFilterApplyBtn = document.getElementById("ga-filter-apply-btn");
+const gaFilterClearBtn = document.getElementById("ga-filter-clear-btn");
+
+/** Read the filter panel inputs into a plain object. */
+function readGaFilterInputs() {
+    const num = (id) => {
+        const el = document.getElementById(id);
+        const v = el ? parseFloat(el.value) : 0;
+        return Number.isFinite(v) && v > 0 ? v : 0;
+    };
+    const str = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : "";
+    };
+    return {
+        minNodes: num("ga-filter-min-nodes"),
+        minEdges: num("ga-filter-min-edges"),
+        minTotalWeight: num("ga-filter-min-weight"),
+        minTotalJsr: num("ga-filter-min-jsr"),
+        svType: str("ga-filter-svtype"),
+        chrom: str("ga-filter-chrom"),
+    };
+}
+
+if (gaFilterApplyBtn) {
+    gaFilterApplyBtn.addEventListener("click", async() => {
+        try {
+            const m = await getGlobalAnalysis();
+            m.setGlobalFilters?.(readGaFilterInputs());
+            // Aggregation cache is preserved; only the filtered view changes.
+            await m.renderGlobalAnalysis();
+        } catch (err) {
+            console.error("Failed to apply global analysis filters:", err);
+            window.showAlert?.(
+                "Failed to apply filters: " + (err?.message || err),
+                "error"
+            );
+        }
+    });
+}
+
+if (gaFilterClearBtn) {
+    gaFilterClearBtn.addEventListener("click", async() => {
+        ["ga-filter-min-nodes", "ga-filter-min-edges", "ga-filter-min-weight",
+            "ga-filter-min-jsr"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.value = "0";
+        });
+        ["ga-filter-svtype", "ga-filter-chrom"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+        });
+        try {
+            const m = await getGlobalAnalysis();
+            m.setGlobalFilters?.({
+                minNodes: 0,
+                minEdges: 0,
+                minTotalWeight: 0,
+                minTotalJsr: 0,
+                svType: "",
+                chrom: "",
+            });
+            await m.renderGlobalAnalysis();
+        } catch (err) {
+            console.error("Failed to clear global analysis filters:", err);
         }
     });
 }

@@ -5,6 +5,26 @@ import { showBreakpointCirclePlotModal } from "./breakpointCirclePlot";
 
 import "jsoneditor/dist/jsoneditor.min.css";
 
+/**
+ * Resolve the junction support read (JSR) count for an edge.
+ * Prefers the canonical `jsr` field, falls back to the raw GTA `sr` tag, and
+ * finally to `weight` (a temporary stand-in until the WASM emits `jsr`).
+ * Returns Infinity when no value is available so that edges lacking JSR data
+ * are never pruned by the JSR filter.
+ * @param {object} edge - Cytoscape edge (or edge collection)
+ * @returns {number}
+ */
+export function edgeJSR(edge) {
+    if (!edge) return Infinity;
+    const jsr = edge.data("jsr");
+    if (jsr !== undefined && jsr !== null && jsr !== "") return Number(jsr);
+    const sr = edge.data("sr");
+    if (sr !== undefined && sr !== null && sr !== "") return Number(sr);
+    const weight = edge.data("weight");
+    if (weight !== undefined && weight !== null && weight !== "") return Number(weight);
+    return Infinity;
+}
+
 export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
     if (!isPathValid) return;
 
@@ -17,7 +37,12 @@ export function dfs(node, currentPath, sinkNodes, isPathValid = true) {
         node.outgoers("node").forEach((neighbor) => {
             const connectingEdge = node.edgesTo(neighbor);
 
-            if (connectingEdge.data("weight") >= STATE.minEdgeWeight) {
+            const passesWeight =
+                connectingEdge.data("weight") >= STATE.minEdgeWeight;
+            const passesJSR =
+                !STATE.minJSR || edgeJSR(connectingEdge) >= STATE.minJSR;
+
+            if (passesWeight && passesJSR) {
                 // if current path's leght is greater than maxdepth, don't continue
                 if (currentPath.length < STATE.maxPathLength) {
                     dfs(neighbor, currentPath, sinkNodes, true);
@@ -245,6 +270,11 @@ export function displayElementInfo(element, container) {
           </div>
           <div class="genomic-bar mt-2">
             <span class="genomic-badge chrom">${bp.svType}</span>
+            ${(() => {
+        const jsr = data.jsr ?? data.sr;
+        return jsr !== undefined && jsr !== null && jsr !== "" ?
+            `<span class="genomic-badge" title="Junction support reads">JSR ${jsr}</span>` : "";
+    })()}
             ${data.insertion_info ? `<span class="genomic-badge">${data.insertion_info}</span>` : ''}
           </div>
           <div class="mt-2">
@@ -280,7 +310,7 @@ export function displayElementInfo(element, container) {
             "id", "name", "chrom", "ref_start", "ref_end", "strand",
             "exons", "ptc", "ptf", "node_id", "is_head", "value",
             "source-node", "geneAnnotations", "gene_name",
-        ] : ["id", "source", "target", "weight", "breakpoints", "insertion_info"];
+        ] : ["id", "source", "target", "weight", "jsr", "sr", "breakpoints", "insertion_info"];
     const additionalProps = Object.keys(data).filter(
         (key) => !standardProps.includes(key)
     );

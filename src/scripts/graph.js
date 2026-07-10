@@ -26,8 +26,13 @@ export const STATE = {
 
     graph_jsons: [],
     graph_ids: [], // graph IDs parsed from raw TSG "G" lines (parallel to graph_jsons)
+    // Max path length (node count of the longest path) per graph, parsed from
+    // raw "P" lines at upload. Parallel to graph_jsons; null entry = unknown
+    // (Global Analysis falls back to a DFS longest-path computation).
+    graph_max_path_len: [],
     currentGraphIndex: 0, // index of the graph currently loaded into cy
     minEdgeWeight: 1,
+    minJSR: 0, // minimum junction support reads (JSR) per edge; 0 = no JSR filter
     minPathLength: 1,
     maxPathLength: 900,
     previousClickedElement: null,
@@ -189,6 +194,20 @@ document
         STATE.minEdgeWeight = minEdgeWeight;
         updateGraph();
     });
+
+const minJSRInput = document.getElementById("minJSR");
+if (minJSRInput) {
+    minJSRInput.addEventListener("change", function() {
+        // JSR filter; 0 (or empty) disables the filter.
+        const minJSR = parseFloat(this.value);
+        if (Number.isNaN(minJSR)) {
+            STATE.minJSR = 0;
+        } else {
+            STATE.minJSR = Math.max(0, minJSR);
+        }
+        updateGraph();
+    });
+}
 
 document.getElementById("MaxDepth").addEventListener("change", function() {
     const MaxDepth = parseFloat(this.value) || 900;
